@@ -20,26 +20,26 @@ with open("../README.md", "r") as readme_file:
 
 if __name__ == "__main__":
     setup(
-        author="Biotrop - Bioinformatic Team",
-        author_email="bioinfo@biotrop.com.br",
-        name="qs",
+        author="Samuel Galvão Elias",
+        author_email="sgelias@outlook.com",
+        name="classeq",
         version=__version__,
-        description="Biotrop Quorum-Sensing",
         long_description=README,
         long_description_content_type="text/markdown",
-        keywords=["Biotrop", "Bioinformatics"],
-        package_data={"": ["assets/*.tsv.gz"]},
+        keywords=["Machine Learning", "Bioinformatics", "Phylogeny"],
+        # ! Uncomment this line in the case of non py files.
+        # package_data={"": ["assets/*.tsv.gz"]},
         packages=find_packages(),
         classifiers=[
-            "Programming Language :: Python :: 3.8",
+            "Programming Language :: Python :: 3.10",
             "Operating System :: OS Independent",
         ],
-        python_requires=">=3.8",
+        python_requires=">=3.10",
         setup_requires=["wheel"],
-        entry_points={
-            "console_scripts": [
-                "qs=qs.ports.cli.main:qs_cmd",
-                "qs-api=qs.ports.api.main:app",
-            ],
-        },
+        # entry_points={
+        #     "console_scripts": [
+        #         "qs=qs.ports.cli.main:qs_cmd",
+        #         "qs-api=qs.ports.api.main:app",
+        #     ],
+        # },
     )
