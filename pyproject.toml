@@ -1,0 +1,9 @@
+[tool.commitizen]
+name = "cz_conventional_commits"
+version = "0.1.0"
+version_files = [
+    "src/setup.py",
+    "src/setup.cfg:version"
+]
+tag_format = "v$version"
+bump_message = "bump: $current_version → $new_version [skip-ci]"
