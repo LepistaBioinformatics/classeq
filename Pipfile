@@ -4,9 +4,19 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+biopython = "*"
+attr = "*"
 
 [dev-packages]
+classeq = {editable = true, path = "./src"}
 black = "*"
+mypy = "*"
 
 [requires]
 python_version = "3.10"
+
+[pipenv]
+allow_prereleases = true
+
+[scripts]
+test = "env MOCK_TREE='src/tests/mock/input/colletotrichum-acutatom-complex/gapdh/Colletotrichum_acutatum_gapdh.tree' python -m unittest discover src/ -vvv"
