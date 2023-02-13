@@ -1,2 +1,2 @@
-def train_one_to_others_strategy():
+def do_one_to_others_train_strategy():
     ...
