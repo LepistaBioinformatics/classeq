@@ -8,7 +8,7 @@ from classeq.settings import LOGGER
 from .load_sequences_from_file import load_sequences_from_file
 
 
-def load_sequences_and_count_kmer(
+def validate_and_load_sequences(
     source_file_path: Path,
     format: MsaSourceFormatEnum,
 ) -> Either[bool, c_exc.MappedErrors]:

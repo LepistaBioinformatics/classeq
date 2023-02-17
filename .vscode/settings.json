@@ -5,6 +5,7 @@
     "fasta",
     "gapsfree",
     "kmer",
+    "kmers",
     "outgroup",
     "outgroups",
     "PHYLIP",

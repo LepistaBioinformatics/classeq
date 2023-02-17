@@ -5,7 +5,7 @@ from unittest import TestCase
 
 from classeq.core.domain.dtos.msa import MsaSourceFormatEnum
 
-from . import load_sequences_and_count_kmer
+from . import validate_and_load_sequences
 
 
 class LoadSequencesAndCountKmerTest(TestCase):
@@ -14,8 +14,8 @@ class LoadSequencesAndCountKmerTest(TestCase):
         self.__logger = logging.getLogger()
 
     def test_if_it_work(self) -> None:
-        response = load_sequences_and_count_kmer(
-            source_file_path=Path(getenv("MOCK_MSA")),  # type: ignore
+        response = validate_and_load_sequences(
+            source_file_path=Path(getenv("MOCK_MSA")),
             format=MsaSourceFormatEnum.FASTA,
         )
 

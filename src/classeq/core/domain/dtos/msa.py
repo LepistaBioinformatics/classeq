@@ -63,7 +63,7 @@ class MsaSource:
                 fasta_headers.append(record.id)
 
             return right(
-                cls(  # type: ignore
+                cls(
                     source_file_path=source_file_path,
                     fasta_headers=fasta_headers,
                     raw_sequences=None,
