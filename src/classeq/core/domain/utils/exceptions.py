@@ -59,7 +59,7 @@ class MappedErrors:
         self.code = code
 
         if logger is None:
-            logger = getLogger(code.name)  # type: ignore
+            logger = getLogger(code.name)
 
         if exp is True:
             logger.error(msg)

@@ -1,11 +1,13 @@
 {
-    "cSpell.words": [
-        "clades",
-        "CLASSEQ",
-        "fasta",
-        "kmer",
-        "outgroup",
-        "outgroups",
-        "reroot"
-    ]
+  "cSpell.words": [
+    "clades",
+    "CLASSEQ",
+    "fasta",
+    "gapsfree",
+    "kmer",
+    "outgroup",
+    "outgroups",
+    "PHYLIP",
+    "reroot"
+  ]
 }

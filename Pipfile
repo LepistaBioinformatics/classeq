@@ -19,4 +19,4 @@ python_version = "3.10"
 allow_prereleases = true
 
 [scripts]
-test = "env MOCK_TREE='src/tests/mock/input/colletotrichum-acutatom-complex/gapdh/Colletotrichum_acutatum_gapdh.tree' python -m unittest discover src/ -vvv"
+test = "env MOCK_MSA='src/tests/mock/input/colletotrichum-acutatom-complex/gapdh/Colletotrichum_acutatum_gapdh_gapsfree.fas' MOCK_TREE='src/tests/mock/input/colletotrichum-acutatom-complex/gapdh/Colletotrichum_acutatum_gapdh.tree' python -m unittest"

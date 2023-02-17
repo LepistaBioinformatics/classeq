@@ -1,2 +1,2 @@
-def load_models_recursively():
+def load_models_recursively() -> None:
     ...

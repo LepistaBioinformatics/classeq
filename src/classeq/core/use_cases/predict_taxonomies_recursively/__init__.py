@@ -1,2 +1,2 @@
-def predict_taxonomies_recursively():
+def predict_taxonomies_recursively() -> None:
     ...

@@ -1,2 +1,2 @@
-def persist_models_recursively():
+def persist_models_recursively() -> None:
     ...

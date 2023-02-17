@@ -1,2 +1,2 @@
-def extract_train_elements():
+def extract_train_elements() -> None:
     ...

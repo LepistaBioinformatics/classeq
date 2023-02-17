@@ -5,6 +5,7 @@ from Bio import Phylo
 from Bio.Phylo.BaseTree import Clade, Tree
 
 import classeq.core.domain.utils.exceptions as c_exc
+from classeq.core.domain.dtos.tree import TreeSourceFormatEnum
 from classeq.core.domain.utils.either import Either, left, right
 from classeq.settings import LOGGER
 
@@ -12,6 +13,7 @@ from classeq.settings import LOGGER
 def parse_and_reroot_tree(
     source_file_path: Path,
     outgroups: List[str],
+    format: TreeSourceFormatEnum,
 ) -> Either[Tree, c_exc.MappedErrors]:
     try:
         raw_tree: Tree = Phylo.read(source_file_path, "newick")

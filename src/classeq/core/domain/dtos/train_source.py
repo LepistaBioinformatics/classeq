@@ -1,8 +1,6 @@
-from typing import List
-
 from attr import define, field
-from Bio.Phylo.BaseTree import Tree
-from Bio.SeqRecord import SeqRecord
+from classeq.core.domain.dtos.msa import MsaSource
+from classeq.core.domain.dtos.tree import TreeSource
 
 import classeq.core.domain.utils.exceptions as c_exc
 from classeq.core.domain.utils.either import Either, left, right
@@ -15,8 +13,8 @@ class TrainSource:
     # ? Class attributes
     # ? ------------------------------------------------------------------------
 
-    tree: Tree = field()
-    fasta: List[SeqRecord] = field()
+    tree: TreeSource = field()
+    fasta: MsaSource = field()
 
     # ? ------------------------------------------------------------------------
     # ? Validations

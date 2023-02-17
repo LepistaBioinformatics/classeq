@@ -4,6 +4,7 @@ from typing import List
 from Bio.Phylo.BaseTree import Tree
 
 import classeq.core.domain.utils.exceptions as c_exc
+from classeq.core.domain.dtos.tree import TreeSourceFormatEnum
 from classeq.core.domain.utils.either import Either, left, right
 from classeq.settings import LOGGER
 
@@ -14,6 +15,7 @@ from .parse_and_reroot_tree import parse_and_reroot_tree
 def load_and_sanitize_phylogeny(
     source_file_path: Path,
     outgroups: List[str],
+    format: TreeSourceFormatEnum,
     support_value_cutoff: int = 99,
 ) -> Either[Tree, c_exc.MappedErrors]:
     """Load phylogenetic tree into memory.
@@ -55,7 +57,9 @@ def load_and_sanitize_phylogeny(
         # ? --------------------------------------------------------------------
 
         rooted_tree_either: Either = parse_and_reroot_tree(
-            source_file_path, outgroups
+            source_file_path,
+            outgroups,
+            format,
         )
 
         if rooted_tree_either.is_left:
@@ -68,9 +72,6 @@ def load_and_sanitize_phylogeny(
             )
 
         rooted_tree: Tree = rooted_tree_either.value
-
-        LOGGER.debug(f"rooted_tree: {rooted_tree}")
-        LOGGER.debug(f"rooted_tree is rooted: {rooted_tree.rooted}")
 
         # ? --------------------------------------------------------------------
         # ? Sanitize tree
@@ -93,8 +94,6 @@ def load_and_sanitize_phylogeny(
             )
 
         sanitized_tree: Tree = sanitized_tree_either.value
-
-        LOGGER.debug(f"sanitized_tree: {sanitized_tree}")
 
         # ? --------------------------------------------------------------------
         # ? Return a positive response
