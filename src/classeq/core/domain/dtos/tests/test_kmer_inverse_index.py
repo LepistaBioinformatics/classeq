@@ -17,7 +17,7 @@ class KmerInverseIndexTest(TestCase):
         self.__logger = logging.getLogger()
 
     def test_if_it_work(self) -> None:
-        source_file_path = Path(getenv("MOCK_MSA"))  # type: ignore
+        source_file_path = Path(str(getenv("MOCK_MSA")))
         format = MsaSourceFormatEnum.FASTA
 
         sequence_headers: DefaultDict[str, int] = defaultdict()
