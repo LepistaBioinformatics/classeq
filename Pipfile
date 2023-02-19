@@ -11,7 +11,7 @@ attrs = "*"
 classeq = {editable = true, path = "./src"}
 black = "*"
 mypy = "*"
-maturin = "*"
+pre-commit = "*"
 
 [requires]
 python_version = "3.11"

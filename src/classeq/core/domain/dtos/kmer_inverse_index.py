@@ -1,7 +1,8 @@
+from hashlib import md5
 from collections import defaultdict
 from itertools import islice
 from pathlib import Path
-from typing import DefaultDict, Iterator, Self, Set
+from typing import DefaultDict, Iterator, Self, Set  # type: ignore
 
 from attrs import define, field, frozen
 from Bio import SeqIO
@@ -28,16 +29,21 @@ class KmerIndex:
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, KmerIndex):
             return NotImplemented
-        return self.kmer == other.kmer
+        return self.__hash__() == other.__hash__()
+
+    def __ne__(self, other: object) -> bool:
+        # Not strictly necessary, but to avoid having both x==y and x!=y True at
+        # the same time.
+        return not (self.__hash__() == other.__hash__())
 
     def __hash__(self) -> int:
-        return hash(self.kmer)
+        return int(md5(self.kmer.encode("utf-8")).hexdigest(), 16)
 
     # ? ------------------------------------------------------------------------
     # ? Public instance methods
     # ? ------------------------------------------------------------------------
 
-    def is_here(
+    def contains(
         self,
         target: int,
     ) -> bool:
@@ -67,6 +73,7 @@ class KmerInverseIndex:
     # ? ------------------------------------------------------------------------
 
     indices: Set[KmerIndex] = field(default=set())
+    hashes: Set[int] = field()
 
     # ? ------------------------------------------------------------------------
     # ? Public instance methods
@@ -117,20 +124,50 @@ class KmerInverseIndex:
 
                     kmer_indices[kmer].add(header_index)
 
+            indices = set(
+                KmerIndex(
+                    kmer=kmer,
+                    records=indices,
+                )
+                for kmer, indices in kmer_indices.items()
+            )
+
             return right(
                 cls(
-                    indices={
-                        KmerIndex(
-                            kmer=kmer,
-                            records=indices,
-                        )
-                        for kmer, indices in kmer_indices.items()
-                    }
+                    indices=indices,
+                    hashes=set(i.__hash__() for i in indices),
                 )
             )
 
         except Exception as exc:
             return left(c_exc.CreationError(exc, logger=LOGGER))
+
+    # ? ------------------------------------------------------------------------
+    # ? Public instance methods
+    # ? ------------------------------------------------------------------------
+
+    def index_of(
+        self,
+        kmer: str,
+    ) -> int | None:
+        hashed_kmer = int(md5(kmer.encode("utf-8")).hexdigest(), 16)
+        records = sorted(self.hashes)
+        first = 0
+        last = len(records) - 1
+        index: int | None = None
+
+        while (first <= last) and (index is None):
+            mid = (first + last) // 2
+
+            if records[mid] == hashed_kmer:
+                index = mid
+            else:
+                if hashed_kmer < records[mid]:
+                    last = mid - 1
+                else:
+                    first = mid + 1
+
+        return index
 
     # ? ------------------------------------------------------------------------
     # ? Private static methods
