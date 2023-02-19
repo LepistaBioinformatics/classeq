@@ -24,3 +24,6 @@ functional-predictions-merged.tsv.gz
 summary-merged.json
 taxonomies-merged.tsv
 functional-predictions-merged
+
+# Mypy specifig files
+.dmypy.json

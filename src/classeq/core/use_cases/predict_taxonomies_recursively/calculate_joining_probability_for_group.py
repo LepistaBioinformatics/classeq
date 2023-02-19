@@ -19,7 +19,7 @@ class __KmerStats:
 @define(kw_only=True)
 class KmerBayesStats:
     kmer: str
-    true_positives_post_prob: float
+    group_post_prob: float
 
 
 def calculate_joining_probability_for_group(
@@ -73,7 +73,7 @@ def calculate_joining_probability_for_group(
 
         sample_size = len(positive_reference) + len(negative_reference)
         kmers_post_probabilities: List[KmerBayesStats] = []
-        available_kmers: Set = set()
+        available_kmers: Set[str] = set()
 
         for reference in [*positive_reference, *negative_reference]:
             available_kmers.update(reference)
@@ -98,7 +98,7 @@ def calculate_joining_probability_for_group(
             kmers_post_probabilities.append(
                 KmerBayesStats(
                     kmer=kmer,
-                    true_positives_post_prob=kmer_post_prob,
+                    group_post_prob=kmer_post_prob,
                 )
             )
 
@@ -178,6 +178,7 @@ def __calculate_kmer_bayes_stats(
     #
     #
     #                         P(A|B) = 0,74 = 74%
+    #
     # ? ------------------------------------------------------------------------
 
     true_positives = ingroup_kmer_percentage * ingroup_probability

@@ -61,3 +61,14 @@ LOGGER = getLogger("CLASSEQ")
 
 
 LOGGER.setLevel(LOGGING_LEVEL)
+
+
+# ? ----------------------------------------------------------------------------
+# ? DNA bases used o kmer count
+# ? ----------------------------------------------------------------------------
+
+
+BASES = ["A", "C", "T", "G"]
+
+
+DEFAULT_KMER_SIZE = 8

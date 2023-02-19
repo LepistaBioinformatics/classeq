@@ -20,6 +20,10 @@ class PredictTaxonomiesRecursivelyTest(TestCase):
             ["AAAA", "AAAT", "AAAG", "AACA"],
             ["AAAA", "TAAT", "AAAG", "AACA"],
             ["AAAA", "TAAT", "AAAG", "AACA"],
+            ["AAAA", "AAAT", "AAAG", "AACA"],
+            ["AAAA", "AAAT", "AAAG", "AACA"],
+            ["AAAA", "AAAT", "AAAG", "AACA"],
+            ["AAAA", "AAAT", "AAAG", "AACA"],
         ]
 
         self.__sister_reference = [
@@ -29,12 +33,20 @@ class PredictTaxonomiesRecursivelyTest(TestCase):
             ["AAAA", "TAAT", "AAAG", "AACA"],
             ["AAAA", "TAAT", "AAAG", "AACA"],
             ["AAAA", "TAAT", "AAAG", "AACA"],
+            ["AAAA", "TAAT", "AAAG", "AACA"],
+            ["AAAA", "TAAT", "AAAG", "AACA"],
+            ["AAAA", "TAAT", "AAAG", "AACA"],
+            ["AAAA", "TAAT", "AAAG", "AACA"],
         ]
 
         self.__outgroup_reference = [
             ["CAAA", "AAAC", "GAAT", "AAAG"],
             ["CAAA", "AAAT", "GAAG", "AACA"],
+            ["CAAA", "AAAC", "GAAT", "AAAG"],
+            ["CAAA", "AAAC", "GAAT", "AAAG"],
             ["CAAA", "AAAT", "GAAG", "AACA"],
+            ["AAAA", "TAAT", "CAAG", "TACA"],
+            ["AAAA", "TAAT", "CAAG", "TACA"],
             ["AAAA", "TAAT", "CAAG", "TACA"],
             ["AAAA", "TAAT", "CAAG", "TACA"],
             ["AAAA", "TAAT", "CAAG", "TACA"],

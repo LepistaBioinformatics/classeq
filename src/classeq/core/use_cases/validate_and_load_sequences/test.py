@@ -15,7 +15,7 @@ class LoadSequencesAndCountKmerTest(TestCase):
 
     def test_if_it_work(self) -> None:
         response = validate_and_load_sequences(
-            source_file_path=Path(getenv("MOCK_MSA")),
+            source_file_path=Path(getenv("MOCK_MSA")),  # type: ignore
             format=MsaSourceFormatEnum.FASTA,
         )
 

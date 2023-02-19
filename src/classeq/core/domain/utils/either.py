@@ -51,7 +51,7 @@ class Right(__Base, Generic[_R]):
 Either = Union[Left[_L], Right[_R]]
 
 
-def left(left: _L) -> Left:
+def left(left: _L) -> Left[_L]:
     """Create a Left instance.
 
     Args:
@@ -64,7 +64,7 @@ def left(left: _L) -> Left:
     return Left(left)
 
 
-def right(right: _R) -> Right:
+def right(right: _R) -> Right[_R]:
     """Create a Right instance.
 
     Args:

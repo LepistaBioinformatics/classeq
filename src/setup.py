@@ -31,10 +31,10 @@ if __name__ == "__main__":
         # package_data={"": ["assets/*.tsv.gz"]},
         packages=find_packages(),
         classifiers=[
-            "Programming Language :: Python :: 3.10",
+            "Programming Language :: Python :: 3.11",
             "Operating System :: OS Independent",
         ],
-        python_requires=">=3.10",
+        python_requires=">=3.11",
         setup_requires=["wheel"],
         # entry_points={
         #     "console_scripts": [

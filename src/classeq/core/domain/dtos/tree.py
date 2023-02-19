@@ -1,13 +1,8 @@
-from enum import Enum
 from pathlib import Path
-from typing import List, Optional
+from typing import List
 
 from attr import define, field
 from Bio.Phylo.BaseTree import Tree
-
-
-class TreeSourceFormatEnum(Enum):
-    NEWICK = "newick"
 
 
 @define(kw_only=True)
@@ -18,10 +13,10 @@ class TreeSource:
 
     source_file_path: Path = field()
     tree_headers: List[str] = field()
-    raw_sequences: Optional[Tree] = field()
+    raw_sequences: Tree | None = field(init=False, default=None)
 
     # ? ------------------------------------------------------------------------
     # ? Public class methods
     # ? ------------------------------------------------------------------------
 
-    # TODO: do implement `new`` classmethod
+    # TODO: do implement `new` classmethod

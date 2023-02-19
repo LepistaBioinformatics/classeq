@@ -1,8 +1,8 @@
 from attr import define, field
-from classeq.core.domain.dtos.msa import MsaSource
-from classeq.core.domain.dtos.tree import TreeSource
 
 import classeq.core.domain.utils.exceptions as c_exc
+from classeq.core.domain.dtos.msa import MsaSource
+from classeq.core.domain.dtos.tree import TreeSource
 from classeq.core.domain.utils.either import Either, left, right
 from classeq.settings import LOGGER
 
