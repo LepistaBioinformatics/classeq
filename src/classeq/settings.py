@@ -7,6 +7,7 @@ from logging import (
     NOTSET,
     WARN,
     WARNING,
+    basicConfig,
     getLogger,
 )
 from os import getenv
@@ -55,6 +56,12 @@ if ENV_LOGGING_LEVEL is not None:
 # ? ----------------------------------------------------------------------------
 # ? Initialize global logger
 # ? ----------------------------------------------------------------------------
+
+
+basicConfig(
+    level=DEBUG,
+    format="%(levelname)s\t[ %(asctime)s ]\t%(message)s",
+)
 
 
 LOGGER = getLogger("CLASSEQ")
