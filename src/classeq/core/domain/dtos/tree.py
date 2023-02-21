@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List, Self
+from typing import List, Self, Set
 
 from attr import define, field
 from Bio import Phylo
@@ -20,6 +20,7 @@ class TreeSource:
 
     source_file_path: Path = field()
     tree_headers: List[str] = field()
+    outgroups: List[str] = field()
     sanitized_tree: Tree | None = field(default=None)
 
     # ? ------------------------------------------------------------------------
@@ -49,6 +50,8 @@ class TreeSource:
             #
             # ? ----------------------------------------------------------------
 
+            LOGGER.info("Parsing and reroot tree")
+
             rooted_tree_either: Either = cls.__parse_and_reroot_tree(
                 source_file_path,
                 outgroups,
@@ -73,8 +76,12 @@ class TreeSource:
             #
             # ? ----------------------------------------------------------------
 
+            LOGGER.info(
+                f"Collapsing low supported (< {support_value_cutoff}) branches"
+            )
+
             sanitized_tree_either: Either = cls.__collapse_low_supported_nodes(
-                rooted_tree,
+                rooted_tree=rooted_tree,
                 support_value_cutoff=support_value_cutoff,
             )
 
@@ -90,8 +97,38 @@ class TreeSource:
             sanitized_tree: Tree = sanitized_tree_either.value
 
             # ? ----------------------------------------------------------------
+            # ? Collapse outgroup internal nodes
+            # ? ----------------------------------------------------------------
+
+            LOGGER.info("Collapsing outgroup branches")
+
+            tree_outgroups = [
+                clade
+                for clade in sanitized_tree.get_terminals()
+                if clade.name in outgroups
+            ]
+
+            common_ancestor: Clade = sanitized_tree.common_ancestor(
+                targets=tree_outgroups
+            )
+
+            clade: Clade
+            collapsable_clades: Set[Clade] = set()
+
+            for clade in common_ancestor.clades:
+                if all([t.name in outgroups for t in clade.get_terminals()]):
+                    collapsable_clades.add(clade)
+
+            sanitized_tree.collapse_all(
+                lambda c: c.__hash__()
+                in [i.__hash__() for i in collapsable_clades]
+            )
+
+            # ? ----------------------------------------------------------------
             # ? Persist sanitized tree
             # ? ----------------------------------------------------------------
+
+            LOGGER.info("Persisting sanitized phylogenetic tree")
 
             cleaned_file_path = source_file_path.parent.joinpath(
                 "".join(
@@ -124,6 +161,7 @@ class TreeSource:
                     tree_headers=[
                         h.name for h in sanitized_tree.get_terminals()
                     ],
+                    outgroups=outgroups,
                     sanitized_tree=sanitized_tree,
                 )
             )
@@ -172,7 +210,7 @@ class TreeSource:
         support_value_cutoff: int = 99,
     ) -> Either[Tree, c_exc.MappedErrors]:
         try:
-            if rooted_tree.root is False:
+            if rooted_tree.rooted is False:
                 return left(
                     c_exc.InvalidArgumentError("Un-rooted trees not allowed.")
                 )
