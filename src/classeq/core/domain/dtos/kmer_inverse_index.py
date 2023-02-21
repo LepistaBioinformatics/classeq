@@ -2,7 +2,7 @@ from hashlib import md5
 from collections import defaultdict
 from itertools import islice
 from pathlib import Path
-from typing import DefaultDict, Iterator, Self, Set
+from typing import DefaultDict, Iterator, Self, Set, Tuple
 
 from attrs import define, field, frozen
 from Bio import SeqIO
@@ -73,7 +73,7 @@ class KmersInverseIndices:
     # ? ------------------------------------------------------------------------
 
     indices: Set[KmerIndex] = field(default=set())
-    _hashes: Set[int] = field()
+    _hashes: Tuple[int, ...] = field()
 
     # ? ------------------------------------------------------------------------
     # ? Public instance methods
@@ -135,7 +135,7 @@ class KmersInverseIndices:
             return right(
                 cls(
                     indices=indices,
-                    hashes=set(sorted(set(i.__hash__() for i in indices))),
+                    hashes=tuple(sorted(set(i.__hash__() for i in indices))),
                 )
             )
 
@@ -150,19 +150,21 @@ class KmersInverseIndices:
         self,
         kmer: str,
     ) -> int | None:
-        hashed_kmer = int(md5(kmer.encode("utf-8")).hexdigest(), 16)
-        records = sorted(self._hashes)
+        # ? Initialize search params
         first = 0
-        last = len(records) - 1
+        last = len(self._hashes) - 1
         index: int | None = None
+
+        # ? Convert the kmer to a md5 representation
+        hashed_kmer = int(md5(kmer.encode("utf-8")).hexdigest(), 16)
 
         while (first <= last) and (index is None):
             mid = (first + last) // 2
 
-            if records[mid] == hashed_kmer:
-                index = mid
+            if self._hashes[mid] == hashed_kmer:
+                return mid
             else:
-                if hashed_kmer < records[mid]:
+                if hashed_kmer < self._hashes[mid]:
                     last = mid - 1
                 else:
                     first = mid + 1
