@@ -65,11 +65,9 @@ class MsaSource:
             )
 
             with cleaned_file_path.open("w") as out:
-                for index, record in enumerate(
-                    SeqIO.parse(
-                        handle=source_file_path,
-                        format=format.value,
-                    )
+                for record in SeqIO.parse(
+                    handle=source_file_path,
+                    format=format.value,
                 ):
                     if cls.__check_sequence_sanity(record) is False:
                         LOGGER.warning(

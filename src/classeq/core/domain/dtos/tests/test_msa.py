@@ -1,6 +1,8 @@
+from collections import defaultdict
 import logging
 from os import getenv
 from pathlib import Path
+from typing import DefaultDict
 from unittest import TestCase
 
 from classeq.core.domain.dtos.msa import MsaSource
@@ -27,7 +29,14 @@ class MsaTest(TestCase):
 
         msa_source: MsaSource = msa_source_either.value
 
-        bool_response_either = msa_source.initialize_kmer_indices()
+        labels_map: DefaultDict[str, int] = defaultdict()
+
+        for index, header in enumerate(msa_source.sequence_headers):
+            labels_map[header] = index
+
+        bool_response_either = msa_source.initialize_kmer_indices(
+            headers_map=labels_map
+        )
 
         self.assertFalse(bool_response_either.is_left)
         self.assertTrue(bool_response_either.is_right)
