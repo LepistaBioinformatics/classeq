@@ -9,6 +9,7 @@ from classeq.core.domain.dtos.kmer_inverse_index import KmerIndex
 
 class NodeType(Enum):
     ROOT = "root"
+    OUTGROUP = "outgroup"
     INTERNAL = "internal"
     TERMINAL = "terminal"
 
