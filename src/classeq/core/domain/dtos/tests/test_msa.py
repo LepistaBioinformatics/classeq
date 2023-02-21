@@ -42,3 +42,6 @@ class MsaTest(TestCase):
         self.assertTrue(bool_response_either.is_right)
         self.assertTrue(bool_response_either.value)
         self.assertEqual(msa_source.kmers_indices.index_of("CTAGCACT"), 270)
+        self.assertEqual(msa_source.kmers_indices.index_of("GACAATCA"), 1084)
+        self.assertEqual(msa_source.kmers_indices.index_of("ATTTTTTT"), 1407)
+        self.assertEqual(msa_source.kmers_indices.index_of("TGACAATA"), 86)
