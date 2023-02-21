@@ -1,10 +1,10 @@
 import logging
 from unittest import TestCase
 
-from .calculate_joining_probability_for_group import (
+from classeq.core.use_cases.predict_taxonomies_recursively.calculate_joining_probability_for_group import (
     calculate_joining_probability_for_group,
 )
-from .perform_phylogenetic_adherence_test import (
+from classeq.core.use_cases.predict_taxonomies_recursively.perform_phylogenetic_adherence_test import (
     perform_phylogenetic_adherence_test,
 )
 

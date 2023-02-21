@@ -2,7 +2,7 @@ from hashlib import md5
 from collections import defaultdict
 from itertools import islice
 from pathlib import Path
-from typing import DefaultDict, Iterator, Self, Set  # type: ignore
+from typing import DefaultDict, Iterator, Self, Set
 
 from attrs import define, field, frozen
 from Bio import SeqIO
@@ -67,13 +67,13 @@ class KmerIndex:
 
 
 @frozen(kw_only=True)
-class KmerInverseIndex:
+class KmersInverseIndices:
     # ? ------------------------------------------------------------------------
     # ? Class attributes
     # ? ------------------------------------------------------------------------
 
     indices: Set[KmerIndex] = field(default=set())
-    hashes: Set[int] = field()
+    _hashes: Set[int] = field()
 
     # ? ------------------------------------------------------------------------
     # ? Public instance methods
@@ -135,7 +135,7 @@ class KmerInverseIndex:
             return right(
                 cls(
                     indices=indices,
-                    hashes=set(i.__hash__() for i in indices),
+                    hashes=set(sorted(set(i.__hash__() for i in indices))),
                 )
             )
 
@@ -151,7 +151,7 @@ class KmerInverseIndex:
         kmer: str,
     ) -> int | None:
         hashed_kmer = int(md5(kmer.encode("utf-8")).hexdigest(), 16)
-        records = sorted(self.hashes)
+        records = sorted(self._hashes)
         first = 0
         last = len(records) - 1
         index: int | None = None

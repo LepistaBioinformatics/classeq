@@ -7,7 +7,7 @@ from unittest import TestCase
 
 from Bio import SeqIO
 
-from classeq.core.domain.dtos.kmer_inverse_index import KmerInverseIndex
+from classeq.core.domain.dtos.kmer_inverse_index import KmersInverseIndices
 from classeq.core.domain.dtos.msa import MsaSourceFormatEnum
 
 
@@ -30,7 +30,7 @@ class KmerInverseIndexTest(TestCase):
         ):
             sequence_headers[record.id] = index
 
-        indices = KmerInverseIndex.new(
+        indices = KmersInverseIndices.new(
             source_file_path=source_file_path,
             format=MsaSourceFormatEnum.FASTA,
             k_size=8,

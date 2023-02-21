@@ -1,22 +1,30 @@
 import classeq.core.domain.utils.exceptions as c_exc
-from classeq.core.domain.dtos.reference_set import ReferenceSet
+from classeq.core.domain.dtos.msa import MsaSource
 from classeq.core.domain.utils.either import Either, left, right
 from classeq.settings import LOGGER
 
 
-def train_from_single_phylogeny(
-    train_source: ReferenceSet,
+def estimate_clade_specific_conditional_probabilities(
+    msa: MsaSource,
 ) -> Either[bool, c_exc.MappedErrors]:
     try:
         # ? --------------------------------------------------------------------
-        # ? Validate args
+        # ? Validate entries
         # ? --------------------------------------------------------------------
 
-        print(train_source)
+        if msa.kmers_indices is None:
+            LOGGER.warning("Kmer probabilities not initialized. Doing it!")
 
-        # ? --------------------------------------------------------------------
-        # ? Recursively train for clades
-        # ? --------------------------------------------------------------------
+            init_either = msa.initialize_kmer_indices()
+
+            if init_either.is_left:
+                return left(
+                    c_exc.InvalidArgumentError(
+                        "Unexpected error on initialize kmers prior probabilities.",
+                        prev=init_either.value,
+                        logger=LOGGER,
+                    )
+                )
 
         # ? --------------------------------------------------------------------
         # ? Return a positive response

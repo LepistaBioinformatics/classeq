@@ -2,10 +2,12 @@ from typing import List
 
 import classeq.core.domain.utils.exceptions as c_exc
 from classeq.core.domain.utils.either import Either, left, right
-from classeq.core.use_cases.predict_taxonomies_recursively.calculate_joining_probability_for_group import (
+from classeq.settings import LOGGER
+
+from .calculate_joining_probability_for_group import (
     calculate_joining_probability_for_group,
 )
-from classeq.settings import LOGGER
+
 
 # !
 # ! Usar os resultados de input, sister e outgroup para estimar com bayesiana:

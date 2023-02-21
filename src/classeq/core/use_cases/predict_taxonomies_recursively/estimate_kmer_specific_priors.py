@@ -1,6 +1,0 @@
-def estimate_kmer_specific_priors() -> None:
-    ...
-
-
-def __build_kmer_inverse_index() -> None:
-    ...

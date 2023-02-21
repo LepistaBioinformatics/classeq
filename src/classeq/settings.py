@@ -78,4 +78,4 @@ DEFAULT_KMER_SIZE = 8
 # ? ----------------------------------------------------------------------------
 
 
-TEMP_INPUT_FILE_PREFIX = "sanitized"
+TEMP_INPUT_FILE_SUFFIX = "sanitized"
