@@ -26,10 +26,19 @@ class ReferenceSet:
     # ? Public instance methods
     # ? ------------------------------------------------------------------------
 
-    def get_linear_tree(self) -> Either[Set[CladeWrapper], c_exc.MappedErrors]:
+    def get_linear_tree(
+        self,
+    ) -> Either[Set[CladeWrapper], c_exc.MappedErrors]:
         """Convert the original Bio.Phylo.BaseTree.Tree to a linear version
         composed of a set of `CladeWrapper` elements.
         """
+
+        def __determine_node_type(clade: Clade) -> NodeType:
+            if clade.is_terminal():
+                if clade.name in self.tree.outgroups:
+                    return NodeType.OUTGROUP
+                return NodeType.TERMINAL
+            return NodeType.INTERNAL
 
         def __collect_clades_recursively(
             parent: UUID | None,
@@ -48,11 +57,7 @@ class ReferenceSet:
                 CladeWrapper(
                     id=current_clade_identifier,
                     name=clade.name,
-                    type=(
-                        NodeType.TERMINAL
-                        if clade.is_terminal()
-                        else NodeType.INTERNAL
-                    ),
+                    type=__determine_node_type(clade=clade),
                     parent=parent,
                     support=clade.confidence,
                 )
@@ -82,7 +87,7 @@ class ReferenceSet:
                 clade=root,
             )
 
-            return right(Set[CladeWrapper])
+            return right(linear_tree)
 
         except Exception as exc:
             return left(c_exc.UseCaseError(exc, logger=LOGGER))
