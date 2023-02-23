@@ -2,9 +2,11 @@ from collections import defaultdict
 from typing import DefaultDict
 
 import classeq.core.domain.utils.exceptions as c_exc
-from classeq.core.domain.dtos.kmer_inverse_index import KmerIndex
 from classeq.core.domain.dtos.msa import MsaSource
 from classeq.core.domain.utils.either import Either, left, right
+from classeq.core.use_cases.train_from_single_phylogeny.calculate_single_kmer_likelihood import (
+    calculate_single_kmer_likelihood,
+)
 from classeq.settings import LOGGER
 
 
@@ -32,7 +34,7 @@ def estimate_global_kmer_specific_priors(
         output: DefaultDict[str, float] = defaultdict()
 
         for index in msa.kmers_indices.indices:
-            index_response_either = __calculate_single_kmer_likelihood(
+            index_response_either = calculate_single_kmer_likelihood(
                 total_records=len(msa.sequence_headers),
                 kmers_index=index,
             )
@@ -53,17 +55,6 @@ def estimate_global_kmer_specific_priors(
         # ? --------------------------------------------------------------------
 
         return right(output)
-
-    except Exception as exc:
-        return left(c_exc.UseCaseError(exc, logger=LOGGER))
-
-
-def __calculate_single_kmer_likelihood(
-    total_records: int,
-    kmers_index: KmerIndex,
-) -> Either[float, c_exc.MappedErrors]:
-    try:
-        return right((len(kmers_index.records) + 0.5) / (total_records + 1))
 
     except Exception as exc:
         return left(c_exc.UseCaseError(exc, logger=LOGGER))

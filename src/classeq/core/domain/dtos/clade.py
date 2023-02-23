@@ -50,3 +50,19 @@ class CladeWrapper:
     @id.default
     def _id_default(self) -> UUID:
         return uuid4()
+
+    # ? ------------------------------------------------------------------------
+    # ? Public instance methods
+    # ? ------------------------------------------------------------------------
+
+    def is_root(self) -> bool:
+        return self.type == NodeType.ROOT
+
+    def is_outgroup(self) -> bool:
+        return self.type == NodeType.OUTGROUP
+
+    def is_internal(self) -> bool:
+        return self.type == NodeType.INTERNAL
+
+    def is_terminal(self) -> bool:
+        return self.type == NodeType.TERMINAL

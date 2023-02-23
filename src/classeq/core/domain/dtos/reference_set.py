@@ -43,6 +43,7 @@ class ReferenceSet:
         def __collect_clades_recursively(
             parent: UUID | None,
             clade: Clade,
+            is_root: bool = False,
         ) -> None:
             """Recursively collect nodes an parse to CladeWrappers.
 
@@ -56,8 +57,14 @@ class ReferenceSet:
             linear_tree.add(
                 CladeWrapper(
                     id=current_clade_identifier,
-                    name=clade.name,
-                    type=__determine_node_type(clade=clade),
+                    name=(
+                        NodeType.ROOT.value if is_root is True else clade.name
+                    ),
+                    type=(
+                        NodeType.ROOT
+                        if is_root is True
+                        else __determine_node_type(clade=clade)
+                    ),
                     parent=parent,
                     support=clade.confidence,
                 )
@@ -75,16 +82,11 @@ class ReferenceSet:
             root: Clade = tree.root
 
             linear_tree: Set[CladeWrapper] = set()
-            linear_tree.add(
-                CladeWrapper(
-                    name=NodeType.ROOT.value,
-                    type=NodeType.ROOT,
-                )
-            )
 
             __collect_clades_recursively(
                 parent=None,
                 clade=root,
+                is_root=True,
             )
 
             return right(linear_tree)

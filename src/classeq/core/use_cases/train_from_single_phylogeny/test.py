@@ -7,8 +7,8 @@ from classeq.core.domain.dtos.msa_source_format import MsaSourceFormatEnum
 from classeq.core.domain.dtos.reference_set import ReferenceSet
 from classeq.core.domain.dtos.tree_source_format import TreeSourceFormatEnum
 from classeq.core.use_cases.load_source_files import load_source_files
-from classeq.core.use_cases.train_from_single_phylogeny.estimate_clade_kmer_specific_priors import (
-    estimate_clade_kmer_specific_priors,
+from classeq.core.use_cases.train_from_single_phylogeny.estimate_clade_specific_conditional_probabilities import (
+    estimate_clade_specific_conditional_probabilities,
 )
 from classeq.core.use_cases.train_from_single_phylogeny.estimate_global_kmer_specific_priors import (
     estimate_global_kmer_specific_priors,
@@ -47,5 +47,5 @@ class TrainFromSinglePhylogenyTest(TestCase):
         self.assertFalse(response_either.is_left)
         self.assertTrue(response_either.is_right)
 
-    def test_estimate_clade_kmer_specific_priors(self) -> None:
-        estimate_clade_kmer_specific_priors(references=self.__ref)
+    def test_estimate_clade_specific_conditional_probabilities(self) -> None:
+        estimate_clade_specific_conditional_probabilities(references=self.__ref)

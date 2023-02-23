@@ -20,7 +20,7 @@ class KmerIndex:
     # ? ------------------------------------------------------------------------
 
     kmer: str = field()
-    records: Set[int] = field(default=set())
+    records: Tuple[int, ...] = field(default=tuple())
 
     # ? ------------------------------------------------------------------------
     # ? Life cycle hook methods
@@ -46,24 +46,23 @@ class KmerIndex:
     def contains(
         self,
         target: int,
-    ) -> bool:
-        records = sorted(self.records)
+    ) -> int | None:
         first = 0
-        last = len(records) - 1
+        last = len(self.records) - 1
         index: int | None = None
 
         while (first <= last) and (index is None):
             mid = (first + last) // 2
 
-            if records[mid] == target:
-                index = mid
+            if self.records[mid] == target:
+                return mid
             else:
-                if target < records[mid]:
+                if target < self.records[mid]:
                     last = mid - 1
                 else:
                     first = mid + 1
 
-        return index is None
+        return index
 
 
 @frozen(kw_only=True)
@@ -72,7 +71,7 @@ class KmersInverseIndices:
     # ? Class attributes
     # ? ------------------------------------------------------------------------
 
-    indices: Set[KmerIndex] = field(default=set())
+    indices: Tuple[KmerIndex, ...] = field(default=tuple())
     _hashes: Tuple[int, ...] = field()
 
     # ? ------------------------------------------------------------------------
@@ -104,7 +103,7 @@ class KmersInverseIndices:
                 for kmer in set(
                     [
                         kmer
-                        for kmer in cls.__kmer_gen(
+                        for kmer in cls.generate_kmers(
                             dna_sequence=record.seq,
                             k_size=k_size,
                         )
@@ -124,18 +123,23 @@ class KmersInverseIndices:
 
                     kmer_indices[kmer].add(header_index)
 
-            indices = set(
-                KmerIndex(
-                    kmer=kmer,
-                    records=indices,
+            indices = tuple(
+                sorted(
+                    [
+                        KmerIndex(
+                            kmer=kmer,
+                            records=tuple(sorted(codes)),
+                        )
+                        for kmer, codes in kmer_indices.items()
+                    ],
+                    key=lambda i: i.__hash__(),
                 )
-                for kmer, indices in kmer_indices.items()
             )
 
             return right(
                 cls(
                     indices=indices,
-                    hashes=tuple(sorted(set(i.__hash__() for i in indices))),
+                    hashes=tuple(i.__hash__() for i in indices),
                 )
             )
 
@@ -172,11 +176,11 @@ class KmersInverseIndices:
         return index
 
     # ? ------------------------------------------------------------------------
-    # ? Private static methods
+    # ? Public static methods
     # ? ------------------------------------------------------------------------
 
     @staticmethod
-    def __kmer_gen(
+    def generate_kmers(
         dna_sequence: str,
         k_size: int,
     ) -> Iterator[str]:

@@ -9,7 +9,7 @@ def calculate_single_kmer_likelihood(
     kmers_index: KmerIndex,
 ) -> Either[float, c_exc.MappedErrors]:
     try:
-        return right((len(kmers_index.records) + 0.5) / (total_records + 1))
+        return right((len(kmers_index.records) + 0.5) / (total_records - 1))
 
     except Exception as exc:
         return left(c_exc.UseCaseError(exc, logger=LOGGER))
