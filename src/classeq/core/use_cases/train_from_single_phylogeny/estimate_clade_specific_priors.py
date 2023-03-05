@@ -1,6 +1,6 @@
 from collections import defaultdict
 from random import sample
-from typing import DefaultDict, Dict, Iterator, List, Set
+from typing import DefaultDict, Iterator, List, Set
 from uuid import UUID
 
 import classeq.core.domain.utils.exceptions as c_exc
@@ -12,6 +12,12 @@ from classeq.core.domain.dtos.kmer_inverse_index import (
 from classeq.core.domain.dtos.priors import (
     CladePriors,
     IngroupCladePriors,
+    IngroupLabeledPriors,
+    LabeledPriors,
+    NoiseGroupLabeledPriors,
+    OutgroupLabeledPriors,
+    PriorGroup,
+    SisterGroupLabeledPriors,
     TreePriors,
 )
 from classeq.core.domain.dtos.reference_set import ReferenceSet
@@ -118,7 +124,7 @@ def __calculate_recursive_priors(
     ingroups: List[CladeWrapper],
     label_map: DefaultDict[str, int],
     kmer_indices: KmersInverseIndices,
-    min_clade_size: int = 5,
+    min_clade_size: int = 3,
 ) -> Either[TreePriors, c_exc.MappedErrors]:
     try:
         # ? --------------------------------------------------------------------
@@ -174,7 +180,10 @@ def __calculate_recursive_priors(
 
         outgroup_priors = CladePriors(
             parent=outgroup_parent,
-            priors=outgroup_priors_either.value,
+            priors=OutgroupLabeledPriors(
+                labels=tuple(sorted(outgroup_labels)),
+                priors=outgroup_priors_either.value,
+            ),
         )
 
         # ? --------------------------------------------------------------------
@@ -273,16 +282,12 @@ def __calculate_recursive_priors(
             # ? Estimate group specific priors
             # ? ----------------------------------------------------------------
 
-            priors_values: Dict[str, float | None] = {
-                "ingroup_priors": None,
-                "sister_group_priors": None,
-                "noise_group_priors": None,
-            }
+            priors_values: List[LabeledPriors] = []
 
             for receiver, group in [
-                ("ingroup_priors", ingroup),
-                ("sister_group_priors", sister_group),
-                ("noise_group_priors", noise_group),
+                (IngroupLabeledPriors, ingroup),
+                (SisterGroupLabeledPriors, sister_group),
+                (NoiseGroupLabeledPriors, noise_group),
             ]:
                 group_labels: List[int] = []
 
@@ -307,26 +312,33 @@ def __calculate_recursive_priors(
                 if group_priors_either.is_left:
                     return group_priors_either
 
-                priors_values[receiver] = group_priors_either.value
-
-            for key, value in priors_values.items():
-                if value is None:
-                    return left(
-                        c_exc.UseCaseError(
-                            f"Unexpected error on calculate priors of `{key}` "
-                            + f"for clade {clade}.",
-                            logger=LOGGER,
-                        )
+                priors_values.append(
+                    receiver(
+                        labels=tuple(sorted(group_labels)),
+                        priors=group_priors_either.value,
                     )
+                )
+
+            ingroup_priors = next(
+                i for i in priors_values if i.group == PriorGroup.INGROUP
+            )
+
+            sister_priors = next(
+                i for i in priors_values if i.group == PriorGroup.SISTER
+            )
+
+            noise_priors = next(
+                i for i in priors_values if i.group == PriorGroup.NOISE
+            )
 
             ingroups_priors.append(
                 IngroupCladePriors(
                     parent=clade.parent,
-                    ingroup_priors=priors_values.get("ingroup_priors"),
-                    sister_group_priors=priors_values.get(
-                        "sister_group_priors"
+                    priors=(
+                        ingroup_priors,
+                        sister_priors,
+                        noise_priors,
                     ),
-                    noise_group_priors=priors_values.get("noise_group_priors"),
                 )
             )
 
@@ -418,35 +430,3 @@ def __get_terminal_nodes(
             )
 
     return [i for i in __get_children(target_nodes)]
-
-
-def __calculate_probability_of_group_contains_kmer(
-    prior: float,
-    sequences_with_kmer: int,
-    total_sequences: int,
-) -> float:
-    if sequences_with_kmer > total_sequences:
-        raise Exception(
-            "`total_sequences` could not be greater than `sequences_with_kmer`"
-        )
-
-    # ? ------------------------------------------------------------------------
-    # ? Calculate
-    #
-    # The original formulation for the probability that a group contains a kmer
-    # is:
-    #
-    # P(wi|G) = [ m(wi) + Pi ] / ( M + 1 )
-    #
-    # m(wi) = be the number of the group sequences containing word wi (argument
-    # `sequences_with_kmer` of these function).
-    #
-    # Pi = The prior probability for the kmer in the overall training dataset
-    # (argument `prior` of these function).
-    #
-    # M = The dataset size for the target training group (argument
-    # `total_sequences` of these function).
-    #
-    # ? ------------------------------------------------------------------------
-
-    return (sequences_with_kmer + prior) / (total_sequences + 1)

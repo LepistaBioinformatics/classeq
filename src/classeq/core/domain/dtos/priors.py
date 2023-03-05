@@ -1,6 +1,49 @@
-from attrs import frozen, field
+from enum import Enum
+from typing import Any, DefaultDict, Dict, List, Tuple
 from uuid import UUID
-from typing import DefaultDict, List
+
+from attrs import field, frozen
+
+
+class PriorGroup(Enum):
+    OUTGROUP = "outgroup"
+    INGROUP = "ingroup"
+    SISTER = "sister"
+    NOISE = "noise"
+
+
+@frozen(kw_only=True)
+class LabeledPriors:
+    labels: Tuple[int, ...] = field()
+    priors: DefaultDict[str, float] = field()
+    group: PriorGroup = field()
+
+    def asdict(self) -> Dict[str, Any]:
+        return {
+            "labels": [i for i in self.labels],
+            "priors": self.priors,
+            "group": self.group.value,
+        }
+
+
+@frozen(kw_only=True)
+class OutgroupLabeledPriors(LabeledPriors):
+    group: PriorGroup = field(default=PriorGroup.OUTGROUP)
+
+
+@frozen(kw_only=True)
+class IngroupLabeledPriors(LabeledPriors):
+    group: PriorGroup = field(default=PriorGroup.INGROUP)
+
+
+@frozen(kw_only=True)
+class SisterGroupLabeledPriors(LabeledPriors):
+    group: PriorGroup = field(default=PriorGroup.SISTER)
+
+
+@frozen(kw_only=True)
+class NoiseGroupLabeledPriors(LabeledPriors):
+    group: PriorGroup = field(default=PriorGroup.NOISE)
 
 
 @frozen(kw_only=True)
@@ -13,7 +56,13 @@ class CladePriors:
 
     # The field include the priors of all kmers shared among members of the
     # target clade.
-    priors: DefaultDict[str, float] = field()
+    priors: LabeledPriors = field()
+
+    def asdict(self) -> Dict[str, Any]:
+        return {
+            "parent": self.parent.__str__(),
+            "priors": self.priors.asdict(),
+        }
 
 
 @frozen(kw_only=True)
@@ -24,14 +73,19 @@ class IngroupCladePriors:
     # target clade.
     parent: UUID = field()
 
-    # Priors of the ingroup.
-    ingroup_priors: DefaultDict[str, float] = field()
+    # Priors of specific groups, being in order: ingroup, sister, and random
+    # groups, respectively.
+    priors: Tuple[
+        IngroupLabeledPriors,
+        SisterGroupLabeledPriors,
+        NoiseGroupLabeledPriors,
+    ] = field()
 
-    # Priors of the sister group.
-    sister_group_priors: DefaultDict[str, float] = field()
-
-    # Priors of the noise group.
-    noise_group_priors: DefaultDict[str, float] = field()
+    def asdict(self) -> Dict[str, Any]:
+        return {
+            "parent": self.parent.__str__(),
+            "priors": [i.asdict() for i in self.priors],
+        }
 
 
 @frozen(kw_only=True)
@@ -40,5 +94,11 @@ class TreePriors:
     are refereed trough the linear tree clade IDs.
     """
 
-    outgroup: CladePriors = field()
+    outgroup: OutgroupLabeledPriors = field()
     ingroups: List[IngroupCladePriors] = field(default=[])
+
+    def asdict(self) -> Dict[str, Any]:
+        return {
+            "outgroup": self.outgroup.__str__(),
+            "ingroups": [i.asdict() for i in self.ingroups],
+        }
