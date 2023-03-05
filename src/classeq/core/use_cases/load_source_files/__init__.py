@@ -149,6 +149,37 @@ def load_source_files(
                 sort_keys=True,
             )
 
+        linear_tree_output_file_path = tree_source.parent.joinpath(
+            ".".join(
+                [
+                    tree_source.stem,
+                    "linear-tree",
+                    "json",
+                    "gz",
+                ]
+            )
+        )
+
+        LOGGER.info(
+            f"Linear tree would be persisted to: {linear_tree_output_file_path}"
+        )
+
+        with gzip.open(
+            linear_tree_output_file_path, "wt", encoding="utf-8"
+        ) as out_gz:
+            linear_tree = references.get_linear_tree()
+
+            if linear_tree.is_left:
+                return linear_tree
+
+            dump(
+                [asdict(i) for i in linear_tree.value],
+                out_gz,
+                indent=4,
+                default=str,
+                sort_keys=True,
+            )
+
         # ? --------------------------------------------------------------------
         # ? Return a positive response
         # ? --------------------------------------------------------------------

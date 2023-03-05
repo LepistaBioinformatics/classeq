@@ -1,0 +1,1370 @@
+[
+    {
+        "branch_length": 0.052062025251661315,
+        "id": "15f7582c-03e0-4e89-99c8-a374631f9b4e",
+        "name": "Col_lupini_IMI_351261",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.006108009020759875,
+        "id": "a55f5110-cabf-44ec-b4e9-7c04e8f9a50a",
+        "name": "Col_orchidophilum_CBS_119291",
+        "parent": "49a211ad-ae84-480b-b5bf-d30d65cb7ce0",
+        "support": null,
+        "type": "NodeType.OUTGROUP"
+    },
+    {
+        "branch_length": 0.006108009020759875,
+        "id": "91b54901-3574-471b-bfec-549886450a62",
+        "name": "Col_orchidophilum_IMI_309357",
+        "parent": "49a211ad-ae84-480b-b5bf-d30d65cb7ce0",
+        "support": null,
+        "type": "NodeType.OUTGROUP"
+    },
+    {
+        "branch_length": 0.04779726343291894,
+        "id": "43a2c79a-a0f1-4a3b-9ddb-6ca634a65ab0",
+        "name": "Col_nymphaeae_CBS_127612",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.13113540780172822,
+        "id": "87789990-e3ed-4da0-a950-e5ada5261c94",
+        "name": "Col_godetiae_CBS_129951",
+        "parent": "038388e3-a1a4-4721-9673-25e13b529da7",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 1.00000050002909e-06,
+        "id": "cd0c053b-378d-4dbc-b4ae-730f5accfb52",
+        "name": "Col_australe_CBS_116478",
+        "parent": "35bf91ec-f1a6-46ee-b9ef-93b6e84d39d7",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.09628774641367531,
+        "id": "01e10b18-66d2-4bcd-814d-31ede6c61103",
+        "name": "Col_fioriniae_CBS_29367",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.12528888466906038,
+        "id": "a0c088d0-81c3-4d7c-b640-6b2db6ed0f06",
+        "name": "Col_godetiae_IMI_376331",
+        "parent": "038388e3-a1a4-4721-9673-25e13b529da7",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.07159411641746398,
+        "id": "25b8831b-10aa-4149-a61f-d78741f6a311",
+        "name": "Col_costaricense_CBS_21178",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.044941262552825864,
+        "id": "6957754c-99b7-4d6f-aef2-20061c625006",
+        "name": null,
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.INTERNAL"
+    },
+    {
+        "branch_length": 0.06846295925925244,
+        "id": "13a762be-6025-4f69-b5e3-5de5ebcd8c33",
+        "name": "Col_scovillei_CBS_120708",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.08460360252031736,
+        "id": "ac147a6b-9115-4552-97ae-328c251dd9e0",
+        "name": "Col_fioriniae_CBS_124958",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.1311344078012282,
+        "id": "0eee1045-024c-4ff8-9251-e70f02cd9572",
+        "name": "Col_godetiae_CBS_126522",
+        "parent": "038388e3-a1a4-4721-9673-25e13b529da7",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.051440067247306834,
+        "id": "933a48c3-38aa-491c-8853-8779f8c60d7f",
+        "name": "Col_acutatum_CBS_126506",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.08459760251731717,
+        "id": "58bbe0f9-b714-49eb-b0df-54d41b6329fb",
+        "name": "Col_fioriniae_CBS_126508",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.0902541564050184,
+        "id": "dcf6ba94-d533-4965-bf32-91bcac9632fe",
+        "name": "Col_cuscutae_CBS_98169",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.047543179947052504,
+        "id": "6bcdfc30-2a1c-47f6-9bac-19f15cc7e1d0",
+        "name": "Col_nymphaeae_CBS_51678",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.006031510378986658,
+        "id": "e54c7016-2a69-480a-b919-cb2b7f78917e",
+        "name": "Col_salicis_CBS_129356",
+        "parent": "798c362b-ca9d-4f9b-a553-329206fcdc28",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.05833573654237252,
+        "id": "bc4bacfd-553b-458c-aa6f-0e7f77d666ed",
+        "name": "Col_acutatum_CBS_112759",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.12417867097631737,
+        "id": "35bf91ec-f1a6-46ee-b9ef-93b6e84d39d7",
+        "name": null,
+        "parent": "038388e3-a1a4-4721-9673-25e13b529da7",
+        "support": 100,
+        "type": "NodeType.INTERNAL"
+    },
+    {
+        "branch_length": 0.05505312151364489,
+        "id": "c908dd93-ddcf-4020-8c83-578b8e9ac6d4",
+        "name": "Col_cosmi_CBS_85373",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.051440067247306834,
+        "id": "8504702c-3741-49c0-89d6-c6605d755c2d",
+        "name": "Col_acutatum_CBS_129919",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.08460360252031736,
+        "id": "52f6d293-7b49-4616-afee-b67d110d2711",
+        "name": "Col_fioriniae_CBS_125396",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": null,
+        "id": "49a211ad-ae84-480b-b5bf-d30d65cb7ce0",
+        "name": "root",
+        "parent": null,
+        "support": 100,
+        "type": "NodeType.ROOT"
+    },
+    {
+        "branch_length": 0.09647955506758016,
+        "id": "349c07b8-6ae7-4c7c-86fa-48d0e2e4d929",
+        "name": "Col_fioriniae_CBS_129946",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.05435835649378684,
+        "id": "03592d78-3689-46ff-a30d-e4186cffa12f",
+        "name": "Col_guajavae_IMI_350839",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.12508951169294227,
+        "id": "33a6390d-1ce4-4a40-b97b-8eb10764c47d",
+        "name": "Col_johnstonii_CBS_128532",
+        "parent": "038388e3-a1a4-4721-9673-25e13b529da7",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 2.00000100005818e-06,
+        "id": "36b3652a-ce61-459c-8f60-b693cf52446b",
+        "name": "Col_sp_1960",
+        "parent": "ac36c070-93b0-41aa-a869-3bf8fd64333a",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.051278955295224575,
+        "id": "cae11973-8f34-4d7f-9a05-d33f0220ae25",
+        "name": "Col_paxtonii_CBS_50297",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.13113540780172822,
+        "id": "bd568480-492d-49c0-bf10-512577aafad3",
+        "name": "Col_godetiae_CBS_79672",
+        "parent": "038388e3-a1a4-4721-9673-25e13b529da7",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 3.00000150008727e-06,
+        "id": "5e2a0134-afbf-46b1-9484-da46fa7ede2e",
+        "name": "Col_sp_1959",
+        "parent": "ac36c070-93b0-41aa-a869-3bf8fd64333a",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.05253205814266312,
+        "id": "fd5ccddd-8ad2-489c-b82f-ea0594b516e2",
+        "name": "Col_cuscutae_IMI_304802",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.058544559377433504,
+        "id": "64cd56c9-1cb5-4083-804d-6bd634fabaf0",
+        "name": "Col_sp_IMI_384185",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.08539919038272992,
+        "id": "16041315-4c2f-4af9-9aea-c4840c4a178d",
+        "name": null,
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": 99,
+        "type": "NodeType.INTERNAL"
+    },
+    {
+        "branch_length": 0.12590853203878297,
+        "id": "ab6a3674-1a53-47ac-89fe-eaf6233f9d30",
+        "name": null,
+        "parent": "038388e3-a1a4-4721-9673-25e13b529da7",
+        "support": 100,
+        "type": "NodeType.INTERNAL"
+    },
+    {
+        "branch_length": 0.05408534439980499,
+        "id": "91158a22-e4dd-4ed1-bbff-7542c2f6923d",
+        "name": "Col_nymphaeae_IMI_370491",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.06433142490042414,
+        "id": "a5f32665-877d-44ed-8f94-fe446d918361",
+        "name": "Col_laticiphilum_CBS_129827",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.058544559377433504,
+        "id": "ac36c070-93b0-41aa-a869-3bf8fd64333a",
+        "name": null,
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": 99,
+        "type": "NodeType.INTERNAL"
+    },
+    {
+        "branch_length": 2.00000100005818e-06,
+        "id": "3f9be3fc-357b-42dd-9d9e-b0c788afcfcc",
+        "name": "Col_citri_ZJUC41",
+        "parent": "7c60e41a-c729-47f5-9437-89efb7fc170e",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.13113140779972815,
+        "id": "f2965c21-9c1a-4b97-bba4-7bdbf371cf7c",
+        "name": "Col_godetiae_CBS_13344",
+        "parent": "038388e3-a1a4-4721-9673-25e13b529da7",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.13113640780222824,
+        "id": "95ac040a-2575-470b-b712-6823a0bc481a",
+        "name": "Col_godetiae_CBS_129942",
+        "parent": "038388e3-a1a4-4721-9673-25e13b529da7",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.04770404792144323,
+        "id": "13e4de66-df63-4c97-9a52-1b7b83534a1e",
+        "name": "Col_walleri_CBS_125472",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.0964775550665801,
+        "id": "85225483-a14c-4d1e-b971-add248659799",
+        "name": "Col_cuscutae_CBS_125970",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.08460560252131742,
+        "id": "56bb1b72-ff15-4b3c-92b7-d9a319df7168",
+        "name": "Col_cuscutae_CBS_126523",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.09647455506508,
+        "id": "2c2beefa-9c71-4a66-ab27-6c96ce899c32",
+        "name": "Col_fioriniae_CBS_127601",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.06528182813036049,
+        "id": "8a21ad7b-cef1-46ed-af4f-57522962b964",
+        "name": "Col_tamarilloi_CBS_129954",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.06055499876590403,
+        "id": "c236076e-d006-48e1-a913-4a6ef063e07c",
+        "name": "Col_nymphaeae_CBS_17351",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.11849301280095514,
+        "id": "798c362b-ca9d-4f9b-a553-329206fcdc28",
+        "name": null,
+        "parent": "038388e3-a1a4-4721-9673-25e13b529da7",
+        "support": 100,
+        "type": "NodeType.INTERNAL"
+    },
+    {
+        "branch_length": 0.09647655506608006,
+        "id": "5f650be8-b1db-492a-9a29-08f25c2f97a7",
+        "name": "Col_cuscutae_CBS_128498",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.06055199876440394,
+        "id": "2a6decea-5c81-40aa-b142-f60c01fcf9d3",
+        "name": "Col_sp_1985",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.08460360252031736,
+        "id": "cb2241d8-3b8b-4aa3-b496-494be907919d",
+        "name": "Col_fioriniae_CBS_126509",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 2.00000100005818e-06,
+        "id": "56c9f1bb-0db9-4187-8ed2-194447e4e365",
+        "name": "Col_salicis_CBS_46583",
+        "parent": "798c362b-ca9d-4f9b-a553-329206fcdc28",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 1.00000050002909e-06,
+        "id": "4e03e7c7-9294-4842-9600-30cb38708f6a",
+        "name": "Col_australe_CBS_131325",
+        "parent": "35bf91ec-f1a6-46ee-b9ef-93b6e84d39d7",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 2.00000100005818e-06,
+        "id": "0e810144-68da-475d-a1f2-bfb905b336c5",
+        "name": "Col_salicis_CBS_18097",
+        "parent": "798c362b-ca9d-4f9b-a553-329206fcdc28",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.0475461799485526,
+        "id": "6e5e2d04-f6d2-4519-a08d-547f92f164dd",
+        "name": "Col_nymphaeae_CBS_52677",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.09647955506758016,
+        "id": "ca311dcb-39b4-45b7-b5fb-c35f759d3eb9",
+        "name": "Col_cuscutae_CSL_318",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.05833573654237252,
+        "id": "ebe068f8-40ae-4925-be5e-f650755089eb",
+        "name": "Col_acutatum_IMI_216370",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.006244014067760843,
+        "id": "070400c9-e38b-47ba-b4d6-136e29d9a511",
+        "name": "Col_salicis_CBS_19156",
+        "parent": "798c362b-ca9d-4f9b-a553-329206fcdc28",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 2.00000100005818e-06,
+        "id": "039e7833-5fc3-49db-b738-22434b6d65ac",
+        "name": "Col_salicis_CBS_23949",
+        "parent": "798c362b-ca9d-4f9b-a553-329206fcdc28",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.11038303403620564,
+        "id": "e22429e1-573a-4ab9-958d-7c67c472c782",
+        "name": "Col_kinghornii_CBS_19835",
+        "parent": "038388e3-a1a4-4721-9673-25e13b529da7",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.06798520558924281,
+        "id": "7c60e41a-c729-47f5-9437-89efb7fc170e",
+        "name": null,
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": 99,
+        "type": "NodeType.INTERNAL"
+    },
+    {
+        "branch_length": 0.06430754674027309,
+        "id": "0f08f948-9d85-43c5-a864-0582c7f5c287",
+        "name": "Col_acutatum_CBS_36973",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.044942262553325896,
+        "id": "6ce1262f-b48c-44ed-bfbf-d170fb139b6f",
+        "name": "Col_acutatum_CBS_110735",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 1.00000050002909e-06,
+        "id": "9b43db20-b80f-4c07-bccc-5c4168ef8cf9",
+        "name": "Col_acutatum_CBS_127602",
+        "parent": "6957754c-99b7-4d6f-aef2-20061c625006",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 1.00000050002909e-06,
+        "id": "eaff00fc-cbba-4857-8108-153253c578f7",
+        "name": "Col_rhombiforme_CBS_131322",
+        "parent": "ab6a3674-1a53-47ac-89fe-eaf6233f9d30",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.11916744195043323,
+        "id": "8c78dfe3-85a9-473b-9fe1-fbc8c7a9e1c9",
+        "name": "Col_godetiae_CBS_129917",
+        "parent": "038388e3-a1a4-4721-9673-25e13b529da7",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.13160354030062144,
+        "id": "0ff48446-56a5-4e49-be38-56de4ac7114a",
+        "name": "Col_godetiae_CBS_129911",
+        "parent": "038388e3-a1a4-4721-9673-25e13b529da7",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.0845956025163171,
+        "id": "57a7825f-a177-47b0-a91b-cf96dab4685c",
+        "name": "Col_cuscutae_CBS_78686",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.006245014068260872,
+        "id": "83ae794e-1d5e-4385-baac-08feb2dbc5e8",
+        "name": "Col_salicis_CBS_11314",
+        "parent": "798c362b-ca9d-4f9b-a553-329206fcdc28",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.08460560252131742,
+        "id": "2c0cec3f-82c4-4676-a613-1a572204f0d6",
+        "name": "Col_cuscutae_CBS_129940",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.052062025251661315,
+        "id": "1a845ce4-66a6-4741-897b-2177e3e25a63",
+        "name": "Col_lupini_CBS_129944",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.13113240780022817,
+        "id": "3238aba2-b90a-44b5-84b4-37acafe0b781",
+        "name": "Col_godetiae_CBS_126512",
+        "parent": "038388e3-a1a4-4721-9673-25e13b529da7",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.13160254030012142,
+        "id": "e566e680-e1c9-4a82-8db8-0e15b7009da1",
+        "name": "Col_godetiae_IMI_351248",
+        "parent": "038388e3-a1a4-4721-9673-25e13b529da7",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.09028365941517567,
+        "id": "9dfe73f0-7549-4db8-aa57-aa3dd67cca58",
+        "name": "Col_cuscutae_IMI_363003",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.051441067247806865,
+        "id": "e995f8a7-522f-4ef9-8370-7edbe55b41b3",
+        "name": "Col_acutatum_CSL_287",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 1.00000050002909e-06,
+        "id": "47f9cbee-b03c-49f1-ba39-db64fd6f681c",
+        "name": "Col_simmondsii_IMI_313840",
+        "parent": "e5a02bcb-4bfe-4e41-b0f0-2ff72352949f",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.057564308999021326,
+        "id": "2a1151b9-b9e0-4af7-b27a-12e48a68047d",
+        "name": "Col_indonesiense_CBS_127551",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.060553998765404,
+        "id": "e734990a-8835-402f-8154-367376774220",
+        "name": "Col_nymphaeae_CBS_23149",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.12508951169294227,
+        "id": "a1f7e767-40fc-4998-8b61-ace912c297b8",
+        "name": "Col_johnstonii_IMI_357027",
+        "parent": "038388e3-a1a4-4721-9673-25e13b529da7",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 1.00000050002909e-06,
+        "id": "afb373c0-c2be-444b-8607-6ee1c5dad3a5",
+        "name": "Col_chrysanthemi_CBS_126518",
+        "parent": "16041315-4c2f-4af9-9aea-c4840c4a178d",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.04779726343291894,
+        "id": "b93f8eab-2680-47e8-a0de-32efdd790dd2",
+        "name": "Col_nymphaeae_CBS_126528",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 1.00000050002909e-06,
+        "id": "c2a81254-29b7-4d9d-966f-3829828ba5c1",
+        "name": "Col_acutatum_CBS_127540",
+        "parent": "6957754c-99b7-4d6f-aef2-20061c625006",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.006245014068260872,
+        "id": "a373c95b-9392-457a-8514-9feaf311f2f4",
+        "name": "Col_salicis_CBS_11514",
+        "parent": "798c362b-ca9d-4f9b-a553-329206fcdc28",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.04779626343241891,
+        "id": "ac0bb04c-07a9-4814-be0d-d2588ca7746e",
+        "name": "Col_nymphaeae_CBS_100064",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.006186427140293815,
+        "id": "df23d108-080c-48f3-a3b8-29ef296d15c7",
+        "name": "Col_simmondsii_CBS_29567",
+        "parent": "e5a02bcb-4bfe-4e41-b0f0-2ff72352949f",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.060553998765404,
+        "id": "15199dae-201d-4473-97bd-c8b46f1d17d5",
+        "name": "Col_sp_2058",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.13113640780222824,
+        "id": "a34bb5b0-3284-4ce4-9a61-238617149b01",
+        "name": "Col_godetiae_CBS_126520",
+        "parent": "038388e3-a1a4-4721-9673-25e13b529da7",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.07159411641746398,
+        "id": "fee609ec-d9d7-4a1a-979f-604e2d509853",
+        "name": "Col_costaricense_CBS_33075",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.09827080562035462,
+        "id": "4b88066f-a895-416a-92e7-56a8ebefbbcc",
+        "name": "Col_cairnsense_BRIP_63642",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.1191664419499332,
+        "id": "a43a7d5d-a300-4e56-8606-26da375251b5",
+        "name": "Col_godetiae_CBS_129809",
+        "parent": "038388e3-a1a4-4721-9673-25e13b529da7",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.06509053541949958,
+        "id": "d75136ec-a9fb-49a9-83b7-fcd8e2eba986",
+        "name": "Col_limetticola_CBS_11414",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.04506455633499307,
+        "id": "36b9d5e4-7e46-4fcc-8d74-5edf61fd12d5",
+        "name": "Col_sloanei_IMI_364297",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.13113040779922813,
+        "id": "c48b0aea-7466-483f-acba-415be58cf6fc",
+        "name": "Col_godetiae_IMI_362149b",
+        "parent": "038388e3-a1a4-4721-9673-25e13b529da7",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.05206002525066125,
+        "id": "dd61cdeb-5203-46cd-bc35-3ee5bb613207",
+        "name": "Col_lupini_IMI_375715",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.12528788466856036,
+        "id": "de6c6772-6612-43ea-b4b1-f66922524800",
+        "name": "Col_godetiae_CBS_131332",
+        "parent": "038388e3-a1a4-4721-9673-25e13b529da7",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.13160354030062144,
+        "id": "8574d33e-7499-46c5-aa36-e9a86038dbcc",
+        "name": "Col_godetiae_CBS_19853",
+        "parent": "038388e3-a1a4-4721-9673-25e13b529da7",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.051440067247306834,
+        "id": "0456a561-8371-4cc9-b3b0-057f1d20d1e2",
+        "name": "Col_acutatum_CBS_127539",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.05204037607895265,
+        "id": "8160ab6c-64f6-4313-b9e3-daf676142d1f",
+        "name": "Col_sp_CBS_129820",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.08459960251831723,
+        "id": "1efeb6f2-7f43-4bfc-9d0d-c98904280ec3",
+        "name": "Col_cuscutae_CBS_128517",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.060553998765404,
+        "id": "7d7e5840-9b8f-469c-8608-9ff4567f1e8e",
+        "name": "Col_nymphaeae_CBS_122111",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.12528888466906038,
+        "id": "0a3221bc-da64-4874-ae4d-95bfe2c8f32e",
+        "name": "Col_godetiae_CBS_15525",
+        "parent": "038388e3-a1a4-4721-9673-25e13b529da7",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.15739557161631765,
+        "id": "a4965e17-54bc-4523-983c-7234103f0602",
+        "name": "Col_pyricola_CBS_128531",
+        "parent": "038388e3-a1a4-4721-9673-25e13b529da7",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.060553998765404,
+        "id": "a14689b1-7386-4373-a4d1-56d34b5789fc",
+        "name": "Col_sp_2056",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.04550954192958388,
+        "id": "5643d257-d0c3-4a0f-bf08-b64512167f19",
+        "name": "Col_sp_CBS_101611",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.08460460252081739,
+        "id": "bb1c0d7d-ccf6-46ce-994e-43da3b892a2d",
+        "name": "Col_fioriniae_CBS_129948",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.06430854674077312,
+        "id": "7c76820e-9d35-4e07-aa5f-b7ca48b9c079",
+        "name": "Col_acutatum_CBS_128499",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.06433142490042414,
+        "id": "3887c05a-bf12-4197-a63f-56c6abc093f8",
+        "name": "Col_laticiphilum_CBS_112989",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.06055299876490397,
+        "id": "2813af0e-6079-416d-af89-d8a92da793ee",
+        "name": "Col_sp_1989",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.006030510378486629,
+        "id": "9188bc99-2c87-4e3f-bdab-0f2d9946894d",
+        "name": "Col_salicis_CBS_129972",
+        "parent": "798c362b-ca9d-4f9b-a553-329206fcdc28",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.09647655506608006,
+        "id": "e7a0e19b-bd3c-4c33-8bfa-076a63001c50",
+        "name": "Col_fioriniae_CBS_49092",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.04494026255232583,
+        "id": "a174a65c-06a3-4ef3-bd96-24c93c272895",
+        "name": "Col_acutatum_CBS_112990",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.12537650899070896,
+        "id": "fea75799-82e8-4c58-8d8e-036e0526a2be",
+        "name": "Col_godetiae_CBS_127561",
+        "parent": "038388e3-a1a4-4721-9673-25e13b529da7",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 2.00000100005818e-06,
+        "id": "c77b59e0-b337-436c-8123-ebac8d7e09ef",
+        "name": "Col_nymphaeae_IMI_360386",
+        "parent": "7c60e41a-c729-47f5-9437-89efb7fc170e",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.07384431433288804,
+        "id": "beb8ac30-fda8-47a5-9741-138910879a7c",
+        "name": "Col_melonis_CBS_15984",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.058544559377433504,
+        "id": "b0fed5f8-9da5-4ea6-862d-1e12a1e9e95a",
+        "name": "Col_paranaense_CBS_134729",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.06430954674127315,
+        "id": "4f0db416-ad77-4d01-b5d8-cef5c05c406e",
+        "name": "Col_acutatum_CBS_111993",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.06430954674127315,
+        "id": "e419fd1a-0385-4221-abb9-e7abb78e100f",
+        "name": "Col_acutatum_CBS_112996",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.05408534439980499,
+        "id": "ba3fdc6a-f62e-48fb-b713-451546664169",
+        "name": "Col_nymphaeae_CBS_119294",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.10585939327160715,
+        "id": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "name": null,
+        "parent": "038388e3-a1a4-4721-9673-25e13b529da7",
+        "support": 100,
+        "type": "NodeType.INTERNAL"
+    },
+    {
+        "branch_length": 0.04494326255382593,
+        "id": "047eb269-63fc-48e9-adf8-8632e17b9cc2",
+        "name": "Col_acutatum_CBS_113006",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.04754517994805257,
+        "id": "6b18dd4a-c600-4f7b-8989-52b480ea50d9",
+        "name": "Col_nymphaeae_CBS_48282",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.09648055506808019,
+        "id": "ea46e7f0-63a3-496b-bb8a-cbf60a858b32",
+        "name": "Col_cuscutae_IMI_345578",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.04754717994905263,
+        "id": "b0795db7-7627-4a49-b343-10a0acca502b",
+        "name": "Col_nymphaeae_CBS_15827",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.1311344078012282,
+        "id": "9c1e8814-c381-4909-8cd8-cd485f230639",
+        "name": "Col_godetiae_CBS_16050",
+        "parent": "038388e3-a1a4-4721-9673-25e13b529da7",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.13113540780172822,
+        "id": "bac9e332-69c1-4105-ab63-76128a17392a",
+        "name": "Col_godetiae_CBS_17159",
+        "parent": "038388e3-a1a4-4721-9673-25e13b529da7",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.006185427139793786,
+        "id": "5de26b71-0cf2-467d-9dc8-924b15ed2beb",
+        "name": "Col_simmondsii_CBS_111531",
+        "parent": "e5a02bcb-4bfe-4e41-b0f0-2ff72352949f",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.13160354030062144,
+        "id": "9058cf94-b4ca-49ca-8c4d-5a35a1b7c2b9",
+        "name": "Col_godetiae_IMI_351262",
+        "parent": "038388e3-a1a4-4721-9673-25e13b529da7",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.08459660251681714,
+        "id": "8cb49dcb-eb3d-4c3f-bda4-2b9bd817e917",
+        "name": "Col_fioriniae_IMI_324991",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.006184427139293757,
+        "id": "a575f6da-c65d-4507-ba14-b33b325da925",
+        "name": "Col_simmondsii_CBS_122122",
+        "parent": "e5a02bcb-4bfe-4e41-b0f0-2ff72352949f",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.060553998765404,
+        "id": "d65e32a8-4771-4bd2-bbcf-2c7814065dbf",
+        "name": "Col_nymphaeae_IMI_301119",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.09806348619492916,
+        "id": "0f5b0a0a-bbf5-4fe9-b317-315eb22a68d7",
+        "name": "Col_phormii_CBS_102054",
+        "parent": "038388e3-a1a4-4721-9673-25e13b529da7",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.04555102875613545,
+        "id": "13916a0a-3812-43f3-be1b-839e87d788cc",
+        "name": "Col_sp_CBS_129810",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.40934630548543904,
+        "id": "038388e3-a1a4-4721-9673-25e13b529da7",
+        "name": null,
+        "parent": "49a211ad-ae84-480b-b5bf-d30d65cb7ce0",
+        "support": 99,
+        "type": "NodeType.INTERNAL"
+    },
+    {
+        "branch_length": 0.0060295103779866,
+        "id": "5b71d8c8-c01b-4ccf-9346-2a04f829bac2",
+        "name": "Col_salicis_CBS_128559",
+        "parent": "798c362b-ca9d-4f9b-a553-329206fcdc28",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.0846016025193173,
+        "id": "c4656191-c493-4810-b291-67079dd98535",
+        "name": "Col_fioriniae_CBS_126526",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.0964775550665801,
+        "id": "f72058ce-14fa-4b45-bace-b3de291936b0",
+        "name": "Col_fioriniae_CBS_20035",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.09498943497557166,
+        "id": "e5a02bcb-4bfe-4e41-b0f0-2ff72352949f",
+        "name": null,
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": 100,
+        "type": "NodeType.INTERNAL"
+    },
+    {
+        "branch_length": 0.044941262552825864,
+        "id": "77e953fe-792d-4c3b-988f-59ff139f30e3",
+        "name": "Col_acutatum_IMI_384175",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.044941262552825864,
+        "id": "85d24b63-0be4-47fa-a971-3b56fb81c886",
+        "name": "Col_acutatum_IMI_336479",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.006031510378986658,
+        "id": "11fdf67e-a204-4588-afee-cee6c88a7ac2",
+        "name": "Col_salicis_IMI_345585",
+        "parent": "798c362b-ca9d-4f9b-a553-329206fcdc28",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.13160354030062144,
+        "id": "5f2ac3af-1d6a-4b0b-b5bb-06cfed793988",
+        "name": "Col_godetiae_CBS_19332",
+        "parent": "038388e3-a1a4-4721-9673-25e13b529da7",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.06528282813086052,
+        "id": "a9663320-bb30-428c-a1d2-00a226c9c80b",
+        "name": "Col_tamarilloi_CBS_129814",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.06528082812986045,
+        "id": "9d26ff21-f5c4-44ca-9af7-f8fd4b483096",
+        "name": "Col_sp_2031",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.06055499876590403,
+        "id": "86190747-4b8a-46d2-b738-00165a2d3c88",
+        "name": "Col_nymphaeae_CBS_112202",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.05206102525116128,
+        "id": "1a6ce8cf-c974-4728-a39b-502664b9ffc9",
+        "name": "Col_lupini_CBS_46676",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 1.00000050002909e-06,
+        "id": "bb6de5d7-eeac-4a63-b0c2-f91904d0e183",
+        "name": "Col_rhombiforme_CBS_129953",
+        "parent": "ab6a3674-1a53-47ac-89fe-eaf6233f9d30",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.08460060251881726,
+        "id": "8729729f-2651-4ed3-9db3-b47e6b145db6",
+        "name": "Col_fioriniae_ATCC_12097",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 3.00000150008727e-06,
+        "id": "a11a3ce9-a023-4f11-9549-7e0133bcb50f",
+        "name": "Col_sp_1966",
+        "parent": "ac36c070-93b0-41aa-a869-3bf8fd64333a",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.09806348619492916,
+        "id": "0ed07405-5f4d-4ff9-a31b-845caf57252c",
+        "name": "Col_phormii_CBS_118201",
+        "parent": "038388e3-a1a4-4721-9673-25e13b529da7",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.08459460251581707,
+        "id": "68c7b6cc-d341-40c3-80a4-62067b5a0056",
+        "name": "Col_cuscutae_CSL_473",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.0070355158953695944,
+        "id": "61fa3dba-4e57-4372-9ff7-0dd7221e93fe",
+        "name": "Col_sp_1957",
+        "parent": "ac36c070-93b0-41aa-a869-3bf8fd64333a",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.04494326255382593,
+        "id": "2ce80b98-6868-4712-80b9-04d0eb19bebc",
+        "name": "Col_acutatum_CBS_127598",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.09648055506808019,
+        "id": "137dc73d-0378-4300-9c90-518d45ecce34",
+        "name": "Col_fioriniae_CBS_16786",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.0964775550665801,
+        "id": "6d8cd12d-8a52-43d1-9007-15ecf81e86d9",
+        "name": "Col_cuscutae_IMI_384569",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.04494026255232583,
+        "id": "3db7fce3-81cb-4718-b687-2b82021ddc0d",
+        "name": "Col_acutatum_CBS_115393",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 1.00000050002909e-06,
+        "id": "2f678b5b-8f8b-41a3-aa3b-d0e3562b43a3",
+        "name": "Col_nymphaeae_CBS_129926",
+        "parent": "7c60e41a-c729-47f5-9437-89efb7fc170e",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.051278955295224575,
+        "id": "9e5dbbe3-e4b7-41c8-ae14-6dd1cefd4264",
+        "name": "Col_paxtonii_IMI_165753",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.04754717994905263,
+        "id": "30505881-c75d-460a-9a3c-90d286847fe3",
+        "name": "Col_nymphaeae_CSL_455",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 2.00000100005818e-06,
+        "id": "23f05bf7-60fc-4d97-8caf-06e37451ebff",
+        "name": "Col_orchidophilum_CBS_63180",
+        "parent": "49a211ad-ae84-480b-b5bf-d30d65cb7ce0",
+        "support": null,
+        "type": "NodeType.OUTGROUP"
+    },
+    {
+        "branch_length": 0.09647955506758016,
+        "id": "65cc481b-da39-4513-aa0d-0c90f050a3fa",
+        "name": "Col_fioriniae_CBS_129947",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.06846295925925244,
+        "id": "8c868c7f-f10f-4b9a-ac1e-a18706500c62",
+        "name": "Col_scovillei_CBS_126529",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.0845986025178172,
+        "id": "bae78d6b-0ae7-4f2d-ac72-e1a65f854790",
+        "name": "Col_fioriniae_CBS_125956_",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 2.00000100005818e-06,
+        "id": "57613703-3c8d-46fa-9c04-d06f0b00e810",
+        "name": "Col_orchidophilum_CBS_63280",
+        "parent": "49a211ad-ae84-480b-b5bf-d30d65cb7ce0",
+        "support": null,
+        "type": "NodeType.OUTGROUP"
+    },
+    {
+        "branch_length": 1.00000050002909e-06,
+        "id": "844f4385-6e6e-4455-980b-2ec2d2e2f9d6",
+        "name": "Col_chrysanthemi_IMI_364540",
+        "parent": "16041315-4c2f-4af9-9aea-c4840c4a178d",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.13160254030012142,
+        "id": "c8243ba7-ecfa-4b6e-b7e7-318bc12d2a98",
+        "name": "Col_godetiae_CBS_129934",
+        "parent": "038388e3-a1a4-4721-9673-25e13b529da7",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.006186427140293815,
+        "id": "2f958705-9530-40c1-b775-d88d44d6a2e2",
+        "name": "Col_simmondsii_CBS_126524",
+        "parent": "e5a02bcb-4bfe-4e41-b0f0-2ff72352949f",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.0869977962256662,
+        "id": "3d39505c-24d9-4b48-9603-ea6e95022740",
+        "name": "Col_brisbanense_CBS_29267",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.06528282813086052,
+        "id": "633fb046-2484-46e6-91dd-77d9fb46ef55",
+        "name": "Col_tamarilloi_CBS_129811",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.051441067247806865,
+        "id": "179d527a-5fb4-49aa-b2f0-495beb96eb3e",
+        "name": "Col_acutatum_CBS_126505",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.06055199876440394,
+        "id": "0cfdbecb-040e-48cb-b91a-e38b286df25c",
+        "name": "Col_nymphaeae_CBS_122110",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    },
+    {
+        "branch_length": 0.05135378553029892,
+        "id": "4a94cb31-a0c8-430a-9321-a1a76d08bffd",
+        "name": "Col_acutatum_CBS_14429",
+        "parent": "aa27d868-2d08-44b5-ae97-5fa38aacefd2",
+        "support": null,
+        "type": "NodeType.TERMINAL"
+    }
+]
