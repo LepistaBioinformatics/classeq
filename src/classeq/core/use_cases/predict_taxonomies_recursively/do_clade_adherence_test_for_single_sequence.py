@@ -1,11 +1,12 @@
 from functools import reduce
-from typing import List, Tuple
+from typing import Dict, List
 
 import classeq.core.domain.utils.exceptions as c_exc
 from classeq.core.domain.dtos.kmer_inverse_index import KmersInverseIndices
 from classeq.core.domain.dtos.priors import (
     IngroupCladePriors,
     LabeledPriors,
+    OutgroupCladePriors,
     PriorGroup,
 )
 from classeq.core.domain.utils.either import Either, left, right
@@ -14,15 +15,41 @@ from classeq.settings import DEFAULT_KMER_SIZE, LOGGER
 
 def do_clade_adherence_test_for_single_sequence(
     target_sequence: str,
-    clade_priors: IngroupCladePriors,
+    clade_priors: IngroupCladePriors | OutgroupCladePriors,
     kmer_indices: KmersInverseIndices,
-) -> Either[bool, c_exc.MappedErrors]:
+) -> Either[Dict[PriorGroup, float], c_exc.MappedErrors]:
     try:
         # ? --------------------------------------------------------------------
         # ? Validate entries
         # ? --------------------------------------------------------------------
 
-        # TODO
+        if not any(
+            [
+                isinstance(clade_priors, IngroupCladePriors),
+                isinstance(clade_priors, OutgroupCladePriors),
+            ]
+        ):
+            return left(
+                c_exc.InvalidArgumentError(
+                    f"argument `{clade_priors}` should be any of "
+                    + f"`{IngroupCladePriors}` or `{OutgroupCladePriors}`.",
+                    exp=True,
+                    logger=LOGGER,
+                )
+            )
+
+        for observed, desired in [
+            (target_sequence, str),
+            (kmer_indices, KmersInverseIndices),
+        ]:
+            if not isinstance(observed, desired):
+                return left(
+                    c_exc.InvalidArgumentError(
+                        f"argument `{observed}` should be a instance of `{desired}`.",
+                        exp=True,
+                        logger=LOGGER,
+                    )
+                )
 
         # ? --------------------------------------------------------------------
         # ? Get sequence kmers
@@ -40,37 +67,49 @@ def do_clade_adherence_test_for_single_sequence(
         # ? Calculate joint probability units
         # ? --------------------------------------------------------------------
 
-        clade_adherence_stats = List[Tuple[PriorGroup, float]]
+        clade_adherence_stats: Dict[PriorGroup, float] = {}
 
-        for group in clade_priors.priors:
-            group_adherence_either = __calculate_clade_adherence(
-                priors=group,
+        if isinstance(clade_priors, IngroupCladePriors):
+            for group in clade_priors.priors:
+                adherence_either = __calculate_clade_adherence(
+                    labeled_priors=group,
+                    target_kmers=target_sequence_kmers,
+                    kmer_indices=kmer_indices,
+                )
+
+                if adherence_either.is_left:
+                    return adherence_either
+
+                clade_adherence_stats.update(
+                    {group.group: adherence_either.value}
+                )
+
+        if isinstance(clade_priors, OutgroupCladePriors):
+            adherence_either = __calculate_clade_adherence(
+                labeled_priors=clade_priors.priors,
                 target_kmers=target_sequence_kmers,
                 kmer_indices=kmer_indices,
             )
 
-            if group_adherence_either.is_left:
-                return group_adherence_either
+            if adherence_either.is_left:
+                return adherence_either
 
-            clade_adherence_stats.append(
-                group.group,
-                group_adherence_either.value,
+            clade_adherence_stats.update(
+                {clade_priors.priors.group: adherence_either.value}
             )
-
-        print(f"clade_adherence_stats: {clade_adherence_stats}")
 
         # ? --------------------------------------------------------------------
         # ? Return a positive response
         # ? --------------------------------------------------------------------
 
-        return right(True)
+        return right(clade_adherence_stats)
 
     except Exception as exc:
         return left(c_exc.UseCaseError(exc, logger=LOGGER))
 
 
 def __calculate_clade_adherence(
-    priors: LabeledPriors,
+    labeled_priors: LabeledPriors,
     target_kmers: List[str],
     kmer_indices: KmersInverseIndices,
 ) -> Either[bool, c_exc.MappedErrors]:
@@ -78,7 +117,7 @@ def __calculate_clade_adherence(
         joint_probability_units: List[float] = []
 
         for kmer in target_kmers:
-            if (prior := priors.get(kmer)) is None:
+            if (prior := labeled_priors.priors.get(kmer)) is None:
                 continue
 
             kmer_index = kmer_indices.index_of(kmer)
@@ -94,7 +133,7 @@ def __calculate_clade_adherence(
 
             current_index = [
                 i
-                for i in priors.labels
+                for i in labeled_priors.labels
                 if kmer_indices.indices[kmer_index].contains(i)
             ]
 
@@ -102,11 +141,9 @@ def __calculate_clade_adherence(
                 __calculate_probability_of_group_contains_kmer(
                     prior=prior,
                     sequences_with_kmer=len(current_index),
-                    total_sequences=len(priors.labels),
+                    total_sequences=len(labeled_priors.labels),
                 )
             )
-
-        print(f"joint_probability_units: {joint_probability_units}")
 
         return right(reduce(lambda i, j: i * j, joint_probability_units))
 

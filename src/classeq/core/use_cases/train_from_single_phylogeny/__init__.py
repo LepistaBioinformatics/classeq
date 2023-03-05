@@ -1,6 +1,8 @@
 import gzip
 from json import dump
 
+from attrs import asdict
+
 import classeq.core.domain.utils.exceptions as c_exc
 from classeq.core.domain.dtos.priors import TreePriors
 from classeq.core.domain.dtos.reference_set import ReferenceSet
@@ -63,7 +65,13 @@ def train_from_single_phylogeny(
         with gzip.open(
             train_output_file_path, "wt", encoding="utf-8"
         ) as out_gz:
-            dump(train_response.to_dict(), out_gz, indent=4, default=str)
+            dump(
+                asdict(train_response),
+                out_gz,
+                indent=4,
+                default=str,
+                sort_keys=True,
+            )
 
         # ? --------------------------------------------------------------------
         # ? Return a positive response

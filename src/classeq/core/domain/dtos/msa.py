@@ -1,6 +1,6 @@
 from pathlib import Path
 from re import search
-from typing import DefaultDict, List, Self
+from typing import Any, DefaultDict, Dict, List, Self
 
 from attr import define, field
 from Bio import SeqIO
@@ -26,8 +26,48 @@ class MsaSource:
 
     source_file_path: Path = field()
     file_format: MsaSourceFormatEnum = field()
-    sequence_headers: List[str] = field()
-    kmers_indices: KmersInverseIndices | None = field(init=False, default=None)
+    sequence_headers: List[int] = field()
+    kmers_indices: KmersInverseIndices | None = field(default=None)
+
+    # ? ------------------------------------------------------------------------
+    # ? Public class methods
+    # ? ------------------------------------------------------------------------
+
+    @classmethod
+    def from_dict(
+        cls,
+        content: Dict[str, Any],
+    ) -> Either[Self, c_exc.MappedErrors]:
+        for key in [
+            "source_file_path",
+            "file_format",
+            "sequence_headers",
+            "kmers_indices",
+        ]:
+            if key not in content:
+                return left(
+                    c_exc.InvalidArgumentError(
+                        f"Invalid content detected on parse `{MsaSource}`. "
+                        f"{key}` key is empty.",
+                        logger=LOGGER,
+                    )
+                )
+
+        kmer_indices_either = KmersInverseIndices.from_dict(
+            content=content.get("kmers_indices")
+        )
+
+        if kmer_indices_either.is_left:
+            return kmer_indices_either
+
+        return right(
+            cls(
+                source_file_path=Path(content.get("source_file_path")),  # type: ignore
+                file_format=eval(content.get("file_format")),  # type: ignore
+                sequence_headers=content.get("sequence_headers"),  # type: ignore
+                kmers_indices=kmer_indices_either.value,
+            )
+        )
 
     # ? ------------------------------------------------------------------------
     # ? Public class methods
@@ -47,7 +87,7 @@ class MsaSource:
                     )
                 )
 
-            sequence_headers: List[str] = list()
+            sequence_headers: List[int] = list()
 
             cleaned_file_path = source_file_path.parent.joinpath(
                 "".join(

@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List, Self, Set
+from typing import Any, Dict, List, Self, Set
 
 from attr import define, field
 from Bio import Phylo
@@ -19,9 +19,42 @@ class TreeSource:
     # ? ------------------------------------------------------------------------
 
     source_file_path: Path = field()
-    tree_headers: List[str] = field()
+    tree_headers: List[int] = field()
     outgroups: List[str] = field()
     sanitized_tree: Tree | None = field(default=None)
+
+    # ? ------------------------------------------------------------------------
+    # ? Public class methods
+    # ? ------------------------------------------------------------------------
+
+    @classmethod
+    def from_dict(
+        cls,
+        content: Dict[str, Any],
+    ) -> Either[Self, c_exc.MappedErrors]:
+        for key in [
+            "source_file_path",
+            "tree_headers",
+            "outgroups",
+            "sanitized_tree",
+        ]:
+            if key not in content:
+                return left(
+                    c_exc.InvalidArgumentError(
+                        f"Invalid content detected on parse `{TreeSource}`. "
+                        f"{key}` key is empty.",
+                        logger=LOGGER,
+                    )
+                )
+
+        return right(
+            cls(
+                source_file_path=Path(content.get("source_file_path")),  # type: ignore
+                tree_headers=content.get("tree_headers"),  # type: ignore
+                outgroups=content.get("outgroups"),  # type: ignore
+                sanitized_tree=content.get("sanitized_tree"),  # type: ignore
+            )
+        )
 
     # ? ------------------------------------------------------------------------
     # ? Public class methods

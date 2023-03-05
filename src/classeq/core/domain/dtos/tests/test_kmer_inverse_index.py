@@ -37,4 +37,6 @@ class KmerInverseIndexTest(TestCase):
             headers_map=sequence_headers,
         )
 
-        self.__logger.debug(indices)
+        self.assertFalse(indices.is_left)
+        self.assertTrue(indices.is_right)
+        self.assertIsInstance(indices.value, KmersInverseIndices)

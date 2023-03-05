@@ -2,7 +2,7 @@ from hashlib import md5
 from collections import defaultdict
 from itertools import islice
 from pathlib import Path
-from typing import DefaultDict, Iterator, Self, Set, Tuple
+from typing import Any, DefaultDict, Dict, Iterator, List, Self, Set, Tuple
 
 from attrs import define, field, frozen
 from Bio import SeqIO
@@ -40,6 +40,35 @@ class KmerIndex:
         return int(md5(self.kmer.encode("utf-8")).hexdigest(), 16)
 
     # ? ------------------------------------------------------------------------
+    # ? Public class methods
+    # ? ------------------------------------------------------------------------
+
+    @classmethod
+    def from_dict(
+        cls,
+        content: Dict[str, Any],
+    ) -> Either[Self, c_exc.MappedErrors]:
+        for key in [
+            "kmer",
+            "records",
+        ]:
+            if key not in content:
+                return left(
+                    c_exc.InvalidArgumentError(
+                        f"Invalid content detected on parse `{KmerIndex}`. "
+                        f"{key}` key is empty.",
+                        logger=LOGGER,
+                    )
+                )
+
+        return right(
+            cls(
+                kmer=content.get("kmer"),  # type: ignore
+                records=tuple(sorted(content.get("records"))),  # type: ignore
+            )
+        )
+
+    # ? ------------------------------------------------------------------------
     # ? Public instance methods
     # ? ------------------------------------------------------------------------
 
@@ -72,7 +101,45 @@ class KmersInverseIndices:
     # ? ------------------------------------------------------------------------
 
     indices: Tuple[KmerIndex, ...] = field(default=tuple())
-    _hashes: Tuple[int, ...] = field()
+    hashes: Tuple[int, ...] = field()
+
+    # ? ------------------------------------------------------------------------
+    # ? Public class methods
+    # ? ------------------------------------------------------------------------
+
+    @classmethod
+    def from_dict(
+        cls,
+        content: Dict[str, Any],
+    ) -> Either[Self, c_exc.MappedErrors]:
+        for key in [
+            "indices",
+            "hashes",
+        ]:
+            if key not in content:
+                return left(
+                    c_exc.InvalidArgumentError(
+                        f"Invalid content detected on parse `{KmersInverseIndices}`. "
+                        f"{key}` key is empty.",
+                        logger=LOGGER,
+                    )
+                )
+
+        kmer_indices: List[KmerIndex] = []
+        for index in content.get("indices"):  # type: ignore
+            kmer_index_either = KmerIndex.from_dict(content=index)
+
+            if kmer_index_either.is_left:
+                return kmer_index_either
+
+            kmer_indices.append(kmer_index_either.value)
+
+        return right(
+            cls(
+                indices=tuple(kmer_indices),
+                hashes=tuple(sorted(content.get("hashes"))),  # type: ignore
+            )
+        )
 
     # ? ------------------------------------------------------------------------
     # ? Public instance methods
@@ -156,7 +223,7 @@ class KmersInverseIndices:
     ) -> int | None:
         # ? Initialize search params
         first = 0
-        last = len(self._hashes) - 1
+        last = len(self.hashes) - 1
         index: int | None = None
 
         # ? Convert the kmer to a md5 representation
@@ -165,10 +232,10 @@ class KmersInverseIndices:
         while (first <= last) and (index is None):
             mid = (first + last) // 2
 
-            if self._hashes[mid] == hashed_kmer:
+            if self.hashes[mid] == hashed_kmer:
                 return mid
             else:
-                if hashed_kmer < self._hashes[mid]:
+                if hashed_kmer < self.hashes[mid]:
                     last = mid - 1
                 else:
                     first = mid + 1

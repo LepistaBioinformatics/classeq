@@ -19,9 +19,17 @@ class PriorGroup(Enum):
 
 @frozen(kw_only=True)
 class LabeledPriors:
+    # ? ------------------------------------------------------------------------
+    # ? Class attributes
+    # ? ------------------------------------------------------------------------
+
     labels: Tuple[int, ...] = field()
     priors: DefaultDict[str, float] = field()
     group: PriorGroup = field()
+
+    # ? ------------------------------------------------------------------------
+    # ? Public instance methods
+    # ? ------------------------------------------------------------------------
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -29,6 +37,10 @@ class LabeledPriors:
             "priors": self.priors,
             "group": self.group.value,
         }
+
+    # ? ------------------------------------------------------------------------
+    # ? Public class methods
+    # ? ------------------------------------------------------------------------
 
     @classmethod
     def from_dict(
@@ -53,7 +65,7 @@ class LabeledPriors:
             cls(
                 labels=tuple([int(i) for i in content.get("labels")]),  # type: ignore
                 priors=defaultdict(float, content.get("priors")),  # type: ignore
-                group=PriorGroup(content.get("group")),
+                group=eval(content.get("group")),  # type: ignore
             )
         )
 
@@ -79,8 +91,12 @@ class NoiseGroupLabeledPriors(LabeledPriors):
 
 
 @frozen(kw_only=True)
-class CladePriors:
+class OutgroupCladePriors:
     """These object stores priors of a single clade."""
+
+    # ? ------------------------------------------------------------------------
+    # ? Class attributes
+    # ? ------------------------------------------------------------------------
 
     # The parent node denotes the most recent common ancestor (MRCA) of the
     # target clade.
@@ -88,13 +104,21 @@ class CladePriors:
 
     # The field include the priors of all kmers shared among members of the
     # target clade.
-    priors: LabeledPriors = field()
+    priors: OutgroupLabeledPriors = field()
+
+    # ? ------------------------------------------------------------------------
+    # ? Public instance methods
+    # ? ------------------------------------------------------------------------
 
     def to_dict(self) -> Dict[str, Any]:
         return {
             "parent": self.parent.__str__(),
             "priors": self.priors.to_dict(),
         }
+
+    # ? ------------------------------------------------------------------------
+    # ? Public class methods
+    # ? ------------------------------------------------------------------------
 
     @classmethod
     def from_dict(
@@ -108,13 +132,13 @@ class CladePriors:
             if key not in content:
                 return left(
                     c_exc.InvalidArgumentError(
-                        f"Invalid content detected on parse `{CladePriors}`. "
+                        f"Invalid content detected on parse `{OutgroupCladePriors}`. "
                         f"{key}` key is empty.",
                         logger=LOGGER,
                     )
                 )
 
-        priors_either = LabeledPriors.from_dict(
+        priors_either = OutgroupLabeledPriors.from_dict(
             content=content.get("priors")  # type: ignore
         )
 
@@ -133,6 +157,10 @@ class CladePriors:
 class IngroupCladePriors:
     """These object stores priors of a single clade."""
 
+    # ? ------------------------------------------------------------------------
+    # ? Class attributes
+    # ? ------------------------------------------------------------------------
+
     # The parent node denotes the most recent common ancestor (MRCA) of the
     # target clade.
     parent: UUID = field()
@@ -145,11 +173,19 @@ class IngroupCladePriors:
         NoiseGroupLabeledPriors,
     ] = field()
 
+    # ? ------------------------------------------------------------------------
+    # ? Public instance methods
+    # ? ------------------------------------------------------------------------
+
     def to_dict(self) -> Dict[str, Any]:
         return {
             "parent": self.parent.__str__(),
             "priors": [i.to_dict() for i in self.priors],
         }
+
+    # ? ------------------------------------------------------------------------
+    # ? Public class methods
+    # ? ------------------------------------------------------------------------
 
     @classmethod
     def from_dict(
@@ -210,14 +246,26 @@ class TreePriors:
     are refereed trough the linear tree clade IDs.
     """
 
-    outgroup: CladePriors = field()
+    # ? ------------------------------------------------------------------------
+    # ? Class attributes
+    # ? ------------------------------------------------------------------------
+
+    outgroup: OutgroupCladePriors = field()
     ingroups: List[IngroupCladePriors] = field(default=[])
+
+    # ? ------------------------------------------------------------------------
+    # ? Public instance methods
+    # ? ------------------------------------------------------------------------
 
     def to_dict(self) -> Dict[str, Any]:
         return {
             "outgroup": self.outgroup.to_dict(),
             "ingroups": [i.to_dict() for i in self.ingroups],
         }
+
+    # ? ------------------------------------------------------------------------
+    # ? Public class methods
+    # ? ------------------------------------------------------------------------
 
     @classmethod
     def from_dict(
@@ -237,7 +285,7 @@ class TreePriors:
                     )
                 )
 
-        outgroup_either = CladePriors.from_dict(
+        outgroup_either = OutgroupCladePriors.from_dict(
             content=content.get("outgroup")  # type: ignore
         )
 

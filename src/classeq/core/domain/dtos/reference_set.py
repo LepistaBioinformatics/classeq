@@ -1,4 +1,5 @@
-from typing import DefaultDict, Set
+from collections import defaultdict
+from typing import Any, DefaultDict, Dict, Self, Set
 from uuid import UUID, uuid4
 
 from attr import field, frozen
@@ -21,6 +22,47 @@ class ReferenceSet:
     tree: TreeSource = field()
     msa: MsaSource = field()
     labels_map: DefaultDict[str, int] = field()
+
+    # ? ------------------------------------------------------------------------
+    # ? Public class methods
+    # ? ------------------------------------------------------------------------
+
+    @classmethod
+    def from_dict(
+        cls,
+        content: Dict[str, Any],
+    ) -> Either[Self, c_exc.MappedErrors]:
+        for key in [
+            "tree",
+            "msa",
+            "labels_map",
+        ]:
+            if key not in content:
+                return left(
+                    c_exc.InvalidArgumentError(
+                        f"Invalid content detected on parse `{ReferenceSet}`. "
+                        f"{key}` key is empty.",
+                        logger=LOGGER,
+                    )
+                )
+
+        tree_either = TreeSource.from_dict(content=content.get("tree"))
+
+        if tree_either.is_left:
+            return tree_either
+
+        msa_either = MsaSource.from_dict(content=content.get("msa"))
+
+        if msa_either.is_left:
+            return msa_either
+
+        return right(
+            cls(
+                tree=tree_either.value,
+                msa=msa_either.value,
+                labels_map=defaultdict(int, content.get("labels_map")),  # type: ignore
+            )
+        )
 
     # ? ------------------------------------------------------------------------
     # ? Public instance methods

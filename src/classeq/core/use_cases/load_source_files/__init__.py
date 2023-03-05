@@ -1,3 +1,4 @@
+from copy import deepcopy
 import gzip
 from collections import defaultdict
 from json import dump
@@ -131,7 +132,7 @@ def load_source_files(
             train_output_file_path, "wt", encoding="utf-8"
         ) as out_gz:
             # ? Remove sanitized tree of the persistence artifact
-            tree_artifact = tree
+            tree_artifact = deepcopy(tree)
             tree_artifact.sanitized_tree = None
 
             dump(
@@ -145,6 +146,7 @@ def load_source_files(
                 out_gz,
                 indent=4,
                 default=str,
+                sort_keys=True,
             )
 
         # ? --------------------------------------------------------------------

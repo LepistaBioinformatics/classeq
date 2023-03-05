@@ -10,7 +10,7 @@ from classeq.core.domain.dtos.kmer_inverse_index import (
     KmersInverseIndices,
 )
 from classeq.core.domain.dtos.priors import (
-    CladePriors,
+    OutgroupCladePriors,
     IngroupCladePriors,
     IngroupLabeledPriors,
     LabeledPriors,
@@ -178,7 +178,7 @@ def __calculate_recursive_priors(
         if outgroup_priors_either.is_left:
             return outgroup_priors_either
 
-        outgroup_priors = CladePriors(
+        outgroup_priors = OutgroupCladePriors(
             parent=outgroup_parent,
             priors=OutgroupLabeledPriors(
                 labels=tuple(sorted(outgroup_labels)),
