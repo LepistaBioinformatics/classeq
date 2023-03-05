@@ -13,9 +13,6 @@ from classeq.core.use_cases.train_from_single_phylogeny import (
 from classeq.core.use_cases.train_from_single_phylogeny.estimate_clade_specific_priors import (
     estimate_clade_specific_priors,
 )
-from classeq.core.use_cases.train_from_single_phylogeny.estimate_global_kmer_specific_priors import (
-    estimate_global_kmer_specific_priors,
-)
 
 
 class TrainFromSinglePhylogenyTest(TestCase):
@@ -38,14 +35,6 @@ class TrainFromSinglePhylogenyTest(TestCase):
         )
 
         self.__ref: ReferenceSet = response.value
-
-    def test_estimate_global_kmer_specific_priors(self) -> None:
-        response_either = estimate_global_kmer_specific_priors(
-            msa=self.__ref.msa,
-        )
-
-        self.assertFalse(response_either.is_left)
-        self.assertTrue(response_either.is_right)
 
     def test_estimate_clade_specific_conditional_probabilities(self) -> None:
         response_either = estimate_clade_specific_priors(references=self.__ref)
