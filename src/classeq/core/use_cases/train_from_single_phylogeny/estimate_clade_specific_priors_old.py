@@ -12,9 +12,11 @@ from classeq.core.domain.utils.either import Either, left, right
 from classeq.settings import DEFAULT_KMER_SIZE, LOGGER
 
 
-def estimate_clade_specific_conditional_probabilities(
+def estimate_clade_specific_priors(
     references: ReferenceSet,
 ) -> Either[bool, c_exc.MappedErrors]:
+    """# ! DEPRECATED"""
+
     try:
         # ? --------------------------------------------------------------------
         # ? Validate entries
@@ -82,7 +84,7 @@ def estimate_clade_specific_conditional_probabilities(
         # ? Recursive calculate probabilities
         # ? --------------------------------------------------------------------
 
-        __calculate_recursive_probabilities(
+        __calculate_recursive_priors(
             root=root,
             outgroups=outgroup_nodes,
             other_nodes=[
@@ -104,14 +106,14 @@ def estimate_clade_specific_conditional_probabilities(
         return left(c_exc.UseCaseError(exc, logger=LOGGER))
 
 
-def __calculate_recursive_probabilities(
+def __calculate_recursive_priors(
     root: CladeWrapper,
     outgroups: List[CladeWrapper],
     other_nodes: List[CladeWrapper],
     label_map: DefaultDict[str, int],
     kmer_indices: KmersInverseIndices,
 ) -> Either[float, c_exc.MappedErrors]:
-    def __calculate_joint_probability_for_clade(
+    def __calculate_priors_for_clade(
         sequence_codes: List[int],
     ) -> Either[float, c_exc.MappedErrors]:
         # ? --------------------------------------------------------------------
@@ -207,10 +209,8 @@ def __calculate_recursive_probabilities(
 
             outgroup_labels.append(label)
 
-        outgroup_joint_probability_either = (
-            __calculate_joint_probability_for_clade(
-                sequence_codes=outgroup_labels
-            )
+        outgroup_joint_probability_either = __calculate_priors_for_clade(
+            sequence_codes=outgroup_labels
         )
 
         if outgroup_joint_probability_either.is_left:
@@ -240,10 +240,8 @@ def __calculate_recursive_probabilities(
 
             outgroup_sisters_labels.append(label)
 
-        sister_joint_probability_either = (
-            __calculate_joint_probability_for_clade(
-                sequence_codes=outgroup_sisters_labels
-            )
+        sister_joint_probability_either = __calculate_priors_for_clade(
+            sequence_codes=outgroup_sisters_labels
         )
 
         if sister_joint_probability_either.is_left:
@@ -306,8 +304,6 @@ def __estimate_clade_kmer_specific_priors(
     sequence_codes: List[int],
     corpus_size: int,
 ) -> Either[DefaultDict[str, float], c_exc.MappedErrors]:
-    # ! ARRUMAR AQUI
-
     try:
         kmers_priors_for_clade: DefaultDict[str, float] = defaultdict()
         target_indices: Set[KmerIndex] = set()

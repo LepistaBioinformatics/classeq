@@ -67,6 +67,7 @@ class ReferenceSet:
                     ),
                     parent=parent,
                     support=clade.confidence,
+                    branch_length=clade.branch_length,
                 )
             )
 

@@ -24,6 +24,7 @@ class CladeWrapper:
     id: UUID = field()
     type: NodeType = field()
     support: float | None = field(default=None)
+    branch_length: float | None = field(default=None)
     parent: UUID | None = field(default=None)
 
     # ? ------------------------------------------------------------------------

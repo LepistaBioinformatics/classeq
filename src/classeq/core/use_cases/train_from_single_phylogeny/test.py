@@ -1,14 +1,14 @@
-import logging
 from os import getenv
 from pathlib import Path
 from unittest import TestCase
 
 from classeq.core.domain.dtos.msa_source_format import MsaSourceFormatEnum
+from classeq.core.domain.dtos.priors import TreePriors
 from classeq.core.domain.dtos.reference_set import ReferenceSet
 from classeq.core.domain.dtos.tree_source_format import TreeSourceFormatEnum
 from classeq.core.use_cases.load_source_files import load_source_files
-from classeq.core.use_cases.train_from_single_phylogeny.estimate_clade_specific_conditional_probabilities import (
-    estimate_clade_specific_conditional_probabilities,
+from classeq.core.use_cases.train_from_single_phylogeny.estimate_clade_specific_priors import (
+    estimate_clade_specific_priors,
 )
 from classeq.core.use_cases.train_from_single_phylogeny.estimate_global_kmer_specific_priors import (
     estimate_global_kmer_specific_priors,
@@ -17,9 +17,6 @@ from classeq.core.use_cases.train_from_single_phylogeny.estimate_global_kmer_spe
 
 class TrainFromSinglePhylogenyTest(TestCase):
     def setUp(self) -> None:
-        logging.basicConfig(level=logging.DEBUG)
-        self.__logger = logging.getLogger()
-
         msa_file_path = Path(str(getenv("MOCK_MSA")))
         tree_file_path = Path(str(getenv("MOCK_TREE")))
 
@@ -48,4 +45,8 @@ class TrainFromSinglePhylogenyTest(TestCase):
         self.assertTrue(response_either.is_right)
 
     def test_estimate_clade_specific_conditional_probabilities(self) -> None:
-        estimate_clade_specific_conditional_probabilities(references=self.__ref)
+        response_either = estimate_clade_specific_priors(references=self.__ref)
+
+        self.assertFalse(response_either.is_left)
+        self.assertTrue(response_either.is_right)
+        self.assertIsInstance(response_either.value, TreePriors)

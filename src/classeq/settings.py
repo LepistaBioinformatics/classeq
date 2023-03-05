@@ -12,29 +12,19 @@ from logging import (
 )
 from os import getenv
 
-from classeq.core.domain.utils.validations import should_be_int
-
-
 # ? ----------------------------------------------------------------------------
 # ? Build logger configurations
 # ? ----------------------------------------------------------------------------
 
 
-LOGGING_LEVEL: int = DEBUG
+LOGGING_LEVEL = DEBUG
 
 
 ENV_LOGGING_LEVEL = getenv("LOGGING_LEVEL")
 
 
 if ENV_LOGGING_LEVEL is not None:
-    ENV_LOGGING_LEVEL = ENV_LOGGING_LEVEL.upper()
-
-    if should_be_int(ENV_LOGGING_LEVEL) is False:
-        raise ValueError(
-            f"Invalid `ENV_LOGGING_LEVEL` type: {ENV_LOGGING_LEVEL}"
-        )
-
-    ENV_LOGGING_LEVEL = int(ENV_LOGGING_LEVEL)  # type: ignore
+    ENV_LOGGING_LEVEL = eval(ENV_LOGGING_LEVEL.upper())
 
     if ENV_LOGGING_LEVEL not in [
         CRITICAL,
