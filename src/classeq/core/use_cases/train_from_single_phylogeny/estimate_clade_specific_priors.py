@@ -123,6 +123,10 @@ def __calculate_recursive_priors(
     try:
         # ? --------------------------------------------------------------------
         # ? Calculate outgroup clade priors
+        #
+        # Outgroup specific priors should be calculated separately to test
+        # specific hypothesis during the prediction steps.
+        #
         # ? --------------------------------------------------------------------
 
         outgroup_labels: List[int] = []
@@ -175,6 +179,19 @@ def __calculate_recursive_priors(
 
         # ? --------------------------------------------------------------------
         # ? Calculate ingroups clades priors
+        #
+        # Ingroup specific priors including a concatenation of three subparts:
+        #
+        # Ingroup: including only kmer priors of the target clade.
+        #
+        # Sister group: including kmer priors of the all sister clades of the
+        # ingroup clade.
+        #
+        # Random group: including a sample of terminals not present on ingroup
+        # or sister group. Random elements should be used to estimate the
+        # probability of the prediction sequence to does not belongs to the
+        # current super-clade.
+        #
         # ? --------------------------------------------------------------------
 
         ingroups_priors: List[IngroupCladePriors] = []
