@@ -1,6 +1,10 @@
+import gzip
 from collections import defaultdict
+from json import dump
 from pathlib import Path
 from typing import DefaultDict, List
+
+from attrs import asdict
 
 import classeq.core.domain.utils.exceptions as c_exc
 from classeq.core.domain.dtos.msa import MsaSource, MsaSourceFormatEnum
@@ -98,16 +102,56 @@ def load_source_files(
             return init_either
 
         # ? --------------------------------------------------------------------
+        # ? Persist reference set to file
+        # ? --------------------------------------------------------------------
+
+        references = ReferenceSet(
+            tree=tree,
+            msa=msa,
+            labels_map=labels_map,
+        )
+
+        tree_source = references.tree.source_file_path
+        train_output_file_path = tree_source.parent.joinpath(
+            ".".join(
+                [
+                    tree_source.stem,
+                    "reference-set",
+                    "json",
+                    "gz",
+                ]
+            )
+        )
+
+        LOGGER.info(
+            f"Train output file would be persisted to: {train_output_file_path}"
+        )
+
+        with gzip.open(
+            train_output_file_path, "wt", encoding="utf-8"
+        ) as out_gz:
+            # ? Remove sanitized tree of the persistence artifact
+            tree_artifact = tree
+            tree_artifact.sanitized_tree = None
+
+            dump(
+                asdict(
+                    ReferenceSet(
+                        tree=tree_artifact,
+                        msa=references.msa,
+                        labels_map=references.labels_map,
+                    )
+                ),
+                out_gz,
+                indent=4,
+                default=str,
+            )
+
+        # ? --------------------------------------------------------------------
         # ? Return a positive response
         # ? --------------------------------------------------------------------
 
-        return right(
-            ReferenceSet(
-                tree=tree,
-                msa=msa,
-                labels_map=labels_map,
-            )
-        )
+        return right(references)
 
     except Exception as exc:
         return left(c_exc.UseCaseError(exc, logger=LOGGER))

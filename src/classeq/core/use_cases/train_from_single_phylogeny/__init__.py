@@ -63,7 +63,7 @@ def train_from_single_phylogeny(
         with gzip.open(
             train_output_file_path, "wt", encoding="utf-8"
         ) as out_gz:
-            dump(train_response.asdict(), out_gz, indent=4, default=str)
+            dump(train_response.to_dict(), out_gz, indent=4, default=str)
 
         # ? --------------------------------------------------------------------
         # ? Return a positive response

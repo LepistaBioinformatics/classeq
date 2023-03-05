@@ -20,4 +20,11 @@ python_version = "3.11"
 allow_prereleases = true
 
 [scripts]
-test = "env MOCK_MSA='src/tests/mock/input/colletotrichum-acutatom-complex/gapdh/Colletotrichum_acutatum_gapdh_gapsfree.fas' MOCK_TREE='src/tests/mock/input/colletotrichum-acutatom-complex/gapdh/Colletotrichum_acutatum_gapdh.tree' python -m unittest"
+test = """
+env \
+    MOCK_MSA='src/tests/mock/input/colletotrichum-acutatom-complex/gapdh/Colletotrichum_acutatum_gapdh_gapsfree.fas'
+    MOCK_TREE='src/tests/mock/input/colletotrichum-acutatom-complex/gapdh/Colletotrichum_acutatum_gapdh.tree'
+    MOCK_PRIORS='src/tests/mock/input/colletotrichum-acutatom-complex/gapdh/Colletotrichum_acutatum_gapdh.sanitized.train-source.json.gz'
+    MOCK_REFS='src/tests/mock/input/colletotrichum-acutatom-complex/gapdh/Colletotrichum_acutatum_gapdh.sanitized.reference-set.json.gz'
+    python -m unittest
+"""

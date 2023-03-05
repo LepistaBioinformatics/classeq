@@ -1,9 +1,8 @@
-import logging
 from os import getenv
 from pathlib import Path
 from unittest import TestCase
 
-from classeq.core.domain.dtos.msa import MsaSourceFormatEnum
+from classeq.core.domain.dtos.msa import MsaSource, MsaSourceFormatEnum
 from classeq.core.domain.dtos.reference_set import ReferenceSet
 from classeq.core.domain.dtos.tree import TreeSource
 from classeq.core.domain.dtos.tree_source_format import TreeSourceFormatEnum
@@ -17,10 +16,6 @@ from classeq.core.use_cases.load_source_files.load_and_sanitize_sequences import
 
 
 class LoadAndSanitizePhylogenyTest(TestCase):
-    def setUp(self) -> None:
-        logging.basicConfig(level=logging.DEBUG)
-        self.__logger = logging.getLogger()
-
     def test_if_it_work(self) -> None:
         response = load_and_sanitize_phylogeny(
             source_file_path=Path(str(getenv("MOCK_TREE"))),
@@ -39,24 +34,18 @@ class LoadAndSanitizePhylogenyTest(TestCase):
 
 
 class LoadAndSanitizeSequencesTest(TestCase):
-    def setUp(self) -> None:
-        logging.basicConfig(level=logging.DEBUG)
-        self.__logger = logging.getLogger()
-
     def test_if_it_work(self) -> None:
         response = load_and_sanitize_sequences(
             source_file_path=Path(str(getenv("MOCK_MSA"))),
             format=MsaSourceFormatEnum.FASTA,
         )
 
-        self.__logger.debug(response)
+        self.assertFalse(response.is_left)
+        self.assertTrue(response.is_right)
+        self.assertIsInstance(response.value, MsaSource)
 
 
 class LoadSourceFilesTest(TestCase):
-    def setUp(self) -> None:
-        logging.basicConfig(level=logging.DEBUG)
-        self.__logger = logging.getLogger()
-
     def test_if_it_work(self) -> None:
         msa_file_path = Path(str(getenv("MOCK_MSA")))
         tree_file_path = Path(str(getenv("MOCK_TREE")))
@@ -75,6 +64,6 @@ class LoadSourceFilesTest(TestCase):
             support_value_cutoff=99,
         )
 
-        ref: ReferenceSet = response.value
-
-        self.__logger.debug(ref)
+        self.assertFalse(response.is_left)
+        self.assertTrue(response.is_right)
+        self.assertIsInstance(response.value, ReferenceSet)
