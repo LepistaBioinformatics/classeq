@@ -2,7 +2,7 @@ from collections import defaultdict
 from typing import Any, DefaultDict, Dict, Self, Set
 from uuid import UUID, uuid4
 
-from attr import field, frozen
+from attr import field, define
 from Bio.Phylo.BaseTree import Clade, Tree
 
 import classeq.core.domain.utils.exceptions as c_exc
@@ -13,7 +13,7 @@ from classeq.core.domain.utils.either import Either, left, right
 from classeq.settings import LOGGER
 
 
-@frozen(kw_only=True)
+@define(kw_only=True)
 class ReferenceSet:
     # ? ------------------------------------------------------------------------
     # ? Class attributes
@@ -68,6 +68,72 @@ class ReferenceSet:
     # ? Public instance methods
     # ? ------------------------------------------------------------------------
 
+    def get_hierarchical_tree(
+        self,
+    ) -> Either[bool, c_exc.MappedErrors]:
+        try:
+            # ? ----------------------------------------------------------------
+            # ? Generate the linear tree
+            # ? ----------------------------------------------------------------
+
+            linear_tree_either = self.get_linear_tree()
+
+            if linear_tree_either.is_left:
+                return linear_tree_either
+
+            linear_tree: Set[CladeWrapper] = linear_tree_either.value
+
+            if len([i for i in linear_tree if i.is_root()]) != 1:
+                return left(
+                    c_exc.ExecutionError(
+                        "More than one root node found in linear tree.",
+                        logger=LOGGER,
+                    )
+                )
+
+            # ? ----------------------------------------------------------------
+            # ? Get the tree seed
+            # ? ----------------------------------------------------------------
+
+            try:
+                root = next(i for i in iter(linear_tree) if i.is_root())
+            except StopIteration:
+                return left(
+                    c_exc.ExecutionError(
+                        "Root node not present in linear tree.",
+                        logger=LOGGER,
+                    )
+                )
+
+            # ? ----------------------------------------------------------------
+            # ? Start the tree expansion
+            # ? ----------------------------------------------------------------
+
+            seed_tree: CladeWrapper = root
+
+            def __expand_tree(clade: CladeWrapper) -> None:
+                for child in [i for i in linear_tree if i.parent == clade.id]:
+                    if clade.children is None:
+                        clade.children = tuple()
+
+                    clade.children = clade.children + (child,)
+
+                    if child.is_internal() or child.is_outgroup():
+                        __expand_tree(clade=child)
+
+            __expand_tree(clade=seed_tree)
+
+            LOGGER.debug(f"\n{seed_tree}")
+
+            # ? ----------------------------------------------------------------
+            # ? Return a positive response
+            # ? ----------------------------------------------------------------
+
+            return right(True)
+
+        except Exception as exc:
+            return left(c_exc.ExecutionError(exc, logger=LOGGER))
+
     def get_linear_tree(
         self,
     ) -> Either[Set[CladeWrapper], c_exc.MappedErrors]:
@@ -121,6 +187,18 @@ class ReferenceSet:
                     )
 
         try:
+            if self.tree.sanitized_tree is None:
+                tree_either = self.tree.parse_and_reroot_tree(
+                    source_file_path=self.tree.source_file_path,
+                    outgroups=self.tree.outgroups,
+                    format=self.tree.tree_format,
+                )
+
+                if tree_either.is_left:
+                    return tree_either
+
+                self.tree.sanitized_tree = tree_either.value
+
             tree: Tree = self.tree.sanitized_tree
             root: Clade = tree.root
 
@@ -135,4 +213,4 @@ class ReferenceSet:
             return right(linear_tree)
 
         except Exception as exc:
-            return left(c_exc.UseCaseError(exc, logger=LOGGER))
+            return left(c_exc.ExecutionError(exc, logger=LOGGER))

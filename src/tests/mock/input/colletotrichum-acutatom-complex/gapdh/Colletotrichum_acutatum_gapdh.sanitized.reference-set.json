@@ -47601,6 +47601,7 @@
         ],
         "sanitized_tree": null,
         "source_file_path": "src/tests/mock/input/colletotrichum-acutatom-complex/gapdh/Colletotrichum_acutatum_gapdh.sanitized.tree",
+        "tree_format": "TreeSourceFormatEnum.NEWICK",
         "tree_headers": [
             0,
             1,

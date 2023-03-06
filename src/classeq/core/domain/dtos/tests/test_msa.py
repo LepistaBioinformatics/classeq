@@ -1,5 +1,5 @@
-from collections import defaultdict
 import logging
+from collections import defaultdict
 from os import getenv
 from pathlib import Path
 from typing import DefaultDict

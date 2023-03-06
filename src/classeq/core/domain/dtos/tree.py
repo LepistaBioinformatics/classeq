@@ -21,6 +21,7 @@ class TreeSource:
     source_file_path: Path = field()
     tree_headers: List[int] = field()
     outgroups: List[str] = field()
+    tree_format: MsaSourceFormatEnum = field()
     sanitized_tree: Tree | None = field(default=None)
 
     # ? ------------------------------------------------------------------------
@@ -36,6 +37,7 @@ class TreeSource:
             "source_file_path",
             "tree_headers",
             "outgroups",
+            "tree_format",
             "sanitized_tree",
         ]:
             if key not in content:
@@ -52,6 +54,7 @@ class TreeSource:
                 source_file_path=Path(content.get("source_file_path")),  # type: ignore
                 tree_headers=content.get("tree_headers"),  # type: ignore
                 outgroups=content.get("outgroups"),  # type: ignore
+                tree_format=eval(content.get("tree_format")),  # type: ignore
                 sanitized_tree=content.get("sanitized_tree"),  # type: ignore
             )
         )
@@ -85,7 +88,7 @@ class TreeSource:
 
             LOGGER.info("Parsing and reroot tree")
 
-            rooted_tree_either: Either = cls.__parse_and_reroot_tree(
+            rooted_tree_either: Either = cls.parse_and_reroot_tree(
                 source_file_path,
                 outgroups,
                 format,
@@ -191,6 +194,7 @@ class TreeSource:
             return right(
                 cls(
                     source_file_path=cleaned_file_path,
+                    tree_format=format,
                     tree_headers=[
                         h.name for h in sanitized_tree.get_terminals()
                     ],
@@ -203,11 +207,11 @@ class TreeSource:
             return left(c_exc.CreationError(exc, logger=LOGGER))
 
     # ? ------------------------------------------------------------------------
-    # ? Private static methods
+    # ? Public static methods
     # ? ------------------------------------------------------------------------
 
     @staticmethod
-    def __parse_and_reroot_tree(
+    def parse_and_reroot_tree(
         source_file_path: Path,
         outgroups: List[str],
         format: TreeSourceFormatEnum,
@@ -236,6 +240,10 @@ class TreeSource:
 
         except Exception as exc:
             return left(c_exc.UseCaseError(exc, logger=LOGGER))
+
+    # ? ------------------------------------------------------------------------
+    # ? Private static methods
+    # ? ------------------------------------------------------------------------
 
     @staticmethod
     def __collapse_low_supported_nodes(
