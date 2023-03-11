@@ -11,5 +11,8 @@
     "outgroups",
     "PHYLIP",
     "reroot"
-  ]
+  ],
+  "mypy.configFile": ".mypy.ini",
+  "mypy.dmypyExecutable": "~/.local/bin/dmypy",
+  "mypy.targets": ["."]
 }
