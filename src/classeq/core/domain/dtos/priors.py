@@ -1,6 +1,6 @@
 from collections import defaultdict
 from enum import Enum
-from typing import Any, DefaultDict, Dict, List, Self, Tuple
+from typing import Any, DefaultDict, Self
 from uuid import UUID
 
 from attrs import field, frozen
@@ -23,7 +23,7 @@ class LabeledPriors:
     # ? Class attributes
     # ? ------------------------------------------------------------------------
 
-    labels: Tuple[int, ...] = field()
+    labels: tuple[int, ...] = field()
     priors: DefaultDict[str, float] = field()
     group: PriorGroup = field()
 
@@ -31,7 +31,7 @@ class LabeledPriors:
     # ? Public instance methods
     # ? ------------------------------------------------------------------------
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "labels": [i for i in self.labels],
             "priors": self.priors,
@@ -45,7 +45,7 @@ class LabeledPriors:
     @classmethod
     def from_dict(
         cls,
-        content: Dict[str, Any],
+        content: dict[str, Any],
     ) -> Either[Self, c_exc.MappedErrors]:
         for key in [
             "labels",
@@ -110,7 +110,7 @@ class OutgroupCladePriors:
     # ? Public instance methods
     # ? ------------------------------------------------------------------------
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "parent": self.parent.__str__(),
             "priors": self.priors.to_dict(),
@@ -123,7 +123,7 @@ class OutgroupCladePriors:
     @classmethod
     def from_dict(
         cls,
-        content: Dict[str, Any],
+        content: dict[str, Any],
     ) -> Either[Self, c_exc.MappedErrors]:
         for key in [
             "parent",
@@ -167,7 +167,7 @@ class IngroupCladePriors:
 
     # Priors of specific groups, being in order: ingroup, sister, and random
     # groups, respectively.
-    priors: Tuple[
+    priors: tuple[
         IngroupLabeledPriors,
         SisterGroupLabeledPriors,
         NoiseGroupLabeledPriors,
@@ -177,7 +177,7 @@ class IngroupCladePriors:
     # ? Public instance methods
     # ? ------------------------------------------------------------------------
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "parent": self.parent.__str__(),
             "priors": [i.to_dict() for i in self.priors],
@@ -190,7 +190,7 @@ class IngroupCladePriors:
     @classmethod
     def from_dict(
         cls,
-        content: Dict[str, Any],
+        content: dict[str, Any],
     ) -> Either[Self, c_exc.MappedErrors]:
         for key in [
             "parent",
@@ -205,7 +205,7 @@ class IngroupCladePriors:
                     )
                 )
 
-        priors: List[LabeledPriors] = []
+        priors: list[LabeledPriors] = []
 
         for prior in content.get("priors"):  # type: ignore
             prior_either = LabeledPriors.from_dict(content=prior)
@@ -251,13 +251,13 @@ class TreePriors:
     # ? ------------------------------------------------------------------------
 
     outgroup: OutgroupCladePriors = field()
-    ingroups: List[IngroupCladePriors] = field(default=[])
+    ingroups: list[IngroupCladePriors] = field(default=[])
 
     # ? ------------------------------------------------------------------------
     # ? Public instance methods
     # ? ------------------------------------------------------------------------
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "outgroup": self.outgroup.to_dict(),
             "ingroups": [i.to_dict() for i in self.ingroups],
@@ -270,7 +270,7 @@ class TreePriors:
     @classmethod
     def from_dict(
         cls,
-        content: Dict[str, Any],
+        content: dict[str, Any],
     ) -> Either[Self, c_exc.MappedErrors]:
         for key in [
             "outgroup",
@@ -292,7 +292,7 @@ class TreePriors:
         if outgroup_either.is_left:
             return outgroup_either
 
-        ingroups: List[IngroupCladePriors] = []
+        ingroups: list[IngroupCladePriors] = []
         for item in content.get("ingroups"):  # type: ignore
             parsed_item = IngroupCladePriors.from_dict(content=item)
 

@@ -2,7 +2,7 @@ from hashlib import md5
 from collections import defaultdict
 from itertools import islice
 from pathlib import Path
-from typing import Any, DefaultDict, Dict, Iterator, List, Self, Set, Tuple
+from typing import Any, DefaultDict, Iterator, Self
 
 from attrs import define, field, frozen
 from Bio import SeqIO
@@ -20,7 +20,7 @@ class KmerIndex:
     # ? ------------------------------------------------------------------------
 
     kmer: str = field()
-    records: Tuple[int, ...] = field(default=tuple())
+    records: tuple[int, ...] = field(default=tuple())
 
     # ? ------------------------------------------------------------------------
     # ? Life cycle hook methods
@@ -46,7 +46,7 @@ class KmerIndex:
     @classmethod
     def from_dict(
         cls,
-        content: Dict[str, Any],
+        content: dict[str, Any],
     ) -> Either[Self, c_exc.MappedErrors]:
         for key in [
             "kmer",
@@ -100,8 +100,8 @@ class KmersInverseIndices:
     # ? Class attributes
     # ? ------------------------------------------------------------------------
 
-    indices: Tuple[KmerIndex, ...] = field(default=tuple())
-    hashes: Tuple[int, ...] = field()
+    indices: tuple[KmerIndex, ...] = field(default=tuple())
+    hashes: tuple[int, ...] = field()
 
     # ? ------------------------------------------------------------------------
     # ? Public class methods
@@ -110,7 +110,7 @@ class KmersInverseIndices:
     @classmethod
     def from_dict(
         cls,
-        content: Dict[str, Any],
+        content: dict[str, Any],
     ) -> Either[Self, c_exc.MappedErrors]:
         for key in [
             "indices",
@@ -125,7 +125,7 @@ class KmersInverseIndices:
                     )
                 )
 
-        kmer_indices: List[KmerIndex] = []
+        kmer_indices: list[KmerIndex] = []
         for index in content.get("indices"):  # type: ignore
             kmer_index_either = KmerIndex.from_dict(content=index)
 
@@ -161,7 +161,7 @@ class KmersInverseIndices:
                     )
                 )
 
-            kmer_indices: DefaultDict[str, Set[int]] = defaultdict(set)
+            kmer_indices: DefaultDict[str, set[int]] = defaultdict(set)
 
             for record in SeqIO.parse(
                 handle=source_file_path,

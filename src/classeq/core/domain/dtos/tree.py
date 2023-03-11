@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any, Dict, List, Self, Set
+from typing import Any, Self
 
 from attr import define, field
 from Bio import Phylo
@@ -19,8 +19,8 @@ class TreeSource:
     # ? ------------------------------------------------------------------------
 
     source_file_path: Path = field()
-    tree_headers: List[int] = field()
-    outgroups: List[str] = field()
+    tree_headers: list[int] = field()
+    outgroups: list[str] = field()
     tree_format: MsaSourceFormatEnum = field()
     sanitized_tree: Tree | None = field(default=None)
 
@@ -31,7 +31,7 @@ class TreeSource:
     @classmethod
     def from_dict(
         cls,
-        content: Dict[str, Any],
+        content: dict[str, Any],
     ) -> Either[Self, c_exc.MappedErrors]:
         for key in [
             "source_file_path",
@@ -68,7 +68,7 @@ class TreeSource:
         cls,
         source_file_path: Path,
         format: MsaSourceFormatEnum,
-        outgroups: List[str],
+        outgroups: list[str],
         support_value_cutoff: int = 99,
     ) -> Either[Self, c_exc.MappedErrors]:
         try:
@@ -149,7 +149,7 @@ class TreeSource:
             )
 
             clade: Clade
-            collapsable_clades: Set[Clade] = set()
+            collapsable_clades: set[Clade] = set()
 
             for clade in common_ancestor.clades:
                 if all([t.name in outgroups for t in clade.get_terminals()]):
@@ -213,13 +213,13 @@ class TreeSource:
     @staticmethod
     def parse_and_reroot_tree(
         source_file_path: Path,
-        outgroups: List[str],
+        outgroups: list[str],
         format: TreeSourceFormatEnum,
     ) -> Either[Tree, c_exc.MappedErrors]:
         try:
             raw_tree: Tree = Phylo.read(source_file_path, format.value)
 
-            terminals: List[Clade] = raw_tree.get_terminals()
+            terminals: list[Clade] = raw_tree.get_terminals()
 
             tree_outgroups = [
                 clade for clade in terminals if clade.name in outgroups

@@ -1,6 +1,6 @@
 from collections import defaultdict
 from functools import reduce
-from typing import DefaultDict, Iterator, List, Set
+from typing import DefaultDict, Iterator
 from classeq.core.domain.dtos.clade import CladeWrapper
 from classeq.core.domain.dtos.kmer_inverse_index import (
     KmerIndex,
@@ -39,7 +39,7 @@ def estimate_clade_specific_priors(
         if linear_tree_either.is_left:
             return linear_tree_either
 
-        linear_tree: Set[CladeWrapper] = linear_tree_either.value
+        linear_tree: set[CladeWrapper] = linear_tree_either.value
 
         # ? --------------------------------------------------------------------
         # ? Extract root node
@@ -108,13 +108,13 @@ def estimate_clade_specific_priors(
 
 def __calculate_recursive_priors(
     root: CladeWrapper,
-    outgroups: List[CladeWrapper],
-    other_nodes: List[CladeWrapper],
+    outgroups: list[CladeWrapper],
+    other_nodes: list[CladeWrapper],
     label_map: DefaultDict[str, int],
     kmer_indices: KmersInverseIndices,
 ) -> Either[float, c_exc.MappedErrors]:
     def __calculate_priors_for_clade(
-        sequence_codes: List[int],
+        sequence_codes: list[int],
     ) -> Either[float, c_exc.MappedErrors]:
         # ? --------------------------------------------------------------------
         # ? Estimate outgroup/sister pair kmer priors
@@ -135,7 +135,7 @@ def __calculate_recursive_priors(
         # ? Calculate joint probability units
         # ? --------------------------------------------------------------------
 
-        joint_probability_units: List[float] = []
+        joint_probability_units: list[float] = []
 
         for kmer in target_sequence_kmers:
             if (prior := kmer_priors.get(kmer)) is None:
@@ -196,7 +196,7 @@ def __calculate_recursive_priors(
         # ? Calculate outgroup joint probabilities
         # ? --------------------------------------------------------------------
 
-        outgroup_labels: List[int] = []
+        outgroup_labels: list[int] = []
 
         for node in outgroups:
             if (label := label_map.get(node.name)) is None:
@@ -224,7 +224,7 @@ def __calculate_recursive_priors(
         # ? Calculate outgroup-sister nodes likelihood
         # ? --------------------------------------------------------------------
 
-        outgroup_sisters_labels: List[int] = []
+        outgroup_sisters_labels: list[int] = []
 
         for i in __get_terminal_nodes(
             target_nodes=[i for i in other_nodes if i.parent == root.id],
@@ -301,12 +301,12 @@ def __calculate_probability_of_group_contains_kmer(
 
 def __estimate_clade_kmer_specific_priors(
     kmer_indices: KmersInverseIndices,
-    sequence_codes: List[int],
+    sequence_codes: list[int],
     corpus_size: int,
 ) -> Either[DefaultDict[str, float], c_exc.MappedErrors]:
     try:
         kmers_priors_for_clade: DefaultDict[str, float] = defaultdict()
-        target_indices: Set[KmerIndex] = set()
+        target_indices: set[KmerIndex] = set()
 
         for index in kmer_indices.indices:
             for code in sequence_codes:
@@ -330,11 +330,11 @@ def __estimate_clade_kmer_specific_priors(
 
 
 def __get_terminal_nodes(
-    target_nodes: List[CladeWrapper],
-    reference_nodes: List[CladeWrapper],
-) -> List[CladeWrapper]:
+    target_nodes: list[CladeWrapper],
+    reference_nodes: list[CladeWrapper],
+) -> list[CladeWrapper]:
     def __get_children(
-        target_nodes: List[CladeWrapper],
+        target_nodes: list[CladeWrapper],
     ) -> Iterator[CladeWrapper]:
         node: CladeWrapper
         for node in target_nodes:

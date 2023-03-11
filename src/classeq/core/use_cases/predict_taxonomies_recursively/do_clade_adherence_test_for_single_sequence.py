@@ -1,5 +1,4 @@
 from functools import reduce
-from typing import Dict, List
 
 import classeq.core.domain.utils.exceptions as c_exc
 from classeq.core.domain.dtos.kmer_inverse_index import KmersInverseIndices
@@ -17,7 +16,7 @@ def do_clade_adherence_test_for_single_sequence(
     target_sequence: str,
     clade_priors: IngroupCladePriors | OutgroupCladePriors,
     kmer_indices: KmersInverseIndices,
-) -> Either[Dict[PriorGroup, float], c_exc.MappedErrors]:
+) -> Either[dict[PriorGroup, float], c_exc.MappedErrors]:
     try:
         # ? --------------------------------------------------------------------
         # ? Validate entries
@@ -67,7 +66,7 @@ def do_clade_adherence_test_for_single_sequence(
         # ? Calculate joint probability units
         # ? --------------------------------------------------------------------
 
-        clade_adherence_stats: Dict[PriorGroup, float] = {}
+        clade_adherence_stats: dict[PriorGroup, float] = {}
 
         if isinstance(clade_priors, IngroupCladePriors):
             for group in clade_priors.priors:
@@ -110,11 +109,11 @@ def do_clade_adherence_test_for_single_sequence(
 
 def __calculate_clade_adherence(
     labeled_priors: LabeledPriors,
-    target_kmers: List[str],
+    target_kmers: list[str],
     kmer_indices: KmersInverseIndices,
 ) -> Either[bool, c_exc.MappedErrors]:
     try:
-        joint_probability_units: List[float] = []
+        joint_probability_units: list[float] = []
 
         for kmer in target_kmers:
             if (prior := labeled_priors.priors.get(kmer)) is None:

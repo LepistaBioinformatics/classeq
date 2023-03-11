@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import List
 
 import classeq.core.domain.utils.exceptions as c_exc
 from classeq.core.domain.dtos.tree import TreeSource
@@ -10,7 +9,7 @@ from classeq.settings import LOGGER
 
 def load_and_sanitize_phylogeny(
     source_file_path: Path,
-    outgroups: List[str],
+    outgroups: list[str],
     format: TreeSourceFormatEnum,
     support_value_cutoff: int = 99,
 ) -> Either[TreeSource, c_exc.MappedErrors]:
@@ -22,7 +21,7 @@ def load_and_sanitize_phylogeny(
 
     Args:
         source_file_path (Path): The system path of the input file.
-        outgroups (List[str]): A list of outgroups to reroot the phylogenetic
+        outgroups (list[str]): A list of outgroups to reroot the phylogenetic
             tree.
         support_value_cutoff (int, optional): A cutoff for collapsing internal
             nodes of the phylogenetic tree. Defaults to 99.

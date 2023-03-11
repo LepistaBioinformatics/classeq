@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Any, DefaultDict, Dict, Self, Set
+from typing import Any, DefaultDict, Self
 from uuid import UUID, uuid4
 
 from attr import field, define
@@ -30,7 +30,7 @@ class ReferenceSet:
     @classmethod
     def from_dict(
         cls,
-        content: Dict[str, Any],
+        content: dict[str, Any],
     ) -> Either[Self, c_exc.MappedErrors]:
         for key in [
             "tree",
@@ -70,7 +70,7 @@ class ReferenceSet:
 
     def get_hierarchical_tree(
         self,
-    ) -> Either[bool, c_exc.MappedErrors]:
+    ) -> Either[CladeWrapper, c_exc.MappedErrors]:
         try:
             # ? ----------------------------------------------------------------
             # ? Generate the linear tree
@@ -81,7 +81,7 @@ class ReferenceSet:
             if linear_tree_either.is_left:
                 return linear_tree_either
 
-            linear_tree: Set[CladeWrapper] = linear_tree_either.value
+            linear_tree: set[CladeWrapper] = linear_tree_either.value
 
             if len([i for i in linear_tree if i.is_root()]) != 1:
                 return left(
@@ -123,20 +123,18 @@ class ReferenceSet:
 
             __expand_tree(clade=seed_tree)
 
-            LOGGER.debug(f"\n{seed_tree}")
-
             # ? ----------------------------------------------------------------
             # ? Return a positive response
             # ? ----------------------------------------------------------------
 
-            return right(True)
+            return right(seed_tree)
 
         except Exception as exc:
             return left(c_exc.ExecutionError(exc, logger=LOGGER))
 
     def get_linear_tree(
         self,
-    ) -> Either[Set[CladeWrapper], c_exc.MappedErrors]:
+    ) -> Either[set[CladeWrapper], c_exc.MappedErrors]:
         """Convert the original Bio.Phylo.BaseTree.Tree to a linear version
         composed of a set of `CladeWrapper` elements.
         """
@@ -202,7 +200,7 @@ class ReferenceSet:
             tree: Tree = self.tree.sanitized_tree
             root: Clade = tree.root
 
-            linear_tree: Set[CladeWrapper] = set()
+            linear_tree: set[CladeWrapper] = set()
 
             __collect_clades_recursively(
                 parent=None,

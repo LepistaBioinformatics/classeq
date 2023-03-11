@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import ABCMeta, abstractmethod
-from typing import Any, List, NamedTuple, NoReturn, Union
+from typing import Any, NamedTuple, NoReturn
 
 from .either import Either
 from .exceptions import (
@@ -35,14 +35,14 @@ class FetchResponse(NamedTuple):
     """A interface for fetch return methods."""
 
     fetched: bool
-    instance: Union[NoReturn, Any]
+    instance: NoReturn | Any
 
 
 class FetchManyResponse(NamedTuple):
     """A interface for fetch return methods."""
 
     fetched: bool
-    instance: Union[NoReturn, List[Any]]
+    instance: NoReturn | list[Any]
 
 
 class UpdateResponse(NamedTuple):

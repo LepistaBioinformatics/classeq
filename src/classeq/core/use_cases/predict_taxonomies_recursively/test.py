@@ -1,5 +1,4 @@
 import gzip
-import logging
 from json import loads
 from os import getenv
 from pathlib import Path
@@ -14,9 +13,6 @@ from classeq.core.use_cases.predict_taxonomies_recursively.do_clade_adherence_te
 
 class PredictTaxonomiesRecursivelyTest(TestCase):
     def setUp(self) -> None:
-        logging.basicConfig(level=logging.DEBUG)
-        self.__logger = logging.getLogger()
-
         self.__ingroup_reference = [
             ["AAAA", "AAAC", "AAAT", "AAAG"],
             ["AAAA", "AAAT", "AAAG", "AACA"],

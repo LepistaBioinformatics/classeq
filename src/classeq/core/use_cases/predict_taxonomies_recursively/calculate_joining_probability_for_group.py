@@ -1,5 +1,3 @@
-from typing import List, Set
-
 from attr import define, field
 
 import classeq.core.domain.utils.exceptions as c_exc
@@ -23,10 +21,10 @@ class KmerBayesStats:
 
 
 def calculate_joining_probability_for_group(
-    prediction_target: List[str],
-    positive_reference: List[List[str]],
-    negative_reference: List[List[str]],
-) -> Either[List[KmerBayesStats], c_exc.MappedErrors]:
+    prediction_target: list[str],
+    positive_reference: list[list[str]],
+    negative_reference: list[list[str]],
+) -> Either[list[KmerBayesStats], c_exc.MappedErrors]:
     try:
         # ? --------------------------------------------------------------------
         # ? Validate args
@@ -72,8 +70,8 @@ def calculate_joining_probability_for_group(
         # ? --------------------------------------------------------------------
 
         sample_size = len(positive_reference) + len(negative_reference)
-        kmers_post_probabilities: List[KmerBayesStats] = []
-        available_kmers: Set[str] = set()
+        kmers_post_probabilities: list[KmerBayesStats] = []
+        available_kmers: set[str] = set()
 
         for reference in [*positive_reference, *negative_reference]:
             available_kmers.update(reference)
@@ -189,7 +187,7 @@ def __calculate_kmer_bayes_stats(
 
 def __calculate_kmer_percentage_in_group(
     kmer: str,
-    group_records: List[List[str]],
+    group_records: list[list[str]],
 ) -> __KmerStats:
     if len(group_records) < 5:
         raise

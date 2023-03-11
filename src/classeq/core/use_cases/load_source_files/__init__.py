@@ -3,7 +3,7 @@ import gzip
 from collections import defaultdict
 from json import dump
 from pathlib import Path
-from typing import DefaultDict, List
+from typing import DefaultDict
 
 from attrs import asdict
 
@@ -27,7 +27,7 @@ def load_source_files(
     msa_format: MsaSourceFormatEnum,
     tree_file_path: Path,
     tree_format: TreeSourceFormatEnum,
-    outgroups: List[str],
+    outgroups: list[str],
     support_value_cutoff: int = 99,
 ) -> Either[bool, c_exc.MappedErrors]:
     try:

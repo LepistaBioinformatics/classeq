@@ -1,6 +1,6 @@
 from enum import Enum
 from hashlib import md5
-from typing import List, Self, Tuple
+from typing import Self
 from uuid import UUID, uuid4
 
 from attr import field, define
@@ -27,7 +27,7 @@ class CladeWrapper:
     support: float | None = field(default=None)
     branch_length: float | None = field(default=None)
     parent: UUID | None = field(default=None)
-    children: Tuple[Self, ...] | None = field(default=None)
+    children: tuple[Self, ...] | None = field(default=None)
 
     # ? ------------------------------------------------------------------------
     # ? Life cycle hook methods
@@ -47,8 +47,22 @@ class CladeWrapper:
         return int(md5(self.id.__str__().encode("utf-8")).hexdigest(), 16)
 
     def __repr__(self) -> str:
-        str_repr: List[str] = []
+        return self.get_pretty_tree_list()
 
+    # ? ------------------------------------------------------------------------
+    # ? Validations
+    # ? ------------------------------------------------------------------------
+
+    @id.default
+    def _id_default(self) -> UUID:
+        return uuid4()
+
+    # ? ------------------------------------------------------------------------
+    # ? Public instance methods
+    # ? ------------------------------------------------------------------------
+
+    def get_pretty_tree_list(self) -> str:
+        str_repr: list[str] = []
         backbone_color = "\033[90m"
         escape = "\033[0m"
 
@@ -58,7 +72,9 @@ class CladeWrapper:
         PIPE_PREFIX = f"{backbone_color}│   {escape}"
         SPACE_PREFIX = f"{backbone_color}    {escape}"
 
-        def __print_nodes(clade: CladeWrapper, prefix: str) -> None:
+        def __build_node_representations(
+            clade: CladeWrapper, prefix: str
+        ) -> None:
             if clade.children is None:
                 return
 
@@ -116,24 +132,14 @@ class CladeWrapper:
 
                     str_repr.append(prefix + indent_sep + PIPE)
 
-                    __print_nodes(clade=child, prefix=prefix + indent_sep)
+                    __build_node_representations(
+                        clade=child, prefix=prefix + indent_sep
+                    )
 
         str_repr.append(PIPE)
-        __print_nodes(clade=self, prefix="")
+        __build_node_representations(clade=self, prefix="")
 
         return "\n".join(str_repr)
-
-    # ? ------------------------------------------------------------------------
-    # ? Validations
-    # ? ------------------------------------------------------------------------
-
-    @id.default
-    def _id_default(self) -> UUID:
-        return uuid4()
-
-    # ? ------------------------------------------------------------------------
-    # ? Public instance methods
-    # ? ------------------------------------------------------------------------
 
     def is_root(self) -> bool:
         return self.type == NodeType.ROOT

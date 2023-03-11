@@ -1,6 +1,6 @@
 from pathlib import Path
 from re import search
-from typing import Any, DefaultDict, Dict, List, Self
+from typing import Any, DefaultDict, Self
 
 from attr import define, field
 from Bio import SeqIO
@@ -26,7 +26,7 @@ class MsaSource:
 
     source_file_path: Path = field()
     file_format: MsaSourceFormatEnum = field()
-    sequence_headers: List[int] = field()
+    sequence_headers: list[int] = field()
     kmers_indices: KmersInverseIndices | None = field(default=None)
 
     # ? ------------------------------------------------------------------------
@@ -36,7 +36,7 @@ class MsaSource:
     @classmethod
     def from_dict(
         cls,
-        content: Dict[str, Any],
+        content: dict[str, Any],
     ) -> Either[Self, c_exc.MappedErrors]:
         for key in [
             "source_file_path",
@@ -87,7 +87,7 @@ class MsaSource:
                     )
                 )
 
-            sequence_headers: List[int] = list()
+            sequence_headers: list[int] = list()
 
             cleaned_file_path = source_file_path.parent.joinpath(
                 "".join(

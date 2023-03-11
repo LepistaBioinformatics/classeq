@@ -30,4 +30,6 @@ class ReferenceSetTest(TestCase):
     def test_hierarchical_tree_generation(self) -> None:
         response_either = self.__reference_set.get_hierarchical_tree()
 
-        self.__logger.debug(response_either)
+        self.assertFalse(response_either.is_left)
+        self.assertTrue(response_either.is_right)
+        self.__logger.debug(response_either.value)
