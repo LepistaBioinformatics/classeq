@@ -14,7 +14,7 @@ from .estimate_clade_specific_priors import estimate_clade_specific_priors
 
 def train_from_single_phylogeny(
     references: ReferenceSet,
-) -> Either[bool, c_exc.MappedErrors]:
+) -> Either[c_exc.MappedErrors, bool]:
     try:
         # ? --------------------------------------------------------------------
         # ? Validate args

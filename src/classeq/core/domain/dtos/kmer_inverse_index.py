@@ -47,7 +47,7 @@ class KmerIndex:
     def from_dict(
         cls,
         content: dict[str, Any],
-    ) -> Either[Self, c_exc.MappedErrors]:
+    ) -> Either[c_exc.MappedErrors, Self]:
         for key in [
             "kmer",
             "records",
@@ -111,7 +111,7 @@ class KmersInverseIndices:
     def from_dict(
         cls,
         content: dict[str, Any],
-    ) -> Either[Self, c_exc.MappedErrors]:
+    ) -> Either[c_exc.MappedErrors, Self]:
         for key in [
             "indices",
             "hashes",
@@ -152,7 +152,7 @@ class KmersInverseIndices:
         format: MsaSourceFormatEnum,
         k_size: int,
         headers_map: DefaultDict[str, int],
-    ) -> Either[Self, c_exc.MappedErrors]:
+    ) -> Either[c_exc.MappedErrors, Self]:
         try:
             if not source_file_path.is_file():
                 return left(

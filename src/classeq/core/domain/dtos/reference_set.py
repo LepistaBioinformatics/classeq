@@ -31,7 +31,7 @@ class ReferenceSet:
     def from_dict(
         cls,
         content: dict[str, Any],
-    ) -> Either[Self, c_exc.MappedErrors]:
+    ) -> Either[c_exc.MappedErrors, Self]:
         for key in [
             "tree",
             "msa",
@@ -70,7 +70,7 @@ class ReferenceSet:
 
     def get_hierarchical_tree(
         self,
-    ) -> Either[CladeWrapper, c_exc.MappedErrors]:
+    ) -> Either[c_exc.MappedErrors, CladeWrapper]:
         try:
             # ? ----------------------------------------------------------------
             # ? Generate the linear tree
@@ -134,7 +134,7 @@ class ReferenceSet:
 
     def get_linear_tree(
         self,
-    ) -> Either[set[CladeWrapper], c_exc.MappedErrors]:
+    ) -> Either[c_exc.MappedErrors, set[CladeWrapper]]:
         """Convert the original Bio.Phylo.BaseTree.Tree to a linear version
         composed of a set of `CladeWrapper` elements.
         """

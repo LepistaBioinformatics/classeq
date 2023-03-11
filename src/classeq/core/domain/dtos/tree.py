@@ -32,7 +32,7 @@ class TreeSource:
     def from_dict(
         cls,
         content: dict[str, Any],
-    ) -> Either[Self, c_exc.MappedErrors]:
+    ) -> Either[c_exc.MappedErrors, Self]:
         for key in [
             "source_file_path",
             "tree_headers",
@@ -70,7 +70,7 @@ class TreeSource:
         format: MsaSourceFormatEnum,
         outgroups: list[str],
         support_value_cutoff: int = 99,
-    ) -> Either[Self, c_exc.MappedErrors]:
+    ) -> Either[c_exc.MappedErrors, Self]:
         try:
             if not source_file_path.is_file():
                 return left(
@@ -215,7 +215,7 @@ class TreeSource:
         source_file_path: Path,
         outgroups: list[str],
         format: TreeSourceFormatEnum,
-    ) -> Either[Tree, c_exc.MappedErrors]:
+    ) -> Either[c_exc.MappedErrors, Tree]:
         try:
             raw_tree: Tree = Phylo.read(source_file_path, format.value)
 
@@ -249,7 +249,7 @@ class TreeSource:
     def __collapse_low_supported_nodes(
         rooted_tree: Tree,
         support_value_cutoff: int = 99,
-    ) -> Either[Tree, c_exc.MappedErrors]:
+    ) -> Either[c_exc.MappedErrors, Tree]:
         try:
             if rooted_tree.rooted is False:
                 return left(

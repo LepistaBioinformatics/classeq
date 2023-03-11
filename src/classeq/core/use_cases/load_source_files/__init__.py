@@ -29,7 +29,7 @@ def load_source_files(
     tree_format: TreeSourceFormatEnum,
     outgroups: list[str],
     support_value_cutoff: int = 99,
-) -> Either[bool, c_exc.MappedErrors]:
+) -> Either[c_exc.MappedErrors, ReferenceSet]:
     try:
         # ? --------------------------------------------------------------------
         # ? Load MSA

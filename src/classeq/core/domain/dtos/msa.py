@@ -37,7 +37,7 @@ class MsaSource:
     def from_dict(
         cls,
         content: dict[str, Any],
-    ) -> Either[Self, c_exc.MappedErrors]:
+    ) -> Either[c_exc.MappedErrors, Self]:
         for key in [
             "source_file_path",
             "file_format",
@@ -78,7 +78,7 @@ class MsaSource:
         cls,
         source_file_path: Path,
         format: MsaSourceFormatEnum,
-    ) -> Either[Self, c_exc.MappedErrors]:
+    ) -> Either[c_exc.MappedErrors, Self]:
         try:
             if not source_file_path.is_file():
                 return left(
@@ -139,7 +139,7 @@ class MsaSource:
     def initialize_kmer_indices(
         self,
         headers_map: DefaultDict[str, int],
-    ) -> Either[bool, c_exc.MappedErrors]:
+    ) -> Either[c_exc.MappedErrors, bool]:
         try:
             indices_either = KmersInverseIndices.new(
                 source_file_path=self.source_file_path,

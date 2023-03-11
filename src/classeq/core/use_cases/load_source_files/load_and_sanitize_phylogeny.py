@@ -12,7 +12,7 @@ def load_and_sanitize_phylogeny(
     outgroups: list[str],
     format: TreeSourceFormatEnum,
     support_value_cutoff: int = 99,
-) -> Either[TreeSource, c_exc.MappedErrors]:
+) -> Either[c_exc.MappedErrors, TreeSource]:
     """Load phylogenetic tree into memory.
 
     The loading process includes the literal loading using BioPython's Phylo

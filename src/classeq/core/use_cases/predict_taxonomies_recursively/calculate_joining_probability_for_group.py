@@ -24,7 +24,7 @@ def calculate_joining_probability_for_group(
     prediction_target: list[str],
     positive_reference: list[list[str]],
     negative_reference: list[list[str]],
-) -> Either[list[KmerBayesStats], c_exc.MappedErrors]:
+) -> Either[c_exc.MappedErrors, list[KmerBayesStats]]:
     try:
         # ? --------------------------------------------------------------------
         # ? Validate args

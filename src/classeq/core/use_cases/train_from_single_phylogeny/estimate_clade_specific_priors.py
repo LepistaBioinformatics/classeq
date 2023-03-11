@@ -27,7 +27,7 @@ from classeq.settings import LOGGER
 
 def estimate_clade_specific_priors(
     references: ReferenceSet,
-) -> Either[TreePriors, c_exc.MappedErrors]:
+) -> Either[c_exc.MappedErrors, TreePriors]:
     try:
         # ? --------------------------------------------------------------------
         # ? Validate entries
@@ -125,7 +125,7 @@ def __calculate_recursive_priors(
     label_map: DefaultDict[str, int],
     kmer_indices: KmersInverseIndices,
     min_clade_size: int = 3,
-) -> Either[TreePriors, c_exc.MappedErrors]:
+) -> Either[c_exc.MappedErrors, TreePriors]:
     try:
         # ? --------------------------------------------------------------------
         # ? Calculate outgroup clade priors
@@ -361,7 +361,7 @@ def __estimate_clade_kmer_specific_priors(
     kmer_indices: KmersInverseIndices,
     sequence_codes: list[int],
     corpus_size: int,
-) -> Either[DefaultDict[str, float], c_exc.MappedErrors]:
+) -> Either[c_exc.MappedErrors, DefaultDict[str, float]]:
     try:
         kmers_priors_for_clade: DefaultDict[str, float] = defaultdict()
         target_indices: set[KmerIndex] = set()

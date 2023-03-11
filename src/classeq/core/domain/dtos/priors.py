@@ -46,7 +46,7 @@ class LabeledPriors:
     def from_dict(
         cls,
         content: dict[str, Any],
-    ) -> Either[Self, c_exc.MappedErrors]:
+    ) -> Either[c_exc.MappedErrors, Self]:
         for key in [
             "labels",
             "priors",
@@ -124,7 +124,7 @@ class OutgroupCladePriors:
     def from_dict(
         cls,
         content: dict[str, Any],
-    ) -> Either[Self, c_exc.MappedErrors]:
+    ) -> Either[c_exc.MappedErrors, Self]:
         for key in [
             "parent",
             "priors",
@@ -191,7 +191,7 @@ class IngroupCladePriors:
     def from_dict(
         cls,
         content: dict[str, Any],
-    ) -> Either[Self, c_exc.MappedErrors]:
+    ) -> Either[c_exc.MappedErrors, Self]:
         for key in [
             "parent",
             "priors",
@@ -271,7 +271,7 @@ class TreePriors:
     def from_dict(
         cls,
         content: dict[str, Any],
-    ) -> Either[Self, c_exc.MappedErrors]:
+    ) -> Either[c_exc.MappedErrors, Self]:
         for key in [
             "outgroup",
             "ingroups",

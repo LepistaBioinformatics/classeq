@@ -9,7 +9,7 @@ from classeq.settings import LOGGER
 def load_and_sanitize_sequences(
     source_file_path: Path,
     format: MsaSourceFormatEnum,
-) -> Either[MsaSource, c_exc.MappedErrors]:
+) -> Either[c_exc.MappedErrors, MsaSource]:
     try:
         return MsaSource.new(
             source_file_path=source_file_path,

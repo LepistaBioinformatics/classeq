@@ -16,7 +16,7 @@ def do_clade_adherence_test_for_single_sequence(
     target_sequence: str,
     clade_priors: IngroupCladePriors | OutgroupCladePriors,
     kmer_indices: KmersInverseIndices,
-) -> Either[dict[PriorGroup, float], c_exc.MappedErrors]:
+) -> Either[c_exc.MappedErrors, dict[PriorGroup, float]]:
     try:
         # ? --------------------------------------------------------------------
         # ? Validate entries
@@ -111,7 +111,7 @@ def __calculate_clade_adherence(
     labeled_priors: LabeledPriors,
     target_kmers: list[str],
     kmer_indices: KmersInverseIndices,
-) -> Either[bool, c_exc.MappedErrors]:
+) -> Either[c_exc.MappedErrors, float]:
     try:
         joint_probability_units: list[float] = []
 

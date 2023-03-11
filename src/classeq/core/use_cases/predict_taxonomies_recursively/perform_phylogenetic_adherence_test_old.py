@@ -18,7 +18,7 @@ def perform_phylogenetic_adherence_test(
     ingroup: list[list[str]],
     sister: list[list[str]],
     outgroup: list[list[str]],
-) -> Either[bool, c_exc.MappedErrors]:
+) -> Either[c_exc.MappedErrors, bool]:
     try:
         # ? --------------------------------------------------------------------
         # ? Validate args
