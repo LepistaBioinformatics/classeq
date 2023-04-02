@@ -1,9 +1,55 @@
+# ? ----------------------------------------------------------------------------
+# ? Building
+# ? ----------------------------------------------------------------------------
+
+[build-system]
+
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+
+# ? ----------------------------------------------------------------------------
+# ? Building
+# ? ----------------------------------------------------------------------------
+
+[project]
+
+name = "classeq"
+authors = [{ name = "Samuel Galvão Elias", email = "sgelias@outlook.com" }]
+description = "A phylogeneny based classifier of DNA sequences"
+requires-python = ">=3.11"
+keywords = ["Machine Learning", "Bioinformatics", "Phylogeny"]
+classifiers = ["Programming Language :: Python :: 3.11"]
+dynamic = ["version"]
+
+
+# ? ----------------------------------------------------------------------------
+# ? Entrypoints
+# ? ----------------------------------------------------------------------------
+
+# [project.scripts]
+
+# The CLI entrypoint
+#cls="cls.ports.cli.main:classeq_cmd"
+
+
+# ? ----------------------------------------------------------------------------
+# ? Commitizen
+# ? ----------------------------------------------------------------------------
+
+# Remove hashtag if non python files should be included at the installation
+# files.
+#
+#[tool.setuptools.package-data]
+#classeq = ["assets/*.tsv.gz"]
+
+# ? ----------------------------------------------------------------------------
+# ? Commitizen
+# ? ----------------------------------------------------------------------------
+
 [tool.commitizen]
+
 name = "cz_conventional_commits"
 version = "0.1.0"
-version_files = [
-    "src/setup.py",
-    "src/setup.cfg:version"
-]
 tag_format = "v$version"
 bump_message = "bump: $current_version → $new_version [skip-ci]"

@@ -8,10 +8,10 @@ biopython = "*"
 attrs = "*"
 
 [dev-packages]
-classeq = {editable = true, path = "./src"}
 black = "*"
 mypy = "*"
 pre-commit = "*"
+classeq = {editable = true, path = "."}
 
 [requires]
 python_version = "3.11"
