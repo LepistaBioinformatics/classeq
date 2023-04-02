@@ -34,7 +34,7 @@ dynamic = ["version"]
 
 
 # ? ----------------------------------------------------------------------------
-# ? Commitizen
+# ? Assets
 # ? ----------------------------------------------------------------------------
 
 # Remove hashtag if non python files should be included at the installation

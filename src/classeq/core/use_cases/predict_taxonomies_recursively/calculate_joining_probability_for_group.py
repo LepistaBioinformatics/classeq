@@ -7,6 +7,14 @@ from classeq.settings import LOGGER
 
 @define(kw_only=True)
 class __KmerStats:
+    """Kmer stats.
+
+    Attributes:
+        group_length (int): The length of the group.
+        records_on_group (int): The number of records on the group.
+
+    """
+
     group_length: int = field()
     records_on_group: int = field()
 
@@ -16,6 +24,14 @@ class __KmerStats:
 
 @define(kw_only=True)
 class KmerBayesStats:
+    """Kmer Bayes stats.
+
+    Attributes:
+        kmer (str): The kmer.
+        group_post_prob (float): The group posterior probability.
+
+    """
+
     kmer: str
     group_post_prob: float
 
@@ -25,6 +41,24 @@ def calculate_joining_probability_for_group(
     positive_reference: list[list[str]],
     negative_reference: list[list[str]],
 ) -> Either[c_exc.MappedErrors, list[KmerBayesStats]]:
+    """Calculate the probability of a sequence belongs to a clade.
+
+    Args:
+        prediction_target (list[str]): The sequence to be tested.
+        positive_reference (list[list[str]]): The positive reference.
+        negative_reference (list[list[str]]): The negative reference.
+
+    Returns:
+        Either[c_exc.MappedErrors, list[KmerBayesStats]]: The probability of
+            the sequence belongs to the clade.
+
+    Raises:
+        c_exc.InvalidArgumentError: If any of the arguments is not a list.
+        c_exc.InvalidArgumentError: If any of the sub-items of the arguments is
+            not a list.
+
+    """
+
     try:
         # ? --------------------------------------------------------------------
         # ? Validate args
@@ -119,6 +153,26 @@ def __calculate_kmer_bayes_stats(
     ingroup_kmer_percentage: float,
     outgroup_kmer_percentage: float,
 ) -> float:
+    """Calculate the bayes stats.
+
+    Args:
+        ingroup_probability (float): The probability of the sequence belongs to
+            the ingroup.
+        ingroup_kmer_percentage (float): The percentage of the kmer on the
+            ingroup.
+        outgroup_kmer_percentage (float): The percentage of the kmer on the
+            outgroup.
+
+    Returns:
+        float: The probability of the sequence belongs to the ingroup.
+
+    Raises:
+        c_exc.InvalidArgumentError: If any of the arguments is not a float.
+        c_exc.InvalidArgumentError: If any of the arguments is not between 0
+            and 1.
+
+    """
+
     # ? ------------------------------------------------------------------------
     # ? Validate args
     # ? ------------------------------------------------------------------------
@@ -189,6 +243,21 @@ def __calculate_kmer_percentage_in_group(
     kmer: str,
     group_records: list[list[str]],
 ) -> __KmerStats:
+    """Calculate the percentage of the k-mer on the group.
+
+    Args:
+        kmer (str): The k-mer to be calculated.
+        group_records (list[list[str]]): The group of records to be
+            calculated.
+
+    Returns:
+        __KmerStats: The k-mer stats.
+
+    Raises:
+        Exception: If the group has less than 5 records.
+
+    """
+
     if len(group_records) < 5:
         raise
 

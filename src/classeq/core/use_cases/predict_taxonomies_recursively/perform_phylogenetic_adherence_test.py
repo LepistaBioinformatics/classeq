@@ -18,6 +18,40 @@ from .do_clade_adherence_test_for_single_sequence import (
 
 
 class CladeAdherenceResultStatus(Enum):
+    """The status of the clade adherence test.
+
+    Description:
+        This class defines the status of the clade adherence test. The status
+        can be one of the following:
+            - `next-iteration`: The test is inconclusive and the test should
+                continue to the next iteration.
+            - `conclusive-ingroup`: The test is conclusive and the sequence is
+                in the ingroup.
+            - `conclusive-sister`: The test is conclusive and the sequence is
+                in the sister group.
+            - `inconclusive`: The test is inconclusive and the sequence is not
+                in the ingroup or sister group.
+            - `not-possible`: The test is not possible because the clade is a
+                leaf node.
+            - `unavailable`: The test is not available because the clade is not
+                in the tree.
+
+    Attributes:
+        NEXT_ITERATION (str): The test is inconclusive and the test should
+            continue to the next iteration.
+        CONCLUSIVE_INGROUP (str): The test is conclusive and the sequence is
+            in the ingroup.
+        CONCLUSIVE_SISTER (str): The test is conclusive and the sequence is
+            in the sister group.
+        INCONCLUSIVE (str): The test is inconclusive and the sequence is not
+            in the ingroup or sister group.
+        NOT_POSSIBLE (str): The test is not possible because the clade is a
+            leaf node.
+        UNAVAILABLE (str): The test is not available because the clade is not
+            in the tree.
+
+    """
+
     NEXT_ITERATION = "next-iteration"
     CONCLUSIVE_INGROUP = "conclusive-ingroup"
     CONCLUSIVE_SISTER = "conclusive-sister"
@@ -31,6 +65,28 @@ def perform_phylogenetic_adherence_test(
     reference_set: ReferenceSet,
     tree_priors: TreePriors,
 ) -> Either[c_exc.MappedErrors, bool]:
+    """Perform phylogenetic adherence test.
+
+    Description:
+        This function performs phylogenetic adherence test. The test is
+        performed by recursively traversing the tree and performing
+        clade-adherence test for each clade. The test is performed until
+        the test is conclusive or inconclusive.
+
+    Args:
+        target_sequence (str): The sequence to be tested.
+        reference_set (ReferenceSet): The reference set.
+        tree_priors (TreePriors): The tree priors.
+
+    Returns:
+        Either[c_exc.MappedErrors, bool]: The result of the test.
+
+    Raises:
+        c_exc.UseCaseError: If the retrieved tree using `get_hierarchical_tree`
+            is not a rooted tree.
+
+    """
+
     try:
         # ? --------------------------------------------------------------------
         # ? Validate args

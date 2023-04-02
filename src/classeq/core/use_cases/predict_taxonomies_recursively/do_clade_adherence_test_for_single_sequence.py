@@ -18,6 +18,30 @@ def do_clade_adherence_test_for_single_sequence(
     kmer_indices: KmersInverseIndices,
     total_length: int,
 ) -> Either[c_exc.MappedErrors, dict[PriorGroup, float]]:
+    """Calculate the probability of a sequence belongs to a clade.
+
+    Description:
+        This function calculates the probability of a sequence belongs to a
+        clade. The probability is calculated by the joint probability of the
+        sequence contains all the kmers of the clade.
+
+    Args:
+        target_sequence (str): The sequence to be tested.
+        clade_priors (IngroupCladePriors | OutgroupCladePriors): The clade
+            priors.
+        kmer_indices (KmersInverseIndices): The kmer indices.
+        total_length (int): The total length of the sequences.
+
+    Returns:
+        Either[c_exc.MappedErrors, dict[PriorGroup, float]]: The probability of
+            the sequence belongs to the clade.
+
+    Raises:
+        c_exc.InvalidArgumentError: If any of the arguments is not a list.
+        c_exc.InvalidArgumentError: If any of the sub-items of the arguments is
+            not a list.
+
+    """
     try:
         # ? --------------------------------------------------------------------
         # ? Validate entries
@@ -119,6 +143,26 @@ def __calculate_clade_adherence(
     kmer_indices: KmersInverseIndices,
     total_length: int,
 ) -> Either[c_exc.MappedErrors, float]:
+    """Calculate the probability of a sequence belongs to a clade.
+
+    Description:
+        This function calculates the probability of a sequence belongs to a
+        clade. The probability is calculated by the joint probability of the
+        sequence contains all the kmers of the clade.
+
+    Args:
+        labeled_priors (LabeledPriors): The labeled priors.
+        target_kmers (list[str]): The target sequence kmers.
+        kmer_indices (KmersInverseIndices): The kmer indices.
+        total_length (int): The total length of the sequences.
+
+    Returns:
+        Either[c_exc.MappedErrors, float]: The probability of the sequence
+            belongs to the clade.
+
+    Raises:
+        c_exc.UseCaseError: If the kmer is not indexed.
+    """
     try:
         joint_probability_units: list[float] = []
 
@@ -164,6 +208,31 @@ def __calculate_probability_of_group_contains_kmer(
     sequences_with_kmer: int,
     total_sequences: int,
 ) -> float:
+    """Calculate the probability of a group contains a kmer.
+
+    Description:
+        This function calculates the probability of a group contains a kmer.
+        The probability is calculated by the following formula:
+        P(wi|G) = [ m(wi) + Pi ] / ( M + 1 ) where m(wi) is the number of the
+        group sequences containing word wi, Pi is the prior probability for the
+        kmer in the overall training dataset, and M is the dataset size for the
+        target training group.
+
+    Args:
+        prior (float): The prior probability for the kmer in the overall
+            training dataset.
+        sequences_with_kmer (int): The number of the group sequences
+            containing word wi.
+        total_sequences (int): The dataset size for the target training group.
+
+    Returns:
+        float: The probability of a group contains a kmer.
+
+    Raises:
+        Exception: If `total_sequences` is greater than `sequences_with_kmer`.
+
+    """
+
     if sequences_with_kmer > total_sequences:
         raise Exception(
             "`total_sequences` could not be greater than `sequences_with_kmer`"
