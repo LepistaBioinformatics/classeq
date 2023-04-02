@@ -40,3 +40,9 @@ class KmerInverseIndexTest(TestCase):
         self.assertFalse(indices.is_left)
         self.assertTrue(indices.is_right)
         self.assertIsInstance(indices.value, KmersInverseIndices)
+
+
+if __name__ == "__main__":
+    from unittest import main
+
+    main()

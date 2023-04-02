@@ -45,3 +45,9 @@ class MsaTest(TestCase):
         self.assertEqual(msa_source.kmers_indices.index_of("GACAATCA"), 1084)
         self.assertEqual(msa_source.kmers_indices.index_of("ATTTTTTT"), 1407)
         self.assertEqual(msa_source.kmers_indices.index_of("TGACAATA"), 86)
+
+
+if __name__ == "__main__":
+    from unittest import main
+
+    main()

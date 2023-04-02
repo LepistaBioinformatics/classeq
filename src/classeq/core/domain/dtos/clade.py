@@ -1,11 +1,14 @@
 from enum import Enum
 from hashlib import md5
-from typing import Self
+from typing import Any, Self
 from uuid import UUID, uuid4
 
 from attr import field, define
 
+import classeq.core.domain.utils.exceptions as c_exc
 from classeq.core.domain.dtos.kmer_inverse_index import KmerIndex
+from classeq.core.domain.utils.either import Either, left, right
+from classeq.settings import LOGGER
 
 
 class NodeType(Enum):
@@ -47,7 +50,7 @@ class CladeWrapper:
         return int(md5(self.id.__str__().encode("utf-8")).hexdigest(), 16)
 
     def __repr__(self) -> str:
-        return self.get_pretty_tree_list()
+        return self.get_pretty_clade()
 
     # ? ------------------------------------------------------------------------
     # ? Validations
@@ -58,10 +61,133 @@ class CladeWrapper:
         return uuid4()
 
     # ? ------------------------------------------------------------------------
+    # ? Public class methods
+    # ? ------------------------------------------------------------------------
+
+    @classmethod
+    def from_dict(
+        cls,
+        content: dict[str, Any],
+    ) -> Either[c_exc.MappedErrors, Self]:
+        for key in [
+            "name",
+            "id",
+            "type",
+            "support",
+            "branch_length",
+            "parent",
+            "children",
+        ]:
+            if key not in content:
+                return left(
+                    c_exc.InvalidArgumentError(
+                        f"Invalid content detected on parse `{CladeWrapper}`."
+                        f" {key}` key is empty.",
+                        logger=LOGGER,
+                    )
+                )
+
+        children: list[Self] = []
+        if isinstance(child := content.get("children"), list):
+            for child in content.get("children"):  # type: ignore
+                child_either = CladeWrapper.from_dict(content=child)
+
+                if child_either.is_left:
+                    return child_either
+
+                children.append(child_either.value)
+
+        return right(
+            cls(
+                name=content.get("name"),  # type: ignore
+                id=UUID(content.get("id")),
+                type=eval(content.get("type")),  # type: ignore
+                support=content.get("support"),
+                branch_length=content.get("branch_length"),
+                parent=UUID(parent)
+                if (parent := content.get("parent"))
+                else None,
+                children=tuple(children),
+            )
+        )
+
+    # ? ------------------------------------------------------------------------
     # ? Public instance methods
     # ? ------------------------------------------------------------------------
 
-    def get_pretty_tree_list(self) -> str:
+    def get_ingroup_clades(
+        self,
+    ) -> Either[c_exc.MappedErrors, list[Self]]:
+        if (children := self.children) is None:
+            return left(
+                c_exc.ExecutionError(
+                    "Unable to find outgroups. Specified clade has no "
+                    + f"children: {self.get_pretty_clade()}",
+                    exp=True,
+                    logger=LOGGER,
+                )
+            )
+
+        return right([clade for clade in children if clade.is_internal()])
+
+    def get_outgroup_clade(
+        self,
+        outgroups: list[str],
+    ) -> Either[c_exc.MappedErrors, list[Self]]:
+        if self.is_root() is False:
+            return left(
+                c_exc.ExecutionError(
+                    "Could not get outgroup. The current clade is not the "
+                    + "tree `root`.",
+                    logger=LOGGER,
+                )
+            )
+
+        if (children := self.children) is None:
+            return left(
+                c_exc.ExecutionError(
+                    "Unable to find outgroups. Specified clade has no "
+                    + f"children: {self.get_pretty_clade()}",
+                    exp=True,
+                    logger=LOGGER,
+                )
+            )
+
+        outgroup_clades = [clade for clade in children if clade.is_outgroup()]
+
+        if not all([clade.name in outgroups for clade in outgroup_clades]):
+            return left(
+                c_exc.ExecutionError(
+                    "Expected outgroups differs from found outgroups:\n"
+                    + f"Expected: {', '.join(outgroups)}\n"
+                    + f"{', '.join([i.name for i in outgroup_clades])}",
+                    exp=True,
+                    logger=LOGGER,
+                )
+            )
+
+        return right(outgroup_clades)
+
+    def is_root(self) -> bool:
+        return self.type == NodeType.ROOT
+
+    def is_outgroup(self) -> bool:
+        return self.type == NodeType.OUTGROUP
+
+    def is_internal(self) -> bool:
+        return self.type == NodeType.INTERNAL
+
+    def is_terminal(self) -> bool:
+        return self.type == NodeType.TERMINAL
+
+    def get_pretty_clade(self) -> str:
+        if self.is_terminal() or self.is_outgroup():
+            return f"type({self.type.name}): {self.name}"
+
+        terminals = 0 if self.children is None else self.children.__len__()
+        return f"type({self.type.name}): [{terminals} terminals] {self.support} {self.id}"
+
+    def get_pretty_tree(self) -> str:
         str_repr: list[str] = []
         backbone_color = "\033[90m"
         escape = "\033[0m"
@@ -140,15 +266,3 @@ class CladeWrapper:
         __build_node_representations(clade=self, prefix="")
 
         return "\n".join(str_repr)
-
-    def is_root(self) -> bool:
-        return self.type == NodeType.ROOT
-
-    def is_outgroup(self) -> bool:
-        return self.type == NodeType.OUTGROUP
-
-    def is_internal(self) -> bool:
-        return self.type == NodeType.INTERNAL
-
-    def is_terminal(self) -> bool:
-        return self.type == NodeType.TERMINAL

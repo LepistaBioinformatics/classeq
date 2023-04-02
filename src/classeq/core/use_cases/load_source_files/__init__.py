@@ -112,6 +112,11 @@ def load_source_files(
             labels_map=labels_map,
         )
 
+        linear_tree_either = references.build_linear_tree()
+
+        if linear_tree_either.is_left:
+            return linear_tree_either
+
         tree_source = references.tree.source_file_path
         train_output_file_path = tree_source.parent.joinpath(
             ".".join(
@@ -141,39 +146,9 @@ def load_source_files(
                         tree=tree_artifact,
                         msa=references.msa,
                         labels_map=references.labels_map,
+                        linear_tree=references.linear_tree,
                     )
                 ),
-                out_gz,
-                indent=4,
-                default=str,
-                sort_keys=True,
-            )
-
-        linear_tree_output_file_path = tree_source.parent.joinpath(
-            ".".join(
-                [
-                    tree_source.stem,
-                    "linear-tree",
-                    "json",
-                    "gz",
-                ]
-            )
-        )
-
-        LOGGER.info(
-            f"Linear tree would be persisted to: {linear_tree_output_file_path}"
-        )
-
-        with gzip.open(
-            linear_tree_output_file_path, "wt", encoding="utf-8"
-        ) as out_gz:
-            linear_tree = references.get_linear_tree()
-
-            if linear_tree.is_left:
-                return linear_tree
-
-            dump(
-                [asdict(i) for i in linear_tree.value],
                 out_gz,
                 indent=4,
                 default=str,

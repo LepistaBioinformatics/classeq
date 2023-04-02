@@ -16,6 +16,7 @@ def do_clade_adherence_test_for_single_sequence(
     target_sequence: str,
     clade_priors: IngroupCladePriors | OutgroupCladePriors,
     kmer_indices: KmersInverseIndices,
+    total_length: int,
 ) -> Either[c_exc.MappedErrors, dict[PriorGroup, float]]:
     try:
         # ? --------------------------------------------------------------------
@@ -57,7 +58,7 @@ def do_clade_adherence_test_for_single_sequence(
         target_sequence_kmers = [
             kmer
             for kmer in KmersInverseIndices.generate_kmers(
-                dna_sequence=target_sequence,
+                dna_sequence=target_sequence.upper(),
                 k_size=DEFAULT_KMER_SIZE,
             )
         ]
@@ -74,6 +75,10 @@ def do_clade_adherence_test_for_single_sequence(
                     labeled_priors=group,
                     target_kmers=target_sequence_kmers,
                     kmer_indices=kmer_indices,
+                    # total_length=sum(
+                    #     len(i.labels) for i in clade_priors.priors
+                    # ),
+                    total_length=total_length,
                 )
 
                 if adherence_either.is_left:
@@ -88,6 +93,7 @@ def do_clade_adherence_test_for_single_sequence(
                 labeled_priors=clade_priors.priors,
                 target_kmers=target_sequence_kmers,
                 kmer_indices=kmer_indices,
+                total_length=len(clade_priors.priors.labels),
             )
 
             if adherence_either.is_left:
@@ -111,12 +117,14 @@ def __calculate_clade_adherence(
     labeled_priors: LabeledPriors,
     target_kmers: list[str],
     kmer_indices: KmersInverseIndices,
+    total_length: int,
 ) -> Either[c_exc.MappedErrors, float]:
     try:
         joint_probability_units: list[float] = []
 
         for kmer in target_kmers:
             if (prior := labeled_priors.priors.get(kmer)) is None:
+                LOGGER.debug(">>>>>> CONTINUE <<<<<<<<<<<")
                 continue
 
             kmer_index = kmer_indices.index_of(kmer)
@@ -141,6 +149,7 @@ def __calculate_clade_adherence(
                     prior=prior,
                     sequences_with_kmer=len(current_index),
                     total_sequences=len(labeled_priors.labels),
+                    # total_sequences=total_length,
                 )
             )
 

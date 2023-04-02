@@ -1,5 +1,4 @@
 from collections import defaultdict
-from random import sample
 from typing import DefaultDict, Iterator
 from uuid import UUID
 
@@ -10,11 +9,10 @@ from classeq.core.domain.dtos.kmer_inverse_index import (
     KmersInverseIndices,
 )
 from classeq.core.domain.dtos.priors import (
-    OutgroupCladePriors,
     IngroupCladePriors,
     IngroupLabeledPriors,
     LabeledPriors,
-    NoiseGroupLabeledPriors,
+    OutgroupCladePriors,
     OutgroupLabeledPriors,
     PriorGroup,
     SisterGroupLabeledPriors,
@@ -52,12 +50,19 @@ def estimate_clade_specific_priors(
         #
         # ? --------------------------------------------------------------------
 
-        linear_tree_either = references.get_linear_tree()
+        if references.linear_tree is None:
+            linear_tree_either = references.build_linear_tree()
 
-        if linear_tree_either.is_left:
-            return linear_tree_either
+            if linear_tree_either.is_left:
+                return linear_tree_either
 
-        linear_tree: set[CladeWrapper] = linear_tree_either.value
+        if references.linear_tree is None:
+            return left(
+                c_exc.UseCaseError(
+                    "Could not generate linear tree.",
+                    logger=LOGGER,
+                )
+            )
 
         # ? --------------------------------------------------------------------
         # ? Extract root node
@@ -68,7 +73,7 @@ def estimate_clade_specific_priors(
         # ? --------------------------------------------------------------------
 
         try:
-            root = next(i for i in iter(linear_tree) if i.is_root())
+            root = next(i for i in iter(references.linear_tree) if i.is_root())
         except StopIteration:
             return left(
                 c_exc.UseCaseError(
@@ -85,11 +90,14 @@ def estimate_clade_specific_priors(
         #
         # ? --------------------------------------------------------------------
 
-        outgroup_nodes = [i for i in linear_tree if i.is_outgroup()]
+        outgroup_nodes = [i for i in references.linear_tree if i.is_outgroup()]
+        expected_outgroups = [
+            name
+            for i in references.tree.outgroups
+            if (name := references.labels_map.get(i)) is not None
+        ]
 
-        if not all(
-            [i.name in references.tree.outgroups for i in outgroup_nodes]
-        ):
+        if not all([i.name in expected_outgroups for i in outgroup_nodes]):
             return left(
                 c_exc.UseCaseError(
                     "Not all outgroups are present at the phylogenetic tree. "
@@ -107,10 +115,9 @@ def estimate_clade_specific_priors(
             outgroups=outgroup_nodes,
             ingroups=[
                 i
-                for i in linear_tree
+                for i in references.linear_tree
                 if i.id not in [root.id, *[o.id for o in outgroup_nodes]]
             ],
-            label_map=references.labels_map,
             kmer_indices=references.msa.kmers_indices,
         )
 
@@ -122,9 +129,8 @@ def __calculate_recursive_priors(
     root: CladeWrapper,
     outgroups: list[CladeWrapper],
     ingroups: list[CladeWrapper],
-    label_map: DefaultDict[str, int],
     kmer_indices: KmersInverseIndices,
-    min_clade_size: int = 3,
+    min_clade_size: int = 1,
 ) -> Either[c_exc.MappedErrors, TreePriors]:
     try:
         # ? --------------------------------------------------------------------
@@ -158,20 +164,9 @@ def __calculate_recursive_priors(
                 )
             )
 
-        for node in outgroups:
-            if (label := label_map.get(node.name)) is None:
-                return left(
-                    c_exc.UseCaseError(
-                        f"Invalid labels map. `{node}` is not included.",
-                        logger=LOGGER,
-                    )
-                )
-
-            outgroup_labels.append(label)
-
         outgroup_priors_either = __estimate_clade_kmer_specific_priors(
             kmer_indices=kmer_indices,
-            sequence_codes=outgroup_labels,
+            sequence_codes=[i.name for i in outgroups],
             corpus_size=(1 + len(outgroups) + len(ingroups)),
         )
 
@@ -242,37 +237,7 @@ def __calculate_recursive_priors(
             if len(sister_group) < min_clade_size:
                 LOGGER.warning(
                     "Sister group clade ineligible for training due to not "
-                    + "having the minimum number of terminals "
-                    + f"({min_clade_size}): {clade.id}"
-                )
-
-                continue
-
-            # ? ----------------------------------------------------------------
-            # ? Extract noise group terminals
-            # ? ----------------------------------------------------------------
-
-            remaining = [*ingroup, *sister_group]
-            noise_group: list[CladeWrapper] = [
-                terminal
-                for terminal in __get_terminal_nodes(
-                    target_nodes=[root],
-                    reference_nodes=[*outgroups, *ingroups],
-                )
-                if terminal.id not in [i.id for i in remaining]
-            ]
-
-            noise_group = sample(
-                noise_group,
-                len(remaining)
-                if len(noise_group) > len(remaining)
-                else len(noise_group),
-            )
-
-            if len(noise_group) < min_clade_size:
-                LOGGER.warning(
-                    "Noise group clade ineligible for training due to not "
-                    + "having the minimum number of terminals "
+                    + "reaches the minimum number of terminals "
                     + f"({min_clade_size}): {clade.id}"
                 )
 
@@ -287,26 +252,14 @@ def __calculate_recursive_priors(
             for receiver, group in [
                 (IngroupLabeledPriors, ingroup),
                 (SisterGroupLabeledPriors, sister_group),
-                (NoiseGroupLabeledPriors, noise_group),
             ]:
-                group_labels: list[int] = []
-
-                for item in group:
-                    if (label := label_map.get(item.name)) is None:
-                        return left(
-                            c_exc.UseCaseError(
-                                f"Invalid labels map. `{item.name}` is not "
-                                + "included.",
-                                logger=LOGGER,
-                            )
-                        )
-
-                    group_labels.append(label)
+                group_labels: list[int] = [i.name for i in group]
 
                 group_priors_either = __estimate_clade_kmer_specific_priors(
                     kmer_indices=kmer_indices,
                     sequence_codes=group_labels,
                     corpus_size=(1 + len(outgroups) + len(ingroups)),
+                    # corpus_size=(1 + len(ingroup) + len(sister_group)),
                 )
 
                 if group_priors_either.is_left:
@@ -327,17 +280,12 @@ def __calculate_recursive_priors(
                 i for i in priors_values if i.group == PriorGroup.SISTER
             )
 
-            noise_priors = next(
-                i for i in priors_values if i.group == PriorGroup.NOISE
-            )
-
             ingroups_priors.append(
                 IngroupCladePriors(
-                    parent=clade.parent,
+                    parent=clade.id,
                     priors=(
                         ingroup_priors,
                         sister_priors,
-                        noise_priors,
                     ),
                 )
             )
@@ -419,7 +367,7 @@ def __get_terminal_nodes(
 
         node: CladeWrapper
         for node in target_nodes:
-            if node.is_terminal():
+            if node.is_terminal() or node.is_outgroup():
                 yield node
 
             yield from __get_terminal_nodes(

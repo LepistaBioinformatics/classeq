@@ -22,6 +22,7 @@ class ReferenceSet:
     tree: TreeSource = field()
     msa: MsaSource = field()
     labels_map: DefaultDict[str, int] = field()
+    linear_tree: tuple[CladeWrapper, ...] | None = field(default=None)
 
     # ? ------------------------------------------------------------------------
     # ? Public class methods
@@ -36,6 +37,7 @@ class ReferenceSet:
             "tree",
             "msa",
             "labels_map",
+            "linear_tree",
         ]:
             if key not in content:
                 return left(
@@ -56,11 +58,27 @@ class ReferenceSet:
         if msa_either.is_left:
             return msa_either
 
+        linear_tree: list[CladeWrapper] | None = None
+        if isinstance(linear_tree_content := content.get("linear_tree"), list):
+            for linear_tree_unit in linear_tree_content:
+                if (
+                    unit_either := CladeWrapper.from_dict(linear_tree_unit)
+                ).is_left:
+                    return unit_either
+
+                if linear_tree is None:
+                    linear_tree = []
+
+                linear_tree.append(unit_either.value)
+
         return right(
             cls(
                 tree=tree_either.value,
                 msa=msa_either.value,
                 labels_map=defaultdict(int, content.get("labels_map")),  # type: ignore
+                linear_tree=(
+                    linear_tree if linear_tree is None else tuple(linear_tree)
+                ),
             )
         )
 
@@ -76,12 +94,25 @@ class ReferenceSet:
             # ? Generate the linear tree
             # ? ----------------------------------------------------------------
 
-            linear_tree_either = self.get_linear_tree()
+            if self.linear_tree is None:
+                print(self.linear_tree)
+                linear_tree_either = self.build_linear_tree()
 
-            if linear_tree_either.is_left:
-                return linear_tree_either
+                if linear_tree_either.is_left:
+                    return linear_tree_either
 
-            linear_tree: set[CladeWrapper] = linear_tree_either.value
+            # The `linear_tree` attribute should exists after execution of the
+            # `build_linear_tree` method. Don't remove these check.
+            if (linear_tree := self.linear_tree) is None:
+                return left(
+                    c_exc.ExecutionError(
+                        "`build_linear_tree` method is maybe not working. "
+                        + f"Attribute `linear_tree` of {Self} is `None` after "
+                        + "execute it. The expected behavior is to be of type"
+                        + f"`{tuple[CladeWrapper, ...]}`.",
+                        logger=LOGGER,
+                    )
+                )
 
             if len([i for i in linear_tree if i.is_root()]) != 1:
                 return left(
@@ -111,17 +142,20 @@ class ReferenceSet:
 
             seed_tree: CladeWrapper = root
 
-            def __expand_tree(clade: CladeWrapper) -> None:
+            def __expand_tree(
+                clade: CladeWrapper,
+                linear_tree: tuple[CladeWrapper, ...],
+            ) -> None:
                 for child in [i for i in linear_tree if i.parent == clade.id]:
                     if clade.children is None:
                         clade.children = tuple()
 
                     clade.children = clade.children + (child,)
 
-                    if child.is_internal() or child.is_outgroup():
-                        __expand_tree(clade=child)
+                    if child.is_internal():
+                        __expand_tree(clade=child, linear_tree=linear_tree)
 
-            __expand_tree(clade=seed_tree)
+            __expand_tree(clade=seed_tree, linear_tree=linear_tree)
 
             # ? ----------------------------------------------------------------
             # ? Return a positive response
@@ -132,9 +166,9 @@ class ReferenceSet:
         except Exception as exc:
             return left(c_exc.ExecutionError(exc, logger=LOGGER))
 
-    def get_linear_tree(
+    def build_linear_tree(
         self,
-    ) -> Either[c_exc.MappedErrors, set[CladeWrapper]]:
+    ) -> Either[c_exc.MappedErrors, bool]:
         """Convert the original Bio.Phylo.BaseTree.Tree to a linear version
         composed of a set of `CladeWrapper` elements.
         """
@@ -164,7 +198,9 @@ class ReferenceSet:
                 CladeWrapper(
                     id=current_clade_identifier,
                     name=(
-                        NodeType.ROOT.value if is_root is True else clade.name
+                        NodeType.ROOT.value
+                        if is_root is True
+                        else self.labels_map.get(clade.name)
                     ),
                     type=(
                         NodeType.ROOT
@@ -208,7 +244,9 @@ class ReferenceSet:
                 is_root=True,
             )
 
-            return right(linear_tree)
+            self.linear_tree = tuple(linear_tree)
+
+            return right(True)
 
         except Exception as exc:
             return left(c_exc.ExecutionError(exc, logger=LOGGER))
