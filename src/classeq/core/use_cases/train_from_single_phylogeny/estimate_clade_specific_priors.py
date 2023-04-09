@@ -26,6 +26,29 @@ from classeq.settings import LOGGER
 def estimate_clade_specific_priors(
     references: ReferenceSet,
 ) -> Either[c_exc.MappedErrors, TreePriors]:
+    """Estimate clade specific priors.
+
+    Description:
+        This function estimates the clade specific priors for each clade in the
+        phylogenetic tree. The function is recursive and it calculates the
+        probabilities for each clade in the tree.
+
+    Args:
+        references (ReferenceSet): Reference set with the phylogenetic tree and
+            the multiple sequence alignment.
+
+    Returns:
+        Either[c_exc.MappedErrors, TreePriors]: Either with the clade specific
+            priors or an error.
+
+    Raises:
+        c_exc.InvalidArgumentError: If the argument `references` is not a
+            `ReferenceSet` instance.
+        c_exc.UseCaseError: If the linear tree could not be generated or if the
+            root node is not present in the tree.
+
+    """
+
     try:
         # ? --------------------------------------------------------------------
         # ? Validate entries
@@ -132,6 +155,30 @@ def __calculate_recursive_priors(
     kmer_indices: KmersInverseIndices,
     min_clade_size: int = 1,
 ) -> Either[c_exc.MappedErrors, TreePriors]:
+    """Recursive calculate probabilities for each clade.
+
+    Description:
+        This function is the core of the recursive calculation of the
+        probabilities for each clade. The function is recursive and it
+        calculates the probabilities for each clade in the tree.
+
+    Args:
+        root (CladeWrapper): Root node of the tree.
+        outgroups (list[CladeWrapper]): Outgroup nodes of the tree.
+        ingroups (list[CladeWrapper]): Ingroup nodes of the tree.
+        kmer_indices (KmersInverseIndices): Kmer indices of the MSA.
+        min_clade_size (int, optional): Minimum size of the clade to be
+            considered. Defaults to 1.
+
+    Returns:
+        Either[c_exc.MappedErrors, TreePriors]: Either a `TreePriors` instance
+            or a `classeq.core.domain.utils.exceptions.MappedErrors` instance.
+
+    Raises:
+        c_exc.UseCaseError: If the outgroups are not valid.
+
+    """
+
     try:
         # ? --------------------------------------------------------------------
         # ? Calculate outgroup clade priors
@@ -310,6 +357,22 @@ def __estimate_clade_kmer_specific_priors(
     sequence_codes: list[int],
     corpus_size: int,
 ) -> Either[c_exc.MappedErrors, DefaultDict[str, float]]:
+    """Estimate clade specific priors for each kmer.
+
+    Args:
+        kmer_indices (KmersInverseIndices): Kmers inverse indices.
+        sequence_codes (list[int]): Sequence codes.
+        corpus_size (int): Corpus size.
+
+    Returns:
+        Either[c_exc.MappedErrors, DefaultDict[str, float]]: Either a
+            UseCaseError or a dictionary with the kmer specific priors.
+
+    Raises:
+        UseCaseError: If the kmer index does not contains any sequence code.
+
+    """
+
     try:
         kmers_priors_for_clade: DefaultDict[str, float] = defaultdict()
         target_indices: set[KmerIndex] = set()
@@ -348,7 +411,8 @@ def __get_terminal_nodes(
             find complementary terminal nodes.
 
     Returns:
-        list[CladeWrapper]: A list containing only NodeType.TERMINAL.
+        list[CladeWrapper]: A list of clades of the type NodeType.TERMINAL.
+
     """
 
     def __get_children(
