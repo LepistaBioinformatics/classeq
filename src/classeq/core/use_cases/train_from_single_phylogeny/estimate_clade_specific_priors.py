@@ -258,8 +258,8 @@ def __calculate_recursive_priors(
                 group_priors_either = __estimate_clade_kmer_specific_priors(
                     kmer_indices=kmer_indices,
                     sequence_codes=group_labels,
-                    corpus_size=(1 + len(outgroups) + len(ingroups)),
-                    # corpus_size=(1 + len(ingroup) + len(sister_group)),
+                    # corpus_size=(1 + len(outgroups) + len(ingroups)),
+                    corpus_size=(1 + len(ingroup) + len(sister_group)),
                 )
 
                 if group_priors_either.is_left:

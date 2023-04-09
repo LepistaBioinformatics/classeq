@@ -12,6 +12,7 @@ black = "*"
 mypy = "*"
 pre-commit = "*"
 classeq = {editable = true, path = "."}
+pandas = "*"
 
 [requires]
 python_version = "3.11"
