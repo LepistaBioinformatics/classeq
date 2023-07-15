@@ -12,7 +12,6 @@
     "PHYLIP",
     "reroot"
   ],
-  "mypy.configFile": ".mypy.ini",
-  "mypy.dmypyExecutable": "~/.local/bin/dmypy",
-  "mypy.targets": ["."]
+  "python.analysis.typeCheckingMode": "off",
+  "python.formatting.provider": "black"
 }
