@@ -1,15 +1,10 @@
-from collections import defaultdict
-from typing import DefaultDict, Iterator
 from uuid import UUID
 
 import clean_base.exceptions as c_exc
 from clean_base.either import Either, right
 
 from classeq.core.domain.dtos.clade import CladeWrapper
-from classeq.core.domain.dtos.kmer_inverse_index import (
-    KmerIndex,
-    KmersInverseIndices,
-)
+from classeq.core.domain.dtos.kmer_inverse_index import KmersInverseIndices
 from classeq.core.domain.dtos.priors import (
     IngroupCladePriors,
     IngroupLabeledPriors,
@@ -22,6 +17,11 @@ from classeq.core.domain.dtos.priors import (
 )
 from classeq.core.domain.dtos.reference_set import ReferenceSet
 from classeq.settings import LOGGER
+
+from ._estimate_clade_kmer_specific_priors import (
+    estimate_clade_kmer_specific_priors,
+)
+from ._get_terminal_nodes import get_terminal_nodes
 
 
 def estimate_clade_specific_priors(
@@ -200,7 +200,7 @@ def __calculate_recursive_priors(
                 logger=LOGGER,
             )()
 
-        outgroup_priors_either = __estimate_clade_kmer_specific_priors(
+        outgroup_priors_either = estimate_clade_kmer_specific_priors(
             kmer_indices=kmer_indices,
             sequence_codes=[i.name for i in outgroups],
             corpus_size=(1 + len(outgroups) + len(ingroups)),
@@ -241,7 +241,7 @@ def __calculate_recursive_priors(
             # ? Extract ingroup terminals
             # ? ----------------------------------------------------------------
 
-            ingroup: list[CladeWrapper] = __get_terminal_nodes(
+            ingroup: list[CladeWrapper] = get_terminal_nodes(
                 target_nodes=[i for i in ingroups if i.parent == clade.id],
                 reference_nodes=ingroups,
             )
@@ -261,7 +261,7 @@ def __calculate_recursive_priors(
 
             sister_group: list[CladeWrapper] = [
                 terminal
-                for terminal in __get_terminal_nodes(
+                for terminal in get_terminal_nodes(
                     target_nodes=[
                         i for i in ingroups if i.parent == clade.parent
                     ],
@@ -291,7 +291,7 @@ def __calculate_recursive_priors(
             ]:
                 group_labels: list[int] = [i.name for i in group]
 
-                group_priors_either = __estimate_clade_kmer_specific_priors(
+                group_priors_either = estimate_clade_kmer_specific_priors(
                     kmer_indices=kmer_indices,
                     sequence_codes=group_labels,
                     # corpus_size=(1 + len(outgroups) + len(ingroups)),
@@ -339,95 +339,3 @@ def __calculate_recursive_priors(
 
     except Exception as exc:
         return c_exc.UseCaseError(exc, logger=LOGGER)()
-
-
-def __estimate_clade_kmer_specific_priors(
-    kmer_indices: KmersInverseIndices,
-    sequence_codes: list[int],
-    corpus_size: int,
-) -> Either[c_exc.MappedErrors, DefaultDict[str, float]]:
-    """Estimate clade specific priors for each kmer.
-
-    Args:
-        kmer_indices (KmersInverseIndices): Kmers inverse indices.
-        sequence_codes (list[int]): Sequence codes.
-        corpus_size (int): Corpus size.
-
-    Returns:
-        Either[c_exc.MappedErrors, DefaultDict[str, float]]: Either a
-            UseCaseError or a dictionary with the kmer specific priors.
-
-    Raises:
-        UseCaseError: If the kmer index does not contains any sequence code.
-
-    """
-
-    try:
-        kmers_priors_for_clade: DefaultDict[str, float] = defaultdict()
-        target_indices: set[KmerIndex] = set()
-
-        for index in kmer_indices.indices:
-            for code in sequence_codes:
-                if index.contains(code):
-                    target_indices.add(index)
-                    continue
-
-        for kmer_index in iter(target_indices):
-            n = [i for i in kmer_index.records if i in sequence_codes]
-
-            if len(n) == 0:
-                raise
-
-            prior = (len(n) + 0.5) / (corpus_size + 1)
-            kmers_priors_for_clade[kmer_index.kmer] = round(prior, 8)
-
-        return right(kmers_priors_for_clade)
-
-    except Exception as exc:
-        return c_exc.UseCaseError(exc, logger=LOGGER)()
-
-
-def __get_terminal_nodes(
-    target_nodes: list[CladeWrapper],
-    reference_nodes: list[CladeWrapper],
-) -> list[CladeWrapper]:
-    """Recursively get nodes of type NodeType.TERMINAL.
-
-    Args:
-        target_nodes (list[CladeWrapper]): A list of clades to find terminals
-            from.
-        reference_nodes (list[CladeWrapper]): A list of the remaining nodes to
-            find complementary terminal nodes.
-
-    Returns:
-        list[CladeWrapper]: A list of clades of the type NodeType.TERMINAL.
-
-    """
-
-    def get_children(
-        target_nodes: list[CladeWrapper],
-    ) -> Iterator[CladeWrapper]:
-        """Performs a recursive search for terminal nodes.
-
-        Args:
-            target_nodes (list[CladeWrapper]): A list of the clades to search
-                terminals from.
-
-        Yields:
-            Iterator[CladeWrapper]: A single clade of the type
-                NodeType.TERMINAL.
-        """
-
-        node: CladeWrapper
-        for node in target_nodes:
-            if node.is_terminal() or node.is_outgroup():
-                yield node
-
-            yield from __get_terminal_nodes(
-                target_nodes=[
-                    i for i in reference_nodes if i.parent == node.id
-                ],
-                reference_nodes=[i for i in reference_nodes if i.id != node.id],
-            )
-
-    return [i for i in get_children(target_nodes)]

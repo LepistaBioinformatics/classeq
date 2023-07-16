@@ -1,4 +1,4 @@
-from classeq.core.use_cases.predict_taxonomies_recursively.do_clade_adherence_test_for_single_sequence import (
+from classeq.core.use_cases.predict_taxonomies_recursively._do_clade_adherence_test_for_single_sequence import (
     do_clade_adherence_test_for_single_sequence,
 )
 from classeq.core.use_cases.predict_taxonomies_recursively.tests.shared import (

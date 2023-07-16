@@ -3,7 +3,7 @@ from clean_base.either import Either, left, right
 
 from classeq.settings import LOGGER
 
-from .calculate_joining_probability_for_group import (
+from ._calculate_joining_probability_for_group import (
     calculate_joining_probability_for_group,
 )
 

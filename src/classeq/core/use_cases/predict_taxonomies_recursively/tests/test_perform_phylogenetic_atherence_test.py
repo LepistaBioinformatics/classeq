@@ -1,4 +1,4 @@
-from classeq.core.use_cases.predict_taxonomies_recursively.perform_phylogenetic_adherence_test import (
+from classeq.core.use_cases.predict_taxonomies_recursively._perform_phylogenetic_adherence_test import (
     perform_phylogenetic_adherence_test,
 )
 from classeq.core.use_cases.predict_taxonomies_recursively.tests.shared import (

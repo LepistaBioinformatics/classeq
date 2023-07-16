@@ -9,7 +9,7 @@ from classeq.core.domain.dtos.priors import TreePriors
 from classeq.core.domain.dtos.reference_set import ReferenceSet
 from classeq.settings import LOGGER
 
-from .estimate_clade_specific_priors import estimate_clade_specific_priors
+from ._estimate_clade_specific_priors import estimate_clade_specific_priors
 
 
 def train_from_single_phylogeny(

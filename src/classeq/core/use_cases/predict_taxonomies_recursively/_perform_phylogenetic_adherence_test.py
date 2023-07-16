@@ -12,7 +12,7 @@ from classeq.core.domain.dtos.priors import PriorGroup, TreePriors
 from classeq.core.domain.dtos.reference_set import ReferenceSet
 from classeq.settings import LOGGER
 
-from .do_clade_adherence_test_for_single_sequence import (
+from ._do_clade_adherence_test_for_single_sequence import (
     do_clade_adherence_test_for_single_sequence,
 )
 

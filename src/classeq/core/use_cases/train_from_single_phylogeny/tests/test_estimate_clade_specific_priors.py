@@ -1,5 +1,5 @@
 from classeq.core.domain.dtos.priors import TreePriors
-from classeq.core.use_cases.train_from_single_phylogeny.estimate_clade_specific_priors import (
+from classeq.core.use_cases.train_from_single_phylogeny._estimate_clade_specific_priors import (
     estimate_clade_specific_priors,
 )
 from classeq.core.use_cases.train_from_single_phylogeny.tests.shared import (

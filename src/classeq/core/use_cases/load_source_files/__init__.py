@@ -13,13 +13,10 @@ from classeq.core.domain.dtos.msa import MsaSource, MsaSourceFormatEnum
 from classeq.core.domain.dtos.reference_set import ReferenceSet
 from classeq.core.domain.dtos.tree import TreeSource
 from classeq.core.domain.dtos.tree_source_format import TreeSourceFormatEnum
-from classeq.core.use_cases.load_source_files.load_and_sanitize_phylogeny import (
-    load_and_sanitize_phylogeny,
-)
-from classeq.core.use_cases.load_source_files.load_and_sanitize_sequences import (
-    load_and_sanitize_sequences,
-)
 from classeq.settings import LOGGER
+
+from ._load_and_sanitize_phylogeny import load_and_sanitize_phylogeny
+from ._load_and_sanitize_sequences import load_and_sanitize_sequences
 
 
 def load_source_files(

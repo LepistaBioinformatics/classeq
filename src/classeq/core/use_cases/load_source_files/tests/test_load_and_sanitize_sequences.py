@@ -3,9 +3,8 @@ from pathlib import Path
 from unittest import TestCase
 
 from classeq.core.domain.dtos.msa import MsaSource, MsaSourceFormatEnum
-from classeq.core.use_cases.load_source_files.load_and_sanitize_sequences import (
-    load_and_sanitize_sequences,
-)
+
+from .._load_and_sanitize_sequences import load_and_sanitize_sequences
 
 
 class LoadAndSanitizeSequencesTest(TestCase):
