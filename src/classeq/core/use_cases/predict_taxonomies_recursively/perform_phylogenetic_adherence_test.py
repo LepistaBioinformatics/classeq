@@ -2,14 +2,14 @@ from enum import Enum
 from hashlib import md5
 from typing import Iterator
 
+import clean_base.exceptions as c_exc
 from attrs import define, field
+from clean_base.either import Either, left, right
 
-import classeq.core.domain.utils.exceptions as c_exc
 from classeq.core.domain.dtos.clade import CladeWrapper
 from classeq.core.domain.dtos.kmer_inverse_index import KmersInverseIndices
 from classeq.core.domain.dtos.priors import PriorGroup, TreePriors
 from classeq.core.domain.dtos.reference_set import ReferenceSet
-from classeq.core.domain.utils.either import Either, left, right
 from classeq.settings import LOGGER
 
 from .do_clade_adherence_test_for_single_sequence import (
@@ -105,6 +105,8 @@ def perform_phylogenetic_adherence_test(
 
         tree: CladeWrapper = tree_either.value
 
+        # print(tree)
+
         if tree.is_root() is False:
             return left(
                 c_exc.UseCaseError(
@@ -153,6 +155,8 @@ def perform_phylogenetic_adherence_test(
         # ? --------------------------------------------------------------------
 
         for clade in first_level_ingroup_clades:
+            print(f"first_level_ingroup_clades clade: {clade}\n")
+
             if (children := clade.children) is None:
                 continue
 
@@ -270,8 +274,8 @@ def __recursive_test_clade_adherence(
                 return adherence_test_either
 
             adherence_test = adherence_test_either.value
-            ingroup = adherence_test.get(PriorGroup.INGROUP)
-            sister = adherence_test.get(PriorGroup.SISTER)
+            ingroup = adherence_test.pop(PriorGroup.INGROUP)
+            sister = adherence_test.pop(PriorGroup.SISTER)
 
             for name, result in [
                 ("ingroup", ingroup),

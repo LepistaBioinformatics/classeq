@@ -1,18 +1,18 @@
-from copy import deepcopy
 import gzip
 from collections import defaultdict
+from copy import deepcopy
 from json import dump
 from pathlib import Path
 from typing import DefaultDict
 
+import clean_base.exceptions as c_exc
 from attrs import asdict
+from clean_base.either import Either, left, right
 
-import classeq.core.domain.utils.exceptions as c_exc
 from classeq.core.domain.dtos.msa import MsaSource, MsaSourceFormatEnum
 from classeq.core.domain.dtos.reference_set import ReferenceSet
 from classeq.core.domain.dtos.tree import TreeSource
 from classeq.core.domain.dtos.tree_source_format import TreeSourceFormatEnum
-from classeq.core.domain.utils.either import Either, left, right
 from classeq.core.use_cases.load_source_files.load_and_sanitize_phylogeny import (
     load_and_sanitize_phylogeny,
 )

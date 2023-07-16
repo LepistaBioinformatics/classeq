@@ -1,15 +1,15 @@
-from hashlib import md5
 from collections import defaultdict
+from hashlib import md5
 from itertools import islice
 from pathlib import Path
 from typing import Any, DefaultDict, Iterator, Self
 
+import clean_base.exceptions as c_exc
 from attrs import define, field, frozen
 from Bio import SeqIO
+from clean_base.either import Either, left, right
 
-import classeq.core.domain.utils.exceptions as c_exc
 from classeq.core.domain.dtos.msa_source_format import MsaSourceFormatEnum
-from classeq.core.domain.utils.either import Either, left, right
 from classeq.settings import LOGGER
 
 

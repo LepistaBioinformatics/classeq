@@ -3,11 +3,11 @@ from hashlib import md5
 from typing import Any, Self
 from uuid import UUID, uuid4
 
-from attr import field, define
+import clean_base.exceptions as c_exc
+from attr import define, field
+from clean_base.either import Either, left, right
 
-import classeq.core.domain.utils.exceptions as c_exc
 from classeq.core.domain.dtos.kmer_inverse_index import KmerIndex
-from classeq.core.domain.utils.either import Either, left, right
 from classeq.settings import LOGGER
 
 

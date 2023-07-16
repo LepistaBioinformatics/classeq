@@ -1,9 +1,10 @@
 from pathlib import Path
 
-import classeq.core.domain.utils.exceptions as c_exc
+import clean_base.exceptions as c_exc
+from clean_base.either import Either, left
+
 from classeq.core.domain.dtos.tree import TreeSource
 from classeq.core.domain.dtos.tree_source_format import TreeSourceFormatEnum
-from classeq.core.domain.utils.either import Either, left
 from classeq.settings import LOGGER
 
 

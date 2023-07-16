@@ -1,6 +1,8 @@
 from functools import reduce
 
-import classeq.core.domain.utils.exceptions as c_exc
+import clean_base.exceptions as c_exc
+from clean_base.either import Either, left, right
+
 from classeq.core.domain.dtos.kmer_inverse_index import KmersInverseIndices
 from classeq.core.domain.dtos.priors import (
     IngroupCladePriors,
@@ -8,7 +10,6 @@ from classeq.core.domain.dtos.priors import (
     OutgroupCladePriors,
     PriorGroup,
 )
-from classeq.core.domain.utils.either import Either, left, right
 from classeq.settings import DEFAULT_KMER_SIZE, LOGGER
 
 
@@ -168,12 +169,10 @@ def __calculate_clade_adherence(
 
         for kmer in target_kmers:
             if (prior := labeled_priors.priors.get(kmer)) is None:
-                LOGGER.debug(">>>>>> CONTINUE <<<<<<<<<<<")
+                # LOGGER.debug(">>>>>> CONTINUE <<<<<<<<<<<")
                 continue
 
-            kmer_index = kmer_indices.index_of(kmer)
-
-            if kmer_index is None:
+            if (kmer_index := kmer_indices.index_of(kmer)) is None:
                 return left(
                     c_exc.UseCaseError(
                         "Unexpected error on calculate outgroup joint "
@@ -192,8 +191,8 @@ def __calculate_clade_adherence(
                 __calculate_probability_of_group_contains_kmer(
                     prior=prior,
                     sequences_with_kmer=len(current_index),
-                    total_sequences=len(labeled_priors.labels),
-                    # total_sequences=total_length,
+                    # total_sequences=len(labeled_priors.labels),
+                    total_sequences=total_length,
                 )
             )
 

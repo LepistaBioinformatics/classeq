@@ -2,14 +2,14 @@ from collections import defaultdict
 from typing import Any, DefaultDict, Self
 from uuid import UUID, uuid4
 
-from attr import field, define
+import clean_base.exceptions as c_exc
+from attr import define, field
 from Bio.Phylo.BaseTree import Clade, Tree
+from clean_base.either import Either, left, right
 
-import classeq.core.domain.utils.exceptions as c_exc
 from classeq.core.domain.dtos.clade import CladeWrapper, NodeType
 from classeq.core.domain.dtos.msa import MsaSource
 from classeq.core.domain.dtos.tree import TreeSource
-from classeq.core.domain.utils.either import Either, left, right
 from classeq.settings import LOGGER
 
 

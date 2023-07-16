@@ -1,11 +1,11 @@
-import classeq.core.domain.utils.exceptions as c_exc
-from classeq.core.domain.utils.either import Either, left, right
+import clean_base.exceptions as c_exc
+from clean_base.either import Either, left, right
+
 from classeq.settings import LOGGER
 
 from .calculate_joining_probability_for_group import (
     calculate_joining_probability_for_group,
 )
-
 
 # !
 # ! Usar os resultados de input, sister e outgroup para estimar com bayesiana:

@@ -3,10 +3,10 @@ from enum import Enum
 from typing import Any, DefaultDict, Self
 from uuid import UUID
 
+import clean_base.exceptions as c_exc
 from attrs import field, frozen
+from clean_base.either import Either, left, right
 
-import classeq.core.domain.utils.exceptions as c_exc
-from classeq.core.domain.utils.either import Either, left, right
 from classeq.settings import LOGGER
 
 

@@ -1,12 +1,12 @@
 import gzip
 from json import dump
 
+import clean_base.exceptions as c_exc
 from attrs import asdict
+from clean_base.either import Either, left, right
 
-import classeq.core.domain.utils.exceptions as c_exc
 from classeq.core.domain.dtos.priors import TreePriors
 from classeq.core.domain.dtos.reference_set import ReferenceSet
-from classeq.core.domain.utils.either import Either, left, right
 from classeq.settings import LOGGER
 
 from .estimate_clade_specific_priors import estimate_clade_specific_priors

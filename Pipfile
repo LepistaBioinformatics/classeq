@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 biopython = "*"
 attrs = "*"
+clean-base = "*"
 
 [dev-packages]
 classeq = {editable = true, path = "."}

@@ -2,14 +2,14 @@ from pathlib import Path
 from re import search
 from typing import Any, DefaultDict, Self
 
+import clean_base.exceptions as c_exc
 from attr import define, field
 from Bio import SeqIO
 from Bio.SeqRecord import SeqRecord
+from clean_base.either import Either, left, right
 
-import classeq.core.domain.utils.exceptions as c_exc
 from classeq.core.domain.dtos.kmer_inverse_index import KmersInverseIndices
 from classeq.core.domain.dtos.msa_source_format import MsaSourceFormatEnum
-from classeq.core.domain.utils.either import Either, left, right
 from classeq.settings import (
     BASES,
     DEFAULT_KMER_SIZE,

@@ -1,7 +1,7 @@
+import clean_base.exceptions as c_exc
 from attr import define, field
+from clean_base.either import Either, left, right
 
-import classeq.core.domain.utils.exceptions as c_exc
-from classeq.core.domain.utils.either import Either, left, right
 from classeq.settings import LOGGER
 
 

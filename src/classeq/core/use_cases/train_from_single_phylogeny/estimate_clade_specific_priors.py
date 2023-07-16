@@ -2,7 +2,9 @@ from collections import defaultdict
 from typing import DefaultDict, Iterator
 from uuid import UUID
 
-import classeq.core.domain.utils.exceptions as c_exc
+import clean_base.exceptions as c_exc
+from clean_base.either import Either, left, right
+
 from classeq.core.domain.dtos.clade import CladeWrapper
 from classeq.core.domain.dtos.kmer_inverse_index import (
     KmerIndex,
@@ -19,7 +21,6 @@ from classeq.core.domain.dtos.priors import (
     TreePriors,
 )
 from classeq.core.domain.dtos.reference_set import ReferenceSet
-from classeq.core.domain.utils.either import Either, left, right
 from classeq.settings import LOGGER
 
 

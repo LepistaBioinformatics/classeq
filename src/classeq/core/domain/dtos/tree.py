@@ -1,14 +1,14 @@
 from pathlib import Path
 from typing import Any, Self
 
+import clean_base.exceptions as c_exc
 from attr import define, field
 from Bio import Phylo
 from Bio.Phylo.BaseTree import Clade, Tree
+from clean_base.either import Either, left, right
 
-import classeq.core.domain.utils.exceptions as c_exc
 from classeq.core.domain.dtos.msa_source_format import MsaSourceFormatEnum
 from classeq.core.domain.dtos.tree_source_format import TreeSourceFormatEnum
-from classeq.core.domain.utils.either import Either, left, right
 from classeq.settings import LOGGER, TEMP_INPUT_FILE_SUFFIX
 
 
