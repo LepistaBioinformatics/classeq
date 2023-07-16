@@ -48,18 +48,18 @@ class ReferenceSet:
                     )
                 )
 
-        tree_either = TreeSource.from_dict(content=content.get("tree"))
+        tree_either = TreeSource.from_dict(content=content.pop("tree"))
 
         if tree_either.is_left:
             return tree_either
 
-        msa_either = MsaSource.from_dict(content=content.get("msa"))
+        msa_either = MsaSource.from_dict(content=content.pop("msa"))
 
         if msa_either.is_left:
             return msa_either
 
         linear_tree: list[CladeWrapper] | None = None
-        if isinstance(linear_tree_content := content.get("linear_tree"), list):
+        if isinstance(linear_tree_content := content.pop("linear_tree"), list):
             for linear_tree_unit in linear_tree_content:
                 if (
                     unit_either := CladeWrapper.from_dict(linear_tree_unit)
@@ -75,7 +75,7 @@ class ReferenceSet:
             cls(
                 tree=tree_either.value,
                 msa=msa_either.value,
-                labels_map=defaultdict(int, content.get("labels_map")),  # type: ignore
+                labels_map=defaultdict(int, content.pop("labels_map")),  # type: ignore
                 linear_tree=(
                     linear_tree if linear_tree is None else tuple(linear_tree)
                 ),

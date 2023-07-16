@@ -68,7 +68,7 @@ LOGGER.setLevel(LOGGING_LEVEL)
 BASES = ["A", "C", "T", "G"]
 
 
-DEFAULT_KMER_SIZE = 15
+DEFAULT_KMER_SIZE = 8
 
 
 # ? ----------------------------------------------------------------------------

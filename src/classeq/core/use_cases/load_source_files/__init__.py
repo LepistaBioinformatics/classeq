@@ -7,7 +7,7 @@ from typing import DefaultDict
 
 import clean_base.exceptions as c_exc
 from attrs import asdict
-from clean_base.either import Either, left, right
+from clean_base.either import Either, right
 
 from classeq.core.domain.dtos.msa import MsaSource, MsaSourceFormatEnum
 from classeq.core.domain.dtos.reference_set import ReferenceSet
@@ -71,14 +71,12 @@ def load_source_files(
                 *[id in tree.tree_headers for id in msa.sequence_headers],
             ]
         ):
-            return left(
-                c_exc.InvalidArgumentError(
-                    "Incompatible file contents. Tree and MSA has no "
-                    + "compatible identifiers.",
-                    exp=True,
-                    logger=LOGGER,
-                )
-            )
+            return c_exc.UseCaseError(
+                "Incompatible file contents. Tree and MSA has no "
+                + "compatible identifiers.",
+                exp=True,
+                logger=LOGGER,
+            )()
 
         # ? --------------------------------------------------------------------
         # ? Check content matches
@@ -162,4 +160,4 @@ def load_source_files(
         return right(references)
 
     except Exception as exc:
-        return left(c_exc.UseCaseError(exc, logger=LOGGER))
+        return c_exc.UseCaseError(exc, logger=LOGGER)()

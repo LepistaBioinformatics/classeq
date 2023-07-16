@@ -3,7 +3,7 @@ from typing import DefaultDict, Iterator
 from uuid import UUID
 
 import clean_base.exceptions as c_exc
-from clean_base.either import Either, left, right
+from clean_base.either import Either, right
 
 from classeq.core.domain.dtos.clade import CladeWrapper
 from classeq.core.domain.dtos.kmer_inverse_index import (
@@ -56,13 +56,11 @@ def estimate_clade_specific_priors(
         # ? --------------------------------------------------------------------
 
         if not isinstance(references, ReferenceSet):
-            return left(
-                c_exc.InvalidArgumentError(
-                    f"Argument `references` should be a `{ReferenceSet}` instance.",
-                    exp=True,
-                    logger=LOGGER,
-                )
-            )
+            return c_exc.UseCaseError(
+                f"Argument `references` should be a `{ReferenceSet}` instance.",
+                exp=True,
+                logger=LOGGER,
+            )()
 
         # ? --------------------------------------------------------------------
         # ? Get linear tree
@@ -81,12 +79,10 @@ def estimate_clade_specific_priors(
                 return linear_tree_either
 
         if references.linear_tree is None:
-            return left(
-                c_exc.UseCaseError(
-                    "Could not generate linear tree.",
-                    logger=LOGGER,
-                )
-            )
+            return c_exc.UseCaseError(
+                "Could not generate linear tree.",
+                logger=LOGGER,
+            )()
 
         # ? --------------------------------------------------------------------
         # ? Extract root node
@@ -99,12 +95,10 @@ def estimate_clade_specific_priors(
         try:
             root = next(i for i in iter(references.linear_tree) if i.is_root())
         except StopIteration:
-            return left(
-                c_exc.UseCaseError(
-                    "Root node not present in linear tree.",
-                    logger=LOGGER,
-                )
-            )
+            return c_exc.UseCaseError(
+                "Root node not present in linear tree.",
+                logger=LOGGER,
+            )()
 
         # ? --------------------------------------------------------------------
         # ? Extract outgroup nodes
@@ -122,13 +116,11 @@ def estimate_clade_specific_priors(
         ]
 
         if not all([i.name in expected_outgroups for i in outgroup_nodes]):
-            return left(
-                c_exc.UseCaseError(
-                    "Not all outgroups are present at the phylogenetic tree. "
-                    + f"Expected nodes: {', '.join(references.tree.outgroups)}",
-                    logger=LOGGER,
-                )
-            )
+            return c_exc.UseCaseError(
+                "Not all outgroups are present at the phylogenetic tree. "
+                + f"Expected nodes: {', '.join(references.tree.outgroups)}",
+                logger=LOGGER,
+            )()
 
         # ? --------------------------------------------------------------------
         # ? Recursive calculate probabilities
@@ -146,7 +138,7 @@ def estimate_clade_specific_priors(
         )
 
     except Exception as exc:
-        return left(c_exc.UseCaseError(exc, logger=LOGGER))
+        return c_exc.UseCaseError(exc, logger=LOGGER)()
 
 
 def __calculate_recursive_priors(
@@ -193,24 +185,20 @@ def __calculate_recursive_priors(
         outgroups_parents = {o.parent for o in outgroups}
 
         if len(outgroups_parents) != 1:
-            return left(
-                c_exc.UseCaseError(
-                    "Invalid outgroups. Outgroups has more than one parent node"
-                    + f": {outgroups_parents}",
-                    logger=LOGGER,
-                )
-            )
+            return c_exc.UseCaseError(
+                "Invalid outgroups. Outgroups has more than one parent node"
+                + f": {outgroups_parents}",
+                logger=LOGGER,
+            )()
 
         outgroup_parent: UUID = outgroups_parents.pop()
 
         if root.id != outgroup_parent:
-            return left(
-                c_exc.UseCaseError(
-                    "Invalid outgroups. Outgroups should share the the root as "
-                    + f"parent node. Expected {root.id}, found {outgroup_parent}",
-                    logger=LOGGER,
-                )
-            )
+            return c_exc.UseCaseError(
+                "Invalid outgroups. Outgroups should share the the root as "
+                + f"parent node. Expected {root.id}, found {outgroup_parent}",
+                logger=LOGGER,
+            )()
 
         outgroup_priors_either = __estimate_clade_kmer_specific_priors(
             kmer_indices=kmer_indices,
@@ -350,7 +338,7 @@ def __calculate_recursive_priors(
         )
 
     except Exception as exc:
-        return left(c_exc.UseCaseError(exc, logger=LOGGER))
+        return c_exc.UseCaseError(exc, logger=LOGGER)()
 
 
 def __estimate_clade_kmer_specific_priors(
@@ -396,7 +384,7 @@ def __estimate_clade_kmer_specific_priors(
         return right(kmers_priors_for_clade)
 
     except Exception as exc:
-        return left(c_exc.UseCaseError(exc, logger=LOGGER))
+        return c_exc.UseCaseError(exc, logger=LOGGER)()
 
 
 def __get_terminal_nodes(
@@ -416,7 +404,7 @@ def __get_terminal_nodes(
 
     """
 
-    def __get_children(
+    def get_children(
         target_nodes: list[CladeWrapper],
     ) -> Iterator[CladeWrapper]:
         """Performs a recursive search for terminal nodes.
@@ -442,4 +430,4 @@ def __get_terminal_nodes(
                 reference_nodes=[i for i in reference_nodes if i.id != node.id],
             )
 
-    return [i for i in __get_children(target_nodes)]
+    return [i for i in get_children(target_nodes)]

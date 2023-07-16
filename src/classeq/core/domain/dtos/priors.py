@@ -1,6 +1,6 @@
 from collections import defaultdict
 from enum import Enum
-from typing import Any, DefaultDict, Self
+from typing import Any, Self
 from uuid import UUID
 
 import clean_base.exceptions as c_exc
@@ -23,7 +23,7 @@ class LabeledPriors:
     # ? ------------------------------------------------------------------------
 
     labels: tuple[int, ...] = field()
-    priors: DefaultDict[str, float] = field()
+    priors: defaultdict[str, float] = field()
     group: PriorGroup = field()
 
     # ? ------------------------------------------------------------------------

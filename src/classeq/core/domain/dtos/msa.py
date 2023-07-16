@@ -6,7 +6,7 @@ import clean_base.exceptions as c_exc
 from attr import define, field
 from Bio import SeqIO
 from Bio.SeqRecord import SeqRecord
-from clean_base.either import Either, left, right
+from clean_base.either import Either, right
 
 from classeq.core.domain.dtos.kmer_inverse_index import KmersInverseIndices
 from classeq.core.domain.dtos.msa_source_format import MsaSourceFormatEnum
@@ -45,13 +45,11 @@ class MsaSource:
             "kmers_indices",
         ]:
             if key not in content:
-                return left(
-                    c_exc.InvalidArgumentError(
-                        f"Invalid content detected on parse `{MsaSource}`. "
-                        f"{key}` key is empty.",
-                        logger=LOGGER,
-                    )
-                )
+                return c_exc.DadaTransferObjectError(
+                    f"Invalid content detected on parse `{MsaSource}`. "
+                    f"{key}` key is empty.",
+                    logger=LOGGER,
+                )()
 
         kmer_indices_either = KmersInverseIndices.from_dict(
             content=content.get("kmers_indices")
@@ -81,11 +79,9 @@ class MsaSource:
     ) -> Either[c_exc.MappedErrors, Self]:
         try:
             if not source_file_path.is_file():
-                return left(
-                    c_exc.InvalidArgumentError(
-                        f"Invalid path: {source_file_path}"
-                    )
-                )
+                return c_exc.DadaTransferObjectError(
+                    f"Invalid path: {source_file_path}"
+                )()
 
             sequence_headers: list[int] = list()
 
@@ -130,7 +126,7 @@ class MsaSource:
             )
 
         except Exception as exc:
-            return left(c_exc.CreationError(exc, logger=LOGGER))
+            return c_exc.CreationError(exc, logger=LOGGER)()
 
     # ? ------------------------------------------------------------------------
     # ? Public instance methods
@@ -149,20 +145,18 @@ class MsaSource:
             )
 
             if indices_either.is_left:
-                return left(
-                    c_exc.InvalidArgumentError(
-                        "Unexpected error on generate kmer indices.",
-                        prev=indices_either.value,
-                        logger=LOGGER,
-                    )
-                )
+                return c_exc.DadaTransferObjectError(
+                    "Unexpected error on generate kmer indices.",
+                    prev=indices_either.value,
+                    logger=LOGGER,
+                )()
 
             self.kmers_indices = indices_either.value
 
             return right(True)
 
         except Exception as exc:
-            return left(c_exc.CreationError(exc, logger=LOGGER))
+            return c_exc.CreationError(exc, logger=LOGGER)()
 
     # ? ------------------------------------------------------------------------
     # ? Private instance methods

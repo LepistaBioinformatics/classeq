@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections import defaultdict
 from hashlib import md5
 from itertools import islice
@@ -7,10 +9,15 @@ from typing import Any, DefaultDict, Iterator, Self
 import clean_base.exceptions as c_exc
 from attrs import define, field, frozen
 from Bio import SeqIO
-from clean_base.either import Either, left, right
+from clean_base.either import Either, right
 
 from classeq.core.domain.dtos.msa_source_format import MsaSourceFormatEnum
 from classeq.settings import LOGGER
+
+
+class OrderedKmerRecords(tuple[int, ...]):
+    def __new__(cls, values: tuple[int, ...] | list[int] | set[int]) -> Self:
+        return super(OrderedKmerRecords, cls).__new__(cls, tuple(sorted(values)))  # type: ignore
 
 
 @define(kw_only=True)
@@ -20,7 +27,7 @@ class KmerIndex:
     # ? ------------------------------------------------------------------------
 
     kmer: str = field()
-    records: tuple[int, ...] = field(default=tuple())
+    records: OrderedKmerRecords = field()
 
     # ? ------------------------------------------------------------------------
     # ? Life cycle hook methods
@@ -48,25 +55,19 @@ class KmerIndex:
         cls,
         content: dict[str, Any],
     ) -> Either[c_exc.MappedErrors, Self]:
-        for key in [
-            "kmer",
-            "records",
-        ]:
-            if key not in content:
-                return left(
-                    c_exc.InvalidArgumentError(
-                        f"Invalid content detected on parse `{KmerIndex}`. "
-                        f"{key}` key is empty.",
-                        logger=LOGGER,
-                    )
-                )
+        if (kmer := content.get("kmer")) is None:
+            return c_exc.DadaTransferObjectError(
+                "Invalid content detected on parse `kmer` from JSON dump",
+                logger=LOGGER,
+            )()
 
-        return right(
-            cls(
-                kmer=content.get("kmer"),  # type: ignore
-                records=tuple(sorted(content.get("records"))),  # type: ignore
-            )
-        )
+        if (records := content.get("records")) is None:
+            return c_exc.DadaTransferObjectError(
+                "Invalid content detected on load `records` from JSON dump",
+                logger=LOGGER,
+            )()
+
+        return right(cls(kmer=kmer, records=OrderedKmerRecords(records)))
 
     # ? ------------------------------------------------------------------------
     # ? Public instance methods
@@ -117,13 +118,11 @@ class KmersInverseIndices:
             "hashes",
         ]:
             if key not in content:
-                return left(
-                    c_exc.InvalidArgumentError(
-                        f"Invalid content detected on parse `{KmersInverseIndices}`. "
-                        f"{key}` key is empty.",
-                        logger=LOGGER,
-                    )
-                )
+                return c_exc.DadaTransferObjectError(
+                    f"Invalid content detected on parse `{KmersInverseIndices}`. "
+                    f"{key}` key is empty.",
+                    logger=LOGGER,
+                )()
 
         kmer_indices: list[KmerIndex] = []
         for index in content.get("indices"):  # type: ignore
@@ -155,11 +154,9 @@ class KmersInverseIndices:
     ) -> Either[c_exc.MappedErrors, Self]:
         try:
             if not source_file_path.is_file():
-                return left(
-                    c_exc.InvalidArgumentError(
-                        f"Invalid path: {source_file_path}"
-                    )
-                )
+                return c_exc.DadaTransferObjectError(
+                    f"Invalid path: {source_file_path}"
+                )()
 
             kmer_indices: DefaultDict[str, set[int]] = defaultdict(set)
 
@@ -179,14 +176,12 @@ class KmersInverseIndices:
                     header_index = headers_map.get(record.id)
 
                     if header_index is None:
-                        return left(
-                            c_exc.CreationError(
-                                "Unexpected unmatch between kmer indices and "
-                                + f"MSA sequence headers: {record.id}",
-                                exp=True,
-                                logger=LOGGER,
-                            )
-                        )
+                        return c_exc.DadaTransferObjectError(
+                            "Unexpected unmatch between kmer indices and "
+                            + f"MSA sequence headers: {record.id}",
+                            exp=True,
+                            logger=LOGGER,
+                        )()
 
                     kmer_indices[kmer].add(header_index)
 
@@ -195,7 +190,7 @@ class KmersInverseIndices:
                     [
                         KmerIndex(
                             kmer=kmer,
-                            records=tuple(sorted(codes)),
+                            records=OrderedKmerRecords(codes),
                         )
                         for kmer, codes in kmer_indices.items()
                     ],
@@ -211,7 +206,7 @@ class KmersInverseIndices:
             )
 
         except Exception as exc:
-            return left(c_exc.CreationError(exc, logger=LOGGER))
+            return c_exc.CreationError(exc, logger=LOGGER)()
 
     # ? ------------------------------------------------------------------------
     # ? Public instance methods
