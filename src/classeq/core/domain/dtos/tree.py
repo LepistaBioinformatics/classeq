@@ -42,7 +42,7 @@ class TreeSource:
         ]:
             if key not in content:
                 return left(
-                    c_exc.InvalidArgumentError(
+                    c_exc.DadaTransferObjectError(
                         f"Invalid content detected on parse `{TreeSource}`. "
                         f"{key}` key is empty.",
                         logger=LOGGER,
@@ -74,7 +74,7 @@ class TreeSource:
         try:
             if not source_file_path.is_file():
                 return left(
-                    c_exc.InvalidArgumentError(
+                    c_exc.DadaTransferObjectError(
                         f"Invalid path: {source_file_path}"
                     )
                 )
@@ -253,7 +253,9 @@ class TreeSource:
         try:
             if rooted_tree.rooted is False:
                 return left(
-                    c_exc.InvalidArgumentError("Un-rooted trees not allowed.")
+                    c_exc.DadaTransferObjectError(
+                        "Un-rooted trees not allowed."
+                    )
                 )
 
             rooted_tree.collapse_all(

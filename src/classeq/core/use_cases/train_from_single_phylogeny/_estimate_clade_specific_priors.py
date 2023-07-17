@@ -27,7 +27,7 @@ def estimate_clade_specific_priors(
             priors or an error.
 
     Raises:
-        c_exc.InvalidArgumentError: If the argument `references` is not a
+        c_exc.UseCaseError: If the argument `references` is not a
             `ReferenceSet` instance.
         c_exc.UseCaseError: If the linear tree could not be generated or if the
             root node is not present in the tree.

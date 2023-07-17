@@ -1,5 +1,4 @@
 from collections import defaultdict
-from typing import DefaultDict
 
 import clean_base.exceptions as c_exc
 from clean_base.either import Either, right
@@ -15,7 +14,7 @@ def estimate_clade_kmer_specific_priors(
     kmer_indices: KmersInverseIndices,
     sequence_codes: list[int],
     corpus_size: int,
-) -> Either[c_exc.MappedErrors, DefaultDict[str, float]]:
+) -> Either[c_exc.MappedErrors, defaultdict[str, float]]:
     """Estimate clade specific priors for each kmer.
 
     Args:
@@ -33,7 +32,7 @@ def estimate_clade_kmer_specific_priors(
     """
 
     try:
-        kmers_priors_for_clade: DefaultDict[str, float] = defaultdict()
+        kmers_priors_for_clade: defaultdict[str, float] = defaultdict()
         target_indices: set[KmerIndex] = set()
 
         for index in kmer_indices.indices:

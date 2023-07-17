@@ -80,7 +80,7 @@ class CladeWrapper:
         ]:
             if key not in content:
                 return left(
-                    c_exc.InvalidArgumentError(
+                    c_exc.DadaTransferObjectError(
                         f"Invalid content detected on parse `{CladeWrapper}`."
                         f" {key}` key is empty.",
                         logger=LOGGER,
@@ -184,7 +184,7 @@ class CladeWrapper:
         if self.is_terminal() or self.is_outgroup():
             return f"type({self.type.name}): {self.name}"
 
-        terminals = 0 if self.children is None else self.children.__len__()
+        terminals = 0 if self.children is None else len(self.children)
         return f"type({self.type.name}): [{terminals} terminals] {self.support} {self.id}"
 
     def get_pretty_tree(self) -> str:

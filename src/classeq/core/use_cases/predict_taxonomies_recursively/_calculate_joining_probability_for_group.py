@@ -53,8 +53,8 @@ def calculate_joining_probability_for_group(
             the sequence belongs to the clade.
 
     Raises:
-        c_exc.InvalidArgumentError: If any of the arguments is not a list.
-        c_exc.InvalidArgumentError: If any of the sub-items of the arguments is
+        c_exc.UseCaseError: If any of the arguments is not a list.
+        c_exc.UseCaseError: If any of the sub-items of the arguments is
             not a list.
 
     """
@@ -66,7 +66,7 @@ def calculate_joining_probability_for_group(
 
         if not isinstance(prediction_target, list):
             return left(
-                c_exc.InvalidArgumentError(
+                c_exc.UseCaseError(
                     f"Prediction target is not a list: {prediction_target}"
                 )
             )
@@ -77,13 +77,13 @@ def calculate_joining_probability_for_group(
         ]:
             if not isinstance(group, list):
                 return left(
-                    c_exc.InvalidArgumentError(f"{name} is not a list: {group}")
+                    c_exc.UseCaseError(f"{name} is not a list: {group}")
                 )
 
             for sub_item in group:
                 if not isinstance(sub_item, list):
                     return left(
-                        c_exc.InvalidArgumentError(
+                        c_exc.UseCaseError(
                             f"An element of {name} is not a list: {sub_item}"
                         )
                     )
@@ -167,8 +167,8 @@ def __calculate_kmer_bayes_stats(
         float: The probability of the sequence belongs to the ingroup.
 
     Raises:
-        c_exc.InvalidArgumentError: If any of the arguments is not a float.
-        c_exc.InvalidArgumentError: If any of the arguments is not between 0
+        c_exc.UseCaseError: If any of the arguments is not a float.
+        c_exc.UseCaseError: If any of the arguments is not between 0
             and 1.
 
     """

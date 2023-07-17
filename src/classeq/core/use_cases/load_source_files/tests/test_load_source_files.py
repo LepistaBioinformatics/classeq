@@ -24,7 +24,7 @@ class LoadSourceFilesTest(TestCase):
                 "Col_orchidophilum_CBS_63180",
                 "Col_orchidophilum_CBS_63280",
             ],
-            support_value_cutoff=95,
+            support_value_cutoff=70,
         )
 
         self.assertFalse(response.is_left)

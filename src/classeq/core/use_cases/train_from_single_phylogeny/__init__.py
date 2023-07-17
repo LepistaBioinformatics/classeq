@@ -22,7 +22,7 @@ def train_from_single_phylogeny(
 
         if not isinstance(references, ReferenceSet):
             return left(
-                c_exc.InvalidArgumentError(
+                c_exc.UseCaseError(
                     f"Argument `references` should be a `{ReferenceSet}` instance.",
                     exp=True,
                     logger=LOGGER,

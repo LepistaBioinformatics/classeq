@@ -1,11 +1,12 @@
 from collections import defaultdict
+from copy import deepcopy
 from typing import Any, DefaultDict, Self
 from uuid import UUID, uuid4
 
 import clean_base.exceptions as c_exc
 from attr import define, field
 from Bio.Phylo.BaseTree import Clade, Tree
-from clean_base.either import Either, left, right
+from clean_base.either import Either, right
 
 from classeq.core.domain.dtos.clade import CladeWrapper, NodeType
 from classeq.core.domain.dtos.msa import MsaSource
@@ -40,13 +41,11 @@ class ReferenceSet:
             "linear_tree",
         ]:
             if key not in content:
-                return left(
-                    c_exc.InvalidArgumentError(
-                        f"Invalid content detected on parse `{ReferenceSet}`. "
-                        f"{key}` key is empty.",
-                        logger=LOGGER,
-                    )
-                )
+                return c_exc.DadaTransferObjectError(
+                    f"Invalid content detected on parse `{ReferenceSet}`. "
+                    f"{key}` key is empty.",
+                    logger=LOGGER,
+                )()
 
         tree_either = TreeSource.from_dict(content=content.pop("tree"))
 
@@ -95,7 +94,6 @@ class ReferenceSet:
             # ? ----------------------------------------------------------------
 
             if self.linear_tree is None:
-                print(self.linear_tree)
                 linear_tree_either = self.build_linear_tree()
 
                 if linear_tree_either.is_left:
@@ -104,23 +102,19 @@ class ReferenceSet:
             # The `linear_tree` attribute should exists after execution of the
             # `build_linear_tree` method. Don't remove these check.
             if (linear_tree := self.linear_tree) is None:
-                return left(
-                    c_exc.ExecutionError(
-                        "`build_linear_tree` method is maybe not working. "
-                        + f"Attribute `linear_tree` of {Self} is `None` after "
-                        + "execute it. The expected behavior is to be of type"
-                        + f"`{tuple[CladeWrapper, ...]}`.",
-                        logger=LOGGER,
-                    )
-                )
+                return c_exc.DadaTransferObjectError(
+                    "`build_linear_tree` method is maybe not working. "
+                    + f"Attribute `linear_tree` of {Self} is `None` after "
+                    + "execute it. The expected behavior is to be of type"
+                    + f"`{tuple[CladeWrapper, ...]}`.",
+                    logger=LOGGER,
+                )()
 
             if len([i for i in linear_tree if i.is_root()]) != 1:
-                return left(
-                    c_exc.ExecutionError(
-                        "More than one root node found in linear tree.",
-                        logger=LOGGER,
-                    )
-                )
+                return c_exc.DadaTransferObjectError(
+                    "More than one root node found in linear tree.",
+                    logger=LOGGER,
+                )()
 
             # ? ----------------------------------------------------------------
             # ? Get the tree seed
@@ -129,18 +123,16 @@ class ReferenceSet:
             try:
                 root = next(i for i in iter(linear_tree) if i.is_root())
             except StopIteration:
-                return left(
-                    c_exc.ExecutionError(
-                        "Root node not present in linear tree.",
-                        logger=LOGGER,
-                    )
-                )
+                return c_exc.DadaTransferObjectError(
+                    "Root node not present in linear tree.",
+                    logger=LOGGER,
+                )()
 
             # ? ----------------------------------------------------------------
             # ? Start the tree expansion
             # ? ----------------------------------------------------------------
 
-            seed_tree: CladeWrapper = root
+            seed_tree: CladeWrapper = deepcopy(root)
 
             def __expand_tree(
                 clade: CladeWrapper,
@@ -164,7 +156,7 @@ class ReferenceSet:
             return right(seed_tree)
 
         except Exception as exc:
-            return left(c_exc.ExecutionError(exc, logger=LOGGER))
+            return c_exc.DadaTransferObjectError(exc, logger=LOGGER)()
 
     def build_linear_tree(
         self,
@@ -233,8 +225,8 @@ class ReferenceSet:
 
                 self.tree.sanitized_tree = tree_either.value
 
-            tree: Tree = self.tree.sanitized_tree
-            root: Clade = tree.root
+            tree: Tree = deepcopy(self.tree.sanitized_tree)
+            root: Clade = deepcopy(tree.root)
 
             linear_tree: set[CladeWrapper] = set()
 
@@ -249,4 +241,4 @@ class ReferenceSet:
             return right(True)
 
         except Exception as exc:
-            return left(c_exc.ExecutionError(exc, logger=LOGGER))
+            return c_exc.DadaTransferObjectError(exc, logger=LOGGER)()

@@ -26,7 +26,7 @@ def perform_phylogenetic_adherence_test(
 
         if not isinstance(prediction_target, list):
             return left(
-                c_exc.InvalidArgumentError(
+                c_exc.UseCaseError(
                     f"Prediction target is not a list: {prediction_target}"
                 )
             )
@@ -38,13 +38,13 @@ def perform_phylogenetic_adherence_test(
         ]:
             if not isinstance(group, list):
                 return left(
-                    c_exc.InvalidArgumentError(f"{name} is not a list: {group}")
+                    c_exc.UseCaseError(f"{name} is not a list: {group}")
                 )
 
             for sub_item in group:
                 if not isinstance(sub_item, list):
                     return left(
-                        c_exc.InvalidArgumentError(
+                        c_exc.UseCaseError(
                             f"An element of {name} is not a list: {sub_item}"
                         )
                     )
