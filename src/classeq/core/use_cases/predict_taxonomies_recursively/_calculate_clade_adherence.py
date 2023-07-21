@@ -65,7 +65,6 @@ def calculate_clade_adherence(
                 calculate_probability_of_group_contains_kmer(
                     prior=prior,
                     sequences_with_kmer=len(current_index),
-                    # total_sequences=len(labeled_priors.labels),
                     total_sequences=total_length,
                 )
             )

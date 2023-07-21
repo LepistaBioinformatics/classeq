@@ -9,6 +9,7 @@ from classeq.settings import LOGGER
 from ._recursively_test_clade_adherence import recursively_test_clade_adherence
 from ._perform_adherence_test_of_child_clades import (
     perform_adherence_test_of_child_clades,
+    CladeAdherenceResultStatus,
 )
 
 
@@ -106,34 +107,37 @@ def perform_phylogenetic_adherence_test(
         # ? Perform adherence test for the ingroups
         # ? --------------------------------------------------------------------
 
-        for clade in first_level_ingroup_clades:
-            print(f"clade: {clade}\n")
+        status = CladeAdherenceResultStatus.NEXT_ITERATION
 
-            if (children := clade.children) is None:
+        while status == CladeAdherenceResultStatus.NEXT_ITERATION:
+            for clade in first_level_ingroup_clades:
+                print(f"clade: {clade}\n")
+
+                if (children := clade.children) is None:
+                    continue
+
+                perform_adherence_test_of_child_clades(
+                    target_sequence=target_sequence,
+                    clades=[i for i in children if i.is_internal()],
+                    tree_priors=tree_priors,
+                    kmer_indices=reference_set.msa.kmers_indices,
+                    total_length=len(reference_set.labels_map),
+                )
+
                 continue
 
-            perform_adherence_test_of_child_clades(
-                target_sequence=target_sequence,
-                clades=[i for i in children if i.is_internal()],
-                tree_priors=tree_priors,
-                kmer_indices=reference_set.msa.kmers_indices,
-                total_length=len(reference_set.labels_map),
-            )
+                adherence_response_either = recursively_test_clade_adherence(
+                    target_sequence=target_sequence,
+                    clades=[i for i in children if i.is_internal()],
+                    tree_priors=tree_priors,
+                    kmer_indices=reference_set.msa.kmers_indices,
+                    total_length=len(reference_set.labels_map),
+                )
 
-            continue
+                if adherence_response_either.is_left:
+                    return adherence_response_either
 
-            adherence_response_either = recursively_test_clade_adherence(
-                target_sequence=target_sequence,
-                clades=[i for i in children if i.is_internal()],
-                tree_priors=tree_priors,
-                kmer_indices=reference_set.msa.kmers_indices,
-                total_length=len(reference_set.labels_map),
-            )
-
-            if adherence_response_either.is_left:
-                return adherence_response_either
-
-            # print(adherence_response_either.value)
+                # print(adherence_response_either.value)
 
         # ? --------------------------------------------------------------------
         # ? Return a positive response
