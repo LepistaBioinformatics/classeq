@@ -88,13 +88,13 @@ class TreeSource:
 
             LOGGER.info("Parsing and reroot tree")
 
-            rooted_tree_either: Either = cls.parse_and_reroot_tree(
-                source_file_path,
-                outgroups,
-                format,
-            )
-
-            if rooted_tree_either.is_left:
+            if (
+                rooted_tree_either := cls.parse_and_reroot_tree(
+                    source_file_path,
+                    outgroups,
+                    format,
+                )
+            ).is_left:
                 return left(
                     c_exc.UseCaseError(
                         "Unexpected error on parse phylogenetic tree.",
@@ -234,7 +234,9 @@ class TreeSource:
                     )
                 )
 
-            raw_tree.root_with_outgroup([{"name": o} for o in outgroups])
+            if raw_tree.root_with_outgroup(tree_outgroups) is None:
+                LOGGER.warning("Outgroup is the current tree root")
+                raw_tree.rooted = True
 
             return right(raw_tree)
 
