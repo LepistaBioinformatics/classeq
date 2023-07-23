@@ -116,9 +116,11 @@ class TreeSource:
                 f"Collapsing low supported (< {support_value_cutoff}) branches"
             )
 
-            sanitized_tree_either: Either = cls.__collapse_low_supported_nodes(
-                rooted_tree=rooted_tree,
-                support_value_cutoff=support_value_cutoff,
+            sanitized_tree_either: Either = (
+                cls.__collapse_low_supported_and_outgroup_nodes(
+                    rooted_tree=rooted_tree,
+                    support_value_cutoff=support_value_cutoff,
+                )
             )
 
             if sanitized_tree_either.is_left:
@@ -207,6 +209,49 @@ class TreeSource:
             return left(c_exc.CreationError(exc, logger=LOGGER))
 
     # ? ------------------------------------------------------------------------
+    # ? Public instance methods
+    # ? ------------------------------------------------------------------------
+
+    def load_tree(
+        self, outgroups: list[str]
+    ) -> Either[c_exc.MappedErrors, bool]:
+        try:
+            if not self.source_file_path.is_file():
+                return left(
+                    c_exc.DadaTransferObjectError(
+                        f"Invalid path: {self.source_file_path}"
+                    )
+                )
+
+            # ? ----------------------------------------------------------------
+            # ? Load phylogenetic tree
+            # ? ----------------------------------------------------------------
+
+            LOGGER.info("Loading phylogenetic tree")
+
+            if (
+                rooted_tree_either := self.parse_and_reroot_tree(
+                    self.source_file_path,
+                    outgroups,
+                    self.tree_format,
+                )
+            ).is_left:
+                return left(
+                    c_exc.UseCaseError(
+                        "Unexpected error on parse phylogenetic tree.",
+                        prev=rooted_tree_either.value,
+                        logger=LOGGER,
+                    )
+                )
+
+            self.sanitized_tree = rooted_tree_either.value
+
+            return right(True)
+
+        except Exception as exc:
+            return left(c_exc.UseCaseError(exc, logger=LOGGER))
+
+    # ? ------------------------------------------------------------------------
     # ? Public static methods
     # ? ------------------------------------------------------------------------
 
@@ -224,6 +269,16 @@ class TreeSource:
             tree_outgroups = [
                 clade for clade in terminals if clade.name in outgroups
             ]
+
+            outgroup_paths: list[Clade] = list()
+            for clade in tree_outgroups:
+                ancestors: list[Clade] = raw_tree.get_path(clade)
+
+                outgroup_paths.extend(
+                    [i for i in ancestors if i.confidence is not None]
+                )
+
+            raw_tree.collapse_all(lambda c: c in outgroup_paths)
 
             if not all([out.name in outgroups for out in tree_outgroups]):
                 return left(
@@ -248,7 +303,7 @@ class TreeSource:
     # ? ------------------------------------------------------------------------
 
     @staticmethod
-    def __collapse_low_supported_nodes(
+    def __collapse_low_supported_and_outgroup_nodes(
         rooted_tree: Tree,
         support_value_cutoff: int = 99,
     ) -> Either[c_exc.MappedErrors, Tree]:
