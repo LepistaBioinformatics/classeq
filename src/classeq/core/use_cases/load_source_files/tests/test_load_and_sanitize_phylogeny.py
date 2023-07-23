@@ -4,8 +4,9 @@ from unittest import TestCase
 
 from classeq.core.domain.dtos.tree import TreeSource
 from classeq.core.domain.dtos.tree_source_format import TreeSourceFormatEnum
-
-from .._load_and_sanitize_phylogeny import load_and_sanitize_phylogeny
+from classeq.core.use_cases.load_source_files._load_and_sanitize_phylogeny import (
+    load_and_sanitize_phylogeny,
+)
 
 
 class LoadAndSanitizePhylogenyTest(TestCase):
@@ -14,11 +15,23 @@ class LoadAndSanitizePhylogenyTest(TestCase):
             source_file_path=Path(str(getenv("MOCK_TREE"))),
             format=TreeSourceFormatEnum.NEWICK,
             outgroups=[
+                "Col_orchidophilum_BJ103_2",
                 "Col_orchidophilum_CBS_119291",
                 "Col_orchidophilum_IMI_309357",
+                "Col_orchidophilum_BS11",
+                "Col_orchidophilum_BS10",
+                "Col_orchidophilum_BS06",
+                "Col_orchidophilum_BS05",
                 "Col_orchidophilum_CBS_63180",
                 "Col_orchidophilum_CBS_63280",
+                "Col_orchidophilum_COUFAL0219",
+                "Col_orchidophilum_LCTJ_04",
+                "Col_orchidophilum_LCTJ_02",
+                "Col_orchidophilum_LCTJ_06",
+                "Col_orchidophilum_LCTJ_05",
+                "Col_orchidophilum_LCTJ_03",
             ],
+            support_value_cutoff=70,
         )
 
         tree: TreeSource = response.value

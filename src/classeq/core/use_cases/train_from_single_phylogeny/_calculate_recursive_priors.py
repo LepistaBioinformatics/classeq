@@ -15,6 +15,8 @@ from classeq.core.domain.dtos.priors import (
     SisterGroupLabeledPriors,
     TreePriors,
 )
+from Bio.Phylo.BaseTree import Tree
+from classeq.core.domain.dtos.tree import TreeSource
 from classeq.settings import LOGGER
 
 from ._estimate_clade_kmer_specific_priors import (
@@ -24,6 +26,7 @@ from ._get_terminal_nodes import get_terminal_nodes
 
 
 def calculate_recursive_priors(
+    reference_tree: TreeSource,
     root: CladeWrapper,
     outgroups: list[CladeWrapper],
     ingroups: list[CladeWrapper],
@@ -66,12 +69,24 @@ def calculate_recursive_priors(
         outgroup_labels: list[int] = []
         outgroups_parents = {o.parent for o in outgroups}
 
-        if len(outgroups_parents) != 1:
-            return c_exc.UseCaseError(
-                "Invalid outgroups. Outgroups has more than one parent node"
-                + f": {outgroups_parents}",
-                logger=LOGGER,
-            )()
+        if reference_tree.sanitized_tree is None:
+            if (
+                load_response := reference_tree.load_tree(
+                    outgroups=reference_tree.outgroups
+                )
+            ).is_left:
+                return load_response
+
+        sanitized_tree: Tree = reference_tree.sanitized_tree  # type: ignore
+
+        outgroup_clades = sanitized_tree.common_ancestor(
+            [i for i in sanitized_tree.get_terminals() if i in outgroups]
+        )
+
+        outgroup_path = sanitized_tree.get_path(outgroup_clades)
+
+        if len(outgroup_path) == 0:
+            LOGGER.warning("Outgroup is the current tree root")
 
         outgroup_parent: UUID = outgroups_parents.pop()
 

@@ -93,6 +93,7 @@ def estimate_clade_specific_priors(
         # ? --------------------------------------------------------------------
 
         outgroup_nodes = [i for i in references.linear_tree if i.is_outgroup()]
+
         expected_outgroups = [
             name
             for i in references.tree.outgroups
@@ -111,6 +112,7 @@ def estimate_clade_specific_priors(
         # ? --------------------------------------------------------------------
 
         return calculate_recursive_priors(
+            reference_tree=references.tree,
             root=root,
             outgroups=outgroup_nodes,
             ingroups=[

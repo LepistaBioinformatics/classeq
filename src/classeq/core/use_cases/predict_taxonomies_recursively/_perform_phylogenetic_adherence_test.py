@@ -1,15 +1,21 @@
+from copy import copy, deepcopy
+
 import clean_base.exceptions as c_exc
-from clean_base.either import Either, left, right
+from clean_base.either import Either, right
 
 from classeq.core.domain.dtos.clade import CladeWrapper
-from classeq.core.domain.dtos.priors import TreePriors
+from classeq.core.domain.dtos.kmer_inverse_index import KmersInverseIndices
+from classeq.core.domain.dtos.priors import PriorGroup, TreePriors
 from classeq.core.domain.dtos.reference_set import ReferenceSet
-from classeq.settings import LOGGER
+from classeq.settings import DEFAULT_KMER_SIZE, LOGGER
 
-from ._recursively_test_clade_adherence import recursively_test_clade_adherence
+from ._do_clade_adherence_test_for_single_sequence import (
+    do_clade_adherence_test_for_single_sequence,
+)
 from ._perform_adherence_test_of_child_clades import (
-    perform_adherence_test_of_child_clades,
+    CladeAdherenceResult,
     CladeAdherenceResultStatus,
+    perform_adherence_test_of_child_clades,
 )
 
 
@@ -17,7 +23,8 @@ def perform_phylogenetic_adherence_test(
     target_sequence: str,
     reference_set: ReferenceSet,
     tree_priors: TreePriors,
-) -> Either[c_exc.MappedErrors, bool]:
+    max_iterations: int = 1000,
+) -> Either[c_exc.MappedErrors, CladeWrapper | None]:
     """Perform phylogenetic adherence test.
 
     Description:
@@ -45,105 +52,195 @@ def perform_phylogenetic_adherence_test(
         # ? Validate args
         # ? --------------------------------------------------------------------
 
-        # TODO: do implement
+        if not isinstance(target_sequence, str):
+            return c_exc.UseCaseError(
+                "Unexpected error. The `target_sequence` argument should be a "
+                + f"string. Received {type(target_sequence)}.",
+                logger=LOGGER,
+            )()
+
+        if not isinstance(reference_set, ReferenceSet):
+            return c_exc.UseCaseError(
+                "Unexpected error. The `reference_set` argument should be a "
+                + f"ReferenceSet. Received {type(reference_set)}.",
+                logger=LOGGER,
+            )()
+
+        if not isinstance(tree_priors, TreePriors):
+            return c_exc.UseCaseError(
+                "Unexpected error. The `tree_priors` argument should be a "
+                + f"TreePriors. Received {type(tree_priors)}.",
+                logger=LOGGER,
+            )()
+
+        if max_iterations > 9999:
+            return c_exc.UseCaseError(
+                "Unexpected error. The `max_iterations` argument should be "
+                + f"less than 9999. Received {max_iterations}.",
+                logger=LOGGER,
+            )()
+
+        # ? --------------------------------------------------------------------
+        # ? Get sequence kmers
+        # ? --------------------------------------------------------------------
+
+        target_sequence_kmers: list[str] = [
+            kmer
+            for kmer in KmersInverseIndices.generate_kmers(
+                dna_sequence=target_sequence.upper(),
+                k_size=DEFAULT_KMER_SIZE,
+            )
+        ]
 
         # ? --------------------------------------------------------------------
         # ? Collect hierarchical tree
         # ? --------------------------------------------------------------------
 
-        tree_either = reference_set.get_hierarchical_tree()
-
-        if tree_either.is_left:
+        if (tree_either := reference_set.get_hierarchical_tree()).is_left:
             return tree_either
 
         tree: CladeWrapper = tree_either.value
 
-        print(f"Tree: {tree}")
-
         if tree.is_root() is False:
-            return left(
-                c_exc.UseCaseError(
-                    "Unexpected error. Retrieved tree using "
-                    + "`get_hierarchical_tree` is not a rooted tree.",
-                    logger=LOGGER,
-                )
-            )
-
-        # print(tree.get_pretty_tree())
+            return c_exc.UseCaseError(
+                "Unexpected error. Retrieved tree using "
+                + "`get_hierarchical_tree` is not a rooted tree.",
+                logger=LOGGER,
+            )()
 
         # ? --------------------------------------------------------------------
         # ? Perform adherence test for outgroup
         # ? --------------------------------------------------------------------
 
-        """ outgroup_adherence_test_either = (
-            do_clade_adherence_test_for_single_sequence(
-                target_sequence=target_sequence,
+        if (outgroup_clades_either := tree.get_outgroup_clade()).is_left:
+            return outgroup_clades_either
+
+        outgroup_clades: CladeWrapper = outgroup_clades_either.value
+
+        if (
+            binding_either := do_clade_adherence_test_for_single_sequence(
+                query_kmers=target_sequence_kmers,
                 clade_priors=tree_priors.outgroup,
                 kmer_indices=reference_set.msa.kmers_indices,
             )
-        )
+        ).is_left:
+            return binding_either
 
-        if outgroup_adherence_test_either.is_left:
-            return outgroup_adherence_test_either
-
-        outgroup_adherence_test = outgroup_adherence_test_either.value """
+        if (
+            outgroup_joint_probability := binding_either.value.pop(
+                PriorGroup.OUTGROUP
+            )
+        ) is None:
+            return c_exc.UseCaseError(
+                "Unexpected error on try to calculate "
+                + "adherence test for ingroup.",
+                logger=LOGGER,
+            )()
 
         # ? --------------------------------------------------------------------
         # ? Perform adherence test for the outgroup-sister pairs
         # ? --------------------------------------------------------------------
 
-        first_level_ingroup_clades_either = tree.get_ingroup_clades()
+        if (ingroup_clades_either := tree.get_ingroup_clades()).is_left:
+            return ingroup_clades_either
 
-        if first_level_ingroup_clades_either.is_left:
-            return first_level_ingroup_clades_either
-
-        first_level_ingroup_clades: list[CladeWrapper] = [
+        ingroup_clades: list[CladeWrapper] = list(
             ingroup
-            for ingroup in first_level_ingroup_clades_either.value
+            for ingroup in ingroup_clades_either.value
             if ingroup.parent == tree_priors.outgroup.parent
-        ]
+        )
 
         # ? --------------------------------------------------------------------
         # ? Perform adherence test for the ingroups
         # ? --------------------------------------------------------------------
 
+        response_children: CladeAdherenceResult | None
+        joint_probability: float
         status = CladeAdherenceResultStatus.NEXT_ITERATION
+        local_max_iterations = copy(max_iterations)
+        final_response: CladeWrapper | None = None
+        response_clades: list[CladeWrapper] = deepcopy(ingroup_clades)
+        current_iteration: int = 0
 
-        while status == CladeAdherenceResultStatus.NEXT_ITERATION:
-            for clade in first_level_ingroup_clades:
-                print(f"clade: {clade}\n")
+        while (
+            response_clades
+            and status == CladeAdherenceResultStatus.NEXT_ITERATION
+        ):
+            clade = response_clades.pop(0)
+            current_iteration += 1
 
-                if (children := clade.children) is None:
-                    continue
-
-                perform_adherence_test_of_child_clades(
-                    target_sequence=target_sequence,
-                    clades=[i for i in children if i.is_internal()],
-                    tree_priors=tree_priors,
-                    kmer_indices=reference_set.msa.kmers_indices,
-                    total_length=len(reference_set.labels_map),
-                )
-
+            if (children := clade.children) is None:
                 continue
 
-                adherence_response_either = recursively_test_clade_adherence(
-                    target_sequence=target_sequence,
-                    clades=[i for i in children if i.is_internal()],
+            children = [i for i in children if i.is_internal()]
+
+            if len(children) == 0:
+                final_response = clade
+                break
+
+            if (
+                response_either := perform_adherence_test_of_child_clades(
+                    query_kmers=target_sequence_kmers,
+                    clades=children,
                     tree_priors=tree_priors,
                     kmer_indices=reference_set.msa.kmers_indices,
-                    total_length=len(reference_set.labels_map),
                 )
+            ).is_left:
+                return response_either
 
-                if adherence_response_either.is_left:
-                    return adherence_response_either
+            (
+                joint_probability,
+                response_children,
+                status,
+            ) = response_either.value
 
-                # print(adherence_response_either.value)
+            # ------------------------------------------------------------------
+            # Break the search if the first iteration is inconclusive for
+            # ingroup. The first iteration represents the test for the sister
+            # clade of the outgroup, in other words, the tree entrypoint.
+            # ------------------------------------------------------------------
+            if (
+                current_iteration == 1
+                and outgroup_joint_probability < joint_probability
+            ):
+                LOGGER.debug("The processed sequence is an outgroup.")
+                final_response = outgroup_clades
+                break
+
+            # ------------------------------------------------------------------
+            # Case the adherence test is conclusive for ingroup and the ingroup
+            # clade has children clades, the adherence test should return a
+            # `CladeAdherenceResultStatus.NEXT_ITERATION`, and the children of
+            # the ingroup clade should be added to the list of clades to be
+            # testes.
+            # ------------------------------------------------------------------
+            if (
+                status == CladeAdherenceResultStatus.NEXT_ITERATION
+                and response_children is not None
+            ):
+                response_clades.append(response_children.clade)
+
+            # ------------------------------------------------------------------
+            # Otherwise, the adherence test is conclusive the search loop should
+            # be broken.
+            # ------------------------------------------------------------------
+            else:
+                final_response = clade
+                break
+
+            # ------------------------------------------------------------------
+            # This is a safety measure to avoid infinite loops. Don't remove it.
+            # ------------------------------------------------------------------
+            local_max_iterations -= 1
+            if local_max_iterations == 0:
+                LOGGER.critical("Max iterations reached.")
+                break
 
         # ? --------------------------------------------------------------------
         # ? Return a positive response
         # ? --------------------------------------------------------------------
 
-        return right(True)
+        return right(final_response)
 
     except Exception as exc:
-        return left(c_exc.UseCaseError(exc, logger=LOGGER))
+        return c_exc.UseCaseError(exc, logger=LOGGER)()

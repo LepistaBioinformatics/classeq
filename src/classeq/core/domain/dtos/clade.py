@@ -130,10 +130,7 @@ class CladeWrapper:
 
         return right([clade for clade in children if clade.is_internal()])
 
-    def get_outgroup_clade(
-        self,
-        outgroups: list[str],
-    ) -> Either[c_exc.MappedErrors, list[Self]]:
+    def get_outgroup_clade(self) -> Either[c_exc.MappedErrors, list[Self]]:
         if self.is_root() is False:
             return left(
                 c_exc.ExecutionError(
@@ -153,20 +150,7 @@ class CladeWrapper:
                 )
             )
 
-        outgroup_clades = [clade for clade in children if clade.is_outgroup()]
-
-        if not all([clade.name in outgroups for clade in outgroup_clades]):
-            return left(
-                c_exc.ExecutionError(
-                    "Expected outgroups differs from found outgroups:\n"
-                    + f"Expected: {', '.join(outgroups)}\n"
-                    + f"{', '.join([i.name for i in outgroup_clades])}",
-                    exp=True,
-                    logger=LOGGER,
-                )
-            )
-
-        return right(outgroup_clades)
+        return right([clade for clade in children if clade.is_outgroup()])
 
     def is_root(self) -> bool:
         return self.type == NodeType.ROOT
@@ -184,8 +168,10 @@ class CladeWrapper:
         if self.is_terminal() or self.is_outgroup():
             return f"type({self.type.name}): {self.name}"
 
-        terminals = 0 if self.children is None else len(self.children)
-        return f"type({self.type.name}): [{terminals} terminals] {self.support} {self.id}"
+        nodes = 0 if self.children is None else len(self.children)
+        return (
+            f"type({self.type.name}): [{nodes} nodes] {self.support} {self.id}"
+        )
 
     def get_pretty_tree(self) -> str:
         str_repr: list[str] = []

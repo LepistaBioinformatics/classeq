@@ -1,5 +1,5 @@
 import clean_base.exceptions as c_exc
-from clean_base.either import Either, left, right
+from clean_base.either import Either, right
 
 from classeq.core.domain.dtos.kmer_inverse_index import KmersInverseIndices
 from classeq.core.domain.dtos.priors import (
@@ -7,16 +7,15 @@ from classeq.core.domain.dtos.priors import (
     OutgroupCladePriors,
     PriorGroup,
 )
-from classeq.settings import DEFAULT_KMER_SIZE, LOGGER
+from classeq.settings import LOGGER
 
 from ._calculate_clade_adherence import calculate_clade_adherence
 
 
 def do_clade_adherence_test_for_single_sequence(
-    target_sequence: str,
+    query_kmers: list[str],
     clade_priors: IngroupCladePriors | OutgroupCladePriors,
     kmer_indices: KmersInverseIndices,
-    total_length: int,
 ) -> Either[c_exc.MappedErrors, dict[PriorGroup, float]]:
     """Calculate the probability of a sequence belongs to a clade.
 
@@ -53,39 +52,23 @@ def do_clade_adherence_test_for_single_sequence(
                 isinstance(clade_priors, OutgroupCladePriors),
             ]
         ):
-            return left(
-                c_exc.UseCaseError(
-                    f"argument `{clade_priors}` should be any of "
-                    + f"`{IngroupCladePriors}` or `{OutgroupCladePriors}`.",
-                    exp=True,
-                    logger=LOGGER,
-                )
-            )
+            return c_exc.UseCaseError(
+                f"argument `{clade_priors}` should be any of "
+                + f"`{IngroupCladePriors}` or `{OutgroupCladePriors}`.",
+                exp=True,
+                logger=LOGGER,
+            )()
 
         for observed, desired in [
-            (target_sequence, str),
+            (query_kmers, list),
             (kmer_indices, KmersInverseIndices),
         ]:
             if not isinstance(observed, desired):
-                return left(
-                    c_exc.UseCaseError(
-                        f"argument `{observed}` should be a instance of `{desired}`.",
-                        exp=True,
-                        logger=LOGGER,
-                    )
-                )
-
-        # ? --------------------------------------------------------------------
-        # ? Get sequence kmers
-        # ? --------------------------------------------------------------------
-
-        target_sequence_kmers = [
-            kmer
-            for kmer in KmersInverseIndices.generate_kmers(
-                dna_sequence=target_sequence.upper(),
-                k_size=DEFAULT_KMER_SIZE,
-            )
-        ]
+                return c_exc.UseCaseError(
+                    f"argument `{observed}` should be a instance of `{desired}`.",
+                    exp=True,
+                    logger=LOGGER,
+                )()
 
         # ? --------------------------------------------------------------------
         # ? Calculate joint probability units
@@ -95,18 +78,14 @@ def do_clade_adherence_test_for_single_sequence(
 
         if isinstance(clade_priors, IngroupCladePriors):
             for group in clade_priors.priors:
-                adherence_either = calculate_clade_adherence(
-                    labeled_priors=group,
-                    target_kmers=target_sequence_kmers,
-                    kmer_indices=kmer_indices,
-                    # total_length=sum(
-                    #     len(i.labels) for i in clade_priors.priors
-                    # ),
-                    # total_length=total_length,
-                    total_length=len(group.labels),
-                )
-
-                if adherence_either.is_left:
+                if (
+                    adherence_either := calculate_clade_adherence(
+                        labeled_priors=group,
+                        target_kmers=query_kmers,
+                        kmer_indices=kmer_indices,
+                        total_length=len(group.labels),
+                    )
+                ).is_left:
                     return adherence_either
 
                 clade_adherence_stats.update(
@@ -114,14 +93,14 @@ def do_clade_adherence_test_for_single_sequence(
                 )
 
         if isinstance(clade_priors, OutgroupCladePriors):
-            adherence_either = calculate_clade_adherence(
-                labeled_priors=clade_priors.priors,
-                target_kmers=target_sequence_kmers,
-                kmer_indices=kmer_indices,
-                total_length=len(clade_priors.priors.labels),
-            )
-
-            if adherence_either.is_left:
+            if (
+                adherence_either := calculate_clade_adherence(
+                    labeled_priors=clade_priors.priors,
+                    target_kmers=query_kmers,
+                    kmer_indices=kmer_indices,
+                    total_length=len(clade_priors.priors.labels),
+                )
+            ).is_left:
                 return adherence_either
 
             clade_adherence_stats.update(
@@ -135,4 +114,4 @@ def do_clade_adherence_test_for_single_sequence(
         return right(clade_adherence_stats)
 
     except Exception as exc:
-        return left(c_exc.UseCaseError(exc, logger=LOGGER))
+        return c_exc.UseCaseError(exc, logger=LOGGER)()

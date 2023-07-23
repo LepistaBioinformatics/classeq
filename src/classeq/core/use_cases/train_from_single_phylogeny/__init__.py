@@ -47,6 +47,7 @@ def train_from_single_phylogeny(
         # ? --------------------------------------------------------------------
 
         tree_source = references.tree.source_file_path
+        print(tree_source)
         train_output_file_path = tree_source.parent.joinpath(
             ".".join(
                 [

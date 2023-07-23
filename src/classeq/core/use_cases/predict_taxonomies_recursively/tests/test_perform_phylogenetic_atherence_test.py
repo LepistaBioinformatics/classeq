@@ -19,6 +19,8 @@ class PerformPhylogeneticAdherenceTest(BaseTest):
         largest_clade = [
             ("Col_acutatum_CBS_110735", self._Col_acutatum_CBS_110735),
             ("Col_simmondsii_CBS_111531", self._Col_simmondsii_CBS_111531),
+            ("Col_cuscutae_CBS_128517", self._Col_cuscutae_CBS_128517),
+            ("Col_simmondsii_CBS_122122", self._Col_simmondsii_CBS_122122),
             ("Col_paranaense_CBS_134729", self._Col_paranaense_CBS_134729),
             ("Col_nymphaeae_CBS_100064", self._Col_nymphaeae_CBS_100064),
             ("Col_cuscutae_CSL_473", self._Col_cuscutae_CSL_473),
@@ -37,17 +39,32 @@ class PerformPhylogeneticAdherenceTest(BaseTest):
             ("Col_salicis_IMI_345585", self._Col_salicis_IMI_345585),
         ]
 
+        external_sequences = [
+            (
+                "KY293404.1_Colletotrichum_godetiae isolate SS354 glyceraldehyde 3-phosphate dehydrogenase (GAPDH) gene, partial cds",
+                "CCTTCATTGAGACCAAGTACGCTGTGAGTATCACCCCACTTTACCCCTCCATGATGATATCACGTCTGTCACGATAACACCACCCTAATCGGTAACCATGGGAAAGAGCCAGAGCTGCTAGCACTCTCGACTCTTTTCCCCCAAGGTTTAGATTTGGCTCGTTGCAATGGCAAGACGTGACGAGATCATGTAGAAACATCCAAGACAAAATTTGCTGACAGACAATCATCACAGGCCTACATGCTCAAGT",
+            ),
+            (
+                "JQ040083.1 Glomerella acutata isolate PMAP213 glyceraldehyde-3-phosphate dehydrogenase gene, partial cds",
+                "GCCGTCAACGACCCCTTCATTGAGACCAAGTACGCTGTGAGTATCACCCCACTTTACCCCTCCATGATGATATCACGTCTGTCACGATAACACCACCCTAATCGGTAACCATGGGAAAGAGCCAGAGCTGCTAGCACTCTCGACTCTTTTCCCCCAAGGTTTAGATTTGGCTCGTTGCAATGGCAAGACGTGACGAGATCATGTAGAAACATCCAAGACAAAATTTGCTGACAGACAATCATCACAGGCCTACATGCTCAAGTACGACTCCACCC",
+            ),
+        ]
+
         for name, seq in [
             *outgroup,
             *largest_clade,
             *minor_clade,
+            *external_sequences,
         ]:
-            print(f"\n{name}")
+            print("-" * 80)
+            print(f"\n\t{name}\n")
             response = perform_phylogenetic_adherence_test(
                 target_sequence=seq,
                 reference_set=deepcopy(self._reference_set),
                 tree_priors=self._tree_priors,
             )
+
+            print(f"final_response: {response.value}\n")
 
             self.assertFalse(response.is_left)
             self.assertTrue(response.is_right)

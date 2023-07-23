@@ -166,8 +166,6 @@ class IngroupCladePriors:
         SisterGroupLabeledPriors,
     ] = field()
 
-    # priors: IngroupLabeledPriors = field()
-
     # ? ------------------------------------------------------------------------
     # ? Public instance methods
     # ? ------------------------------------------------------------------------
@@ -176,7 +174,6 @@ class IngroupCladePriors:
         return {
             "parent": self.parent.__str__(),
             "priors": [i.to_dict() for i in self.priors],
-            # "priors": self.priors.to_dict(),
         }
 
     # ? ------------------------------------------------------------------------
@@ -218,10 +215,6 @@ class IngroupCladePriors:
         return right(
             cls(
                 parent=UUID(content.get("parent")),
-                # priors=IngroupLabeledPriors(
-                #     labels=ingroup_prior.labels,
-                #     priors=ingroup_prior.priors,
-                # ),
                 priors=(
                     IngroupLabeledPriors(
                         labels=ingroup_prior.labels,

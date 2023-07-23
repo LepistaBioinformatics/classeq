@@ -125,7 +125,7 @@ def load_source_files(
         )
 
         LOGGER.info(
-            f"Train output file would be persisted to: {train_output_file_path}"
+            f"Load output file would be persisted to: {train_output_file_path}"
         )
 
         with gzip.open(

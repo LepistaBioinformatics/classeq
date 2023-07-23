@@ -15,15 +15,13 @@ logging.log
 # Environment file
 .env
 
-# Requirements file
-src/requirements.txt
-
 # Expected artifacts of the package
 diversity-merged.json
 functional-predictions-merged.tsv.gz
 summary-merged.json
 taxonomies-merged.tsv
 functional-predictions-merged
+public
 
 # Mypy specifig files
 .dmypy.json

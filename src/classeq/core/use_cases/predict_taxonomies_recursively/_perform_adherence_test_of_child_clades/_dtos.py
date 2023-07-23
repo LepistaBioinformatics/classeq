@@ -1,6 +1,6 @@
 from enum import Enum
-from hashlib import md5
 
+from hashlib import md5
 from attrs import define, field
 
 from classeq.core.domain.dtos.clade import CladeWrapper
@@ -22,8 +22,6 @@ class CladeAdherenceResultStatus(Enum):
                 in the ingroup or sister group.
             - `not-possible`: The test is not possible because the clade is a
                 leaf node.
-            - `unavailable`: The test is not available because the clade is not
-                in the tree.
 
     Attributes:
         NEXT_ITERATION (str): The test is inconclusive and the test should
@@ -32,29 +30,23 @@ class CladeAdherenceResultStatus(Enum):
             in the ingroup.
         CONCLUSIVE_SISTER (str): The test is conclusive and the sequence is
             in the sister group.
-        INCONCLUSIVE (str): The test is inconclusive and the sequence is not
-            in the ingroup or sister group.
+        MAX_DEPTH_REACHED (str): The maximum depth of the tree was reached.
         NOT_POSSIBLE (str): The test is not possible because the clade is a
             leaf node.
-        UNAVAILABLE (str): The test is not available because the clade is not
-            in the tree.
 
     """
 
+    INCONCLUSIVE = "inconclusive"
     NEXT_ITERATION = "next-iteration"
     CONCLUSIVE_INGROUP = "conclusive-ingroup"
-    CONCLUSIVE_SISTER = "conclusive-sister"
-    INCONCLUSIVE = "inconclusive"
-    NOT_POSSIBLE = "not-possible"
-    UNAVAILABLE = "unavailable"
+    MAX_RESOLUTION_REACHED = "max-resolution-reached"
 
 
 @define
 class CladeAdherenceResult:
     clade: CladeWrapper = field()
-    parent: set[CladeWrapper] = field()
-    status: CladeAdherenceResultStatus = field()
     ingroup_joint_probability: float = field(default=-999)
+    sister_joint_probability: float = field(default=-999)
 
     # ? ------------------------------------------------------------------------
     # ? Life cycle hook methods
@@ -78,8 +70,8 @@ class CladeAdherenceResult:
                 "-".join(
                     [
                         self.clade.__hash__().__str__(),
-                        "".join([i.__str__() for i in self.parent]),
-                        self.status.name,
+                        str(self.ingroup_joint_probability),
+                        str(self.sister_joint_probability),
                     ]
                 ).encode("utf-8")
             ).hexdigest(),
