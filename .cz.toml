@@ -1,7 +1,7 @@
 [tool.commitizen]
 version = "0.0.1"
 version_files = [
-    "src/mdv/__version__.py",
+    "src/classeq/__version__.py",
     "pyproject.toml",
 ]
 name = "cz_conventional_commits"
