@@ -12,7 +12,6 @@ from classeq.core.domain.dtos.kmer_inverse_index import KmersInverseIndices
 from classeq.core.domain.dtos.msa_source_format import MsaSourceFormatEnum
 from classeq.settings import (
     BASES,
-    DEFAULT_KMER_SIZE,
     LOGGER,
     TEMP_INPUT_FILE_SUFFIX,
 )
@@ -76,6 +75,7 @@ class MsaSource:
         cls,
         source_file_path: Path,
         format: MsaSourceFormatEnum,
+        output_directory: Path,
     ) -> Either[c_exc.MappedErrors, Self]:
         try:
             if not source_file_path.is_file():
@@ -85,7 +85,7 @@ class MsaSource:
 
             sequence_headers: list[int] = list()
 
-            cleaned_file_path = source_file_path.parent.joinpath(
+            cleaned_file_path = output_directory.joinpath(
                 "".join(
                     [
                         source_file_path.stem,
@@ -96,9 +96,8 @@ class MsaSource:
                 )
             )
 
-            LOGGER.info(
-                f"Sanitized MSA would be persisted to: {cleaned_file_path}"
-            )
+            LOGGER.info("Sanitized MSA should be persisted to:")
+            LOGGER.info(f"\t{cleaned_file_path.relative_to(Path.cwd())}")
 
             with cleaned_file_path.open("w") as out:
                 for record in SeqIO.parse(
@@ -109,7 +108,7 @@ class MsaSource:
                         LOGGER.warning(
                             f"Sequence `{record.id}` has invalid characters. "
                             + f"Only non redundant residuals ({', '.join(BASES)}) "
-                            + "would be included in analysis."
+                            + "should be included in analysis."
                         )
 
                     sequence_headers.append(record.id)
@@ -135,12 +134,13 @@ class MsaSource:
     def initialize_kmer_indices(
         self,
         headers_map: DefaultDict[str, int],
+        k_size: int,
     ) -> Either[c_exc.MappedErrors, bool]:
         try:
             indices_either = KmersInverseIndices.new(
                 source_file_path=self.source_file_path,
                 format=self.file_format,
-                k_size=DEFAULT_KMER_SIZE,
+                k_size=k_size,
                 headers_map=headers_map,
             )
 

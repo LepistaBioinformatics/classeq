@@ -7,7 +7,9 @@ from logging import (
     NOTSET,
     WARN,
     WARNING,
-    basicConfig,
+    FileHandler,
+    Formatter,
+    StreamHandler,
     getLogger,
 )
 from os import getenv
@@ -17,7 +19,7 @@ from os import getenv
 # ? ----------------------------------------------------------------------------
 
 
-LOGGING_LEVEL = DEBUG
+LOGGING_LEVEL = INFO
 
 
 ENV_LOGGING_LEVEL = getenv("LOGGING_LEVEL")
@@ -48,16 +50,26 @@ if ENV_LOGGING_LEVEL is not None:
 # ? ----------------------------------------------------------------------------
 
 
-basicConfig(
-    level=DEBUG,
-    format="%(levelname)s\t[ %(asctime)s ]\t%(message)s",
+LOGGER = getLogger("CLASSEQ")
+LOGGER.setLevel(DEBUG)
+
+
+formatter = Formatter(
+    "%(levelname)s [ %(asctime)s ] %(message)s",
+    datefmt="%Y-%d-%m %H:%M:%S",
 )
 
 
-LOGGER = getLogger("CLASSEQ")
+file_handler = FileHandler(getenv("LOGGING_FILE", "classeq.log"))
+file_handler.setLevel(DEBUG)
+file_handler.setFormatter(formatter)
+LOGGER.addHandler(file_handler)
 
 
-LOGGER.setLevel(LOGGING_LEVEL)
+stream_handler = StreamHandler()
+stream_handler.setLevel(LOGGING_LEVEL)
+stream_handler.setFormatter(formatter)
+LOGGER.addHandler(stream_handler)
 
 
 # ? ----------------------------------------------------------------------------
@@ -69,6 +81,14 @@ BASES = ["A", "C", "T", "G"]
 
 
 DEFAULT_KMER_SIZE = 32
+
+
+# ? ----------------------------------------------------------------------------
+# ? Minimum clade size
+# ? ----------------------------------------------------------------------------
+
+
+MINIMUM_CLADE_SIZE = 3
 
 
 # ? ----------------------------------------------------------------------------

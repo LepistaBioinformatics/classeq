@@ -9,14 +9,17 @@ from classeq.core.domain.dtos.priors import (
 )
 from classeq.settings import LOGGER
 
-from ._calculate_clade_adherence import calculate_clade_adherence
+from ._calculate_clade_adherence_with_bootstrap import (
+    AdherenceResult,
+    calculate_clade_adherence_with_bootstrap,
+)
 
 
 def do_clade_adherence_test_for_single_sequence(
-    query_kmers: list[str],
+    query_kmers: set[str],
     clade_priors: IngroupCladePriors | OutgroupCladePriors,
     kmer_indices: KmersInverseIndices,
-) -> Either[c_exc.MappedErrors, dict[PriorGroup, float]]:
+) -> Either[c_exc.MappedErrors, dict[PriorGroup, AdherenceResult]]:
     """Calculate the probability of a sequence belongs to a clade.
 
     Description:
@@ -41,6 +44,7 @@ def do_clade_adherence_test_for_single_sequence(
             not a list.
 
     """
+
     try:
         # ? --------------------------------------------------------------------
         # ? Validate entries
@@ -60,7 +64,7 @@ def do_clade_adherence_test_for_single_sequence(
             )()
 
         for observed, desired in [
-            (query_kmers, list),
+            (query_kmers, set),
             (kmer_indices, KmersInverseIndices),
         ]:
             if not isinstance(observed, desired):
@@ -77,16 +81,21 @@ def do_clade_adherence_test_for_single_sequence(
         clade_adherence_stats: dict[PriorGroup, float] = {}
 
         if isinstance(clade_priors, IngroupCladePriors):
-            for group in clade_priors.priors:
+            for group in sorted(
+                clade_priors.priors,
+                key=lambda x: x.group.value,
+            ):
                 if (
-                    adherence_either := calculate_clade_adherence(
+                    adherence_either := calculate_clade_adherence_with_bootstrap(
                         labeled_priors=group,
-                        target_kmers=query_kmers,
+                        query_kmers=query_kmers,
                         kmer_indices=kmer_indices,
                         total_length=len(group.labels),
                     )
                 ).is_left:
                     return adherence_either
+
+                LOGGER.debug(f"\t\t{group.group}: {adherence_either.value}")
 
                 clade_adherence_stats.update(
                     {group.group: adherence_either.value}
@@ -94,9 +103,9 @@ def do_clade_adherence_test_for_single_sequence(
 
         if isinstance(clade_priors, OutgroupCladePriors):
             if (
-                adherence_either := calculate_clade_adherence(
+                adherence_either := calculate_clade_adherence_with_bootstrap(
                     labeled_priors=clade_priors.priors,
-                    target_kmers=query_kmers,
+                    query_kmers=query_kmers,
                     kmer_indices=kmer_indices,
                     total_length=len(clade_priors.priors.labels),
                 )

@@ -1,9 +1,11 @@
 from enum import Enum
-
 from hashlib import md5
+
 from attrs import define, field
 
 from classeq.core.domain.dtos.clade import CladeWrapper
+
+from .._calculate_clade_adherence_with_bootstrap._dtos import AdherenceResult
 
 
 class CladeAdherenceResultStatus(Enum):
@@ -45,8 +47,8 @@ class CladeAdherenceResultStatus(Enum):
 @define
 class CladeAdherenceResult:
     clade: CladeWrapper = field()
-    ingroup_joint_probability: float = field(default=-999)
-    sister_joint_probability: float = field(default=-999)
+    ingroup_joint_probability: AdherenceResult = field()
+    sister_joint_probability: AdherenceResult = field()
 
     # ? ------------------------------------------------------------------------
     # ? Life cycle hook methods
@@ -76,4 +78,12 @@ class CladeAdherenceResult:
                 ).encode("utf-8")
             ).hexdigest(),
             16,
+        )
+
+    def __str__(self) -> str:
+        return (
+            "CladeAdherenceResult( "
+            + f"clade={self.clade}, "
+            + f"ingroup={self.ingroup_joint_probability.__str__()}, "
+            + f"sister={self.sister_joint_probability.__str__()} )"
         )

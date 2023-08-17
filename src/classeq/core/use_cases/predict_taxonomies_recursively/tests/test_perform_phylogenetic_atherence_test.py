@@ -1,6 +1,6 @@
 from copy import deepcopy
-from classeq.core.use_cases.predict_taxonomies_recursively._perform_phylogenetic_adherence_test import (
-    perform_phylogenetic_adherence_test,
+from classeq.core.use_cases.predict_taxonomies_recursively._perform_single_sequence_phylogenetic_adherence_test import (
+    perform_single_sequence_phylogenetic_adherence_test,
 )
 from classeq.core.use_cases.predict_taxonomies_recursively.tests.shared import (
     BaseTest,
@@ -58,7 +58,7 @@ class PerformPhylogeneticAdherenceTest(BaseTest):
         ]:
             print("-" * 80)
             print(f"\n\t{name}\n")
-            response = perform_phylogenetic_adherence_test(
+            response = perform_single_sequence_phylogenetic_adherence_test(
                 target_sequence=seq,
                 reference_set=deepcopy(self._reference_set),
                 tree_priors=self._tree_priors,

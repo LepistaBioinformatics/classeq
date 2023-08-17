@@ -69,6 +69,7 @@ class TreeSource:
         source_file_path: Path,
         format: MsaSourceFormatEnum,
         outgroups: list[str],
+        output_directory: Path,
         support_value_cutoff: int = 99,
     ) -> Either[c_exc.MappedErrors, Self]:
         try:
@@ -168,20 +169,21 @@ class TreeSource:
 
             LOGGER.info("Persisting sanitized phylogenetic tree")
 
-            cleaned_file_path = source_file_path.parent.joinpath(
+            cleaned_file_path = output_directory.joinpath(
                 "".join(
                     [
                         source_file_path.stem,
                         ".",
                         TEMP_INPUT_FILE_SUFFIX,
+                        ".",
+                        f"cutoff{support_value_cutoff}",
                         source_file_path.suffix,
                     ]
                 )
             )
 
-            LOGGER.info(
-                f"Sanitized TREE would be persisted to: {cleaned_file_path}"
-            )
+            LOGGER.info("Sanitized TREE would be persisted to:")
+            LOGGER.info(f"\t{cleaned_file_path.relative_to(Path.cwd())}")
 
             Phylo.write(
                 sanitized_tree,

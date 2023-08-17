@@ -3,7 +3,6 @@ from collections import defaultdict
 from copy import deepcopy
 from json import dump
 from pathlib import Path
-from typing import DefaultDict
 
 import clean_base.exceptions as c_exc
 from attrs import asdict
@@ -13,7 +12,7 @@ from classeq.core.domain.dtos.msa import MsaSource, MsaSourceFormatEnum
 from classeq.core.domain.dtos.reference_set import ReferenceSet
 from classeq.core.domain.dtos.tree import TreeSource
 from classeq.core.domain.dtos.tree_source_format import TreeSourceFormatEnum
-from classeq.settings import LOGGER
+from classeq.settings import DEFAULT_KMER_SIZE, LOGGER
 
 from ._load_and_sanitize_phylogeny import load_and_sanitize_phylogeny
 from ._load_and_sanitize_sequences import load_and_sanitize_sequences
@@ -25,19 +24,30 @@ def load_source_files(
     tree_file_path: Path,
     tree_format: TreeSourceFormatEnum,
     outgroups: list[str],
+    output_directory: Path | None = None,
+    k_size: int = DEFAULT_KMER_SIZE,
     support_value_cutoff: int = 99,
 ) -> Either[c_exc.MappedErrors, ReferenceSet]:
     try:
+        train_output_dir = (
+            tree_file_path.parent
+            if output_directory is None
+            else output_directory
+        )
+
         # ? --------------------------------------------------------------------
         # ? Load MSA
         # ? --------------------------------------------------------------------
 
-        msa_either = load_and_sanitize_sequences(
-            source_file_path=msa_file_path,
-            format=msa_format,
-        )
+        LOGGER.info("Loading and sanitize sequences")
 
-        if msa_either.is_left:
+        if (
+            msa_either := load_and_sanitize_sequences(
+                source_file_path=msa_file_path,
+                format=msa_format,
+                output_directory=train_output_dir,
+            )
+        ).is_left:
             return msa_either
 
         msa: MsaSource = msa_either.value
@@ -46,14 +56,17 @@ def load_source_files(
         # ? Load Tree
         # ? --------------------------------------------------------------------
 
-        tree_either = load_and_sanitize_phylogeny(
-            source_file_path=tree_file_path,
-            outgroups=outgroups,
-            format=tree_format,
-            support_value_cutoff=support_value_cutoff,
-        )
+        LOGGER.info("Loading and sanitize phylogeny")
 
-        if tree_either.is_left:
+        if (
+            tree_either := load_and_sanitize_phylogeny(
+                source_file_path=tree_file_path,
+                outgroups=outgroups,
+                format=tree_format,
+                support_value_cutoff=support_value_cutoff,
+                output_directory=train_output_dir,
+            )
+        ).is_left:
             return tree_either
 
         tree: TreeSource = tree_either.value
@@ -61,6 +74,8 @@ def load_source_files(
         # ? --------------------------------------------------------------------
         # ? Check content matches
         # ? --------------------------------------------------------------------
+
+        LOGGER.info("Validating phylogeny and sequences headers")
 
         if not all(
             [
@@ -75,11 +90,7 @@ def load_source_files(
                 logger=LOGGER,
             )()
 
-        # ? --------------------------------------------------------------------
-        # ? Check content matches
-        # ? --------------------------------------------------------------------
-
-        labels_map: DefaultDict[str, int] = defaultdict()
+        labels_map: defaultdict[str, int] = defaultdict()
 
         for index, header in enumerate(msa.sequence_headers):
             labels_map[header] = index
@@ -92,14 +103,21 @@ def load_source_files(
         # ? Initialize kmers
         # ? --------------------------------------------------------------------
 
-        init_either = msa.initialize_kmer_indices(headers_map=labels_map)
+        LOGGER.info(f"Building kmers indices of size: {k_size}")
 
-        if init_either.is_left:
+        if (
+            init_either := msa.initialize_kmer_indices(
+                headers_map=labels_map,
+                k_size=k_size,
+            )
+        ).is_left:
             return init_either
 
         # ? --------------------------------------------------------------------
         # ? Persist reference set to file
         # ? --------------------------------------------------------------------
+
+        LOGGER.info("Building output")
 
         references = ReferenceSet(
             tree=tree,
@@ -107,26 +125,28 @@ def load_source_files(
             labels_map=labels_map,
         )
 
-        linear_tree_either = references.build_linear_tree()
-
-        if linear_tree_either.is_left:
+        if (linear_tree_either := references.build_linear_tree()).is_left:
             return linear_tree_either
 
         tree_source = references.tree.source_file_path
-        train_output_file_path = tree_source.parent.joinpath(
+
+        if not train_output_dir.exists():
+            train_output_dir.mkdir(parents=True)
+
+        train_output_file_path = train_output_dir.joinpath(
             ".".join(
                 [
                     tree_source.stem,
                     "reference-set",
+                    f"k{k_size}",
                     "json",
                     "gz",
                 ]
             )
         )
 
-        LOGGER.info(
-            f"Load output file would be persisted to: {train_output_file_path}"
-        )
+        LOGGER.info("Load output file would be persisted to:")
+        LOGGER.info(f"\t{train_output_file_path.relative_to(Path.cwd())}")
 
         with gzip.open(
             train_output_file_path, "wt", encoding="utf-8"

@@ -1,5 +1,6 @@
 import gzip
 from json import dump
+from pathlib import Path
 
 import clean_base.exceptions as c_exc
 from attrs import asdict
@@ -7,13 +8,14 @@ from clean_base.either import Either, left, right
 
 from classeq.core.domain.dtos.priors import TreePriors
 from classeq.core.domain.dtos.reference_set import ReferenceSet
-from classeq.settings import LOGGER
+from classeq.settings import LOGGER, MINIMUM_CLADE_SIZE
 
 from ._estimate_clade_specific_priors import estimate_clade_specific_priors
 
 
 def train_from_single_phylogeny(
     references: ReferenceSet,
+    min_clade_size: int = MINIMUM_CLADE_SIZE,
 ) -> Either[c_exc.MappedErrors, bool]:
     try:
         # ? --------------------------------------------------------------------
@@ -34,7 +36,8 @@ def train_from_single_phylogeny(
         # ? --------------------------------------------------------------------
 
         train_response_either = estimate_clade_specific_priors(
-            references=references
+            references=references,
+            min_clade_size=min_clade_size,
         )
 
         if train_response_either.is_left:
@@ -47,7 +50,6 @@ def train_from_single_phylogeny(
         # ? --------------------------------------------------------------------
 
         tree_source = references.tree.source_file_path
-        print(tree_source)
         train_output_file_path = tree_source.parent.joinpath(
             ".".join(
                 [
@@ -59,9 +61,8 @@ def train_from_single_phylogeny(
             )
         )
 
-        LOGGER.info(
-            f"Train output file would be persisted to: {train_output_file_path}"
-        )
+        LOGGER.info("Train output file would be persisted to:")
+        LOGGER.info(f"\t{train_output_file_path.relative_to(Path.cwd())}")
 
         with gzip.open(
             train_output_file_path, "wt", encoding="utf-8"

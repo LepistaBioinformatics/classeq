@@ -10,6 +10,7 @@ from ._calculate_recursive_priors import calculate_recursive_priors
 
 def estimate_clade_specific_priors(
     references: ReferenceSet,
+    min_clade_size: int,
 ) -> Either[c_exc.MappedErrors, TreePriors]:
     """Estimate clade specific priors.
 
@@ -121,6 +122,7 @@ def estimate_clade_specific_priors(
                 if i.id not in [root.id, *[o.id for o in outgroup_nodes]]
             ],
             kmer_indices=references.msa.kmers_indices,
+            min_clade_size=min_clade_size,
         )
 
     except Exception as exc:

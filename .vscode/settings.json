@@ -2,15 +2,21 @@
   "cSpell.words": [
     "clades",
     "CLASSEQ",
+    "coro",
     "fasta",
+    "fastapi",
     "gapsfree",
+    "getrusage",
     "kmer",
     "kmers",
+    "ksize",
     "MRCA",
     "outgroup",
     "outgroups",
     "PHYLIP",
-    "reroot"
+    "reroot",
+    "RUSAGE",
+    "uvicorn"
   ],
   "python.analysis.typeCheckingMode": "off",
   "python.formatting.provider": "black"

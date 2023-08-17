@@ -12,6 +12,7 @@ def load_and_sanitize_phylogeny(
     source_file_path: Path,
     outgroups: list[str],
     format: TreeSourceFormatEnum,
+    output_directory: Path,
     support_value_cutoff: int = 99,
 ) -> Either[c_exc.MappedErrors, TreeSource]:
     """Load phylogenetic tree into memory.
@@ -39,6 +40,7 @@ def load_and_sanitize_phylogeny(
             format=format,
             outgroups=outgroups,
             support_value_cutoff=support_value_cutoff,
+            output_directory=output_directory,
         )
 
     except Exception as exc:

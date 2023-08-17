@@ -15,6 +15,9 @@ class PriorGroup(Enum):
     INGROUP = "ingroup"
     SISTER = "sister"
 
+    def __str__(self) -> str:
+        return self.name
+
 
 @frozen(kw_only=True)
 class LabeledPriors:

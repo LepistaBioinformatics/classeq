@@ -10,7 +10,7 @@ dist
 Pipfile.lock
 *.csv
 *#
-logging.log
+*.log
 
 # Environment file
 .env

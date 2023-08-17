@@ -1,6 +1,0 @@
-DNA, ITS = 1-547
-DNA, BTUB_exons = 548-778\3
-DNA, BTUB_exons = 549-778\3
-DNA, BTUB_exons = 550-778\3
-DNA, BTUB_introns = 779-1039
-DNA, GAPDH = 1040-1314

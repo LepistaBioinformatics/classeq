@@ -1,4 +1,5 @@
 from copy import copy, deepcopy
+from enum import Enum
 
 import clean_base.exceptions as c_exc
 from clean_base.either import Either, right
@@ -9,6 +10,10 @@ from classeq.core.domain.dtos.priors import PriorGroup, TreePriors
 from classeq.core.domain.dtos.reference_set import ReferenceSet
 from classeq.settings import DEFAULT_KMER_SIZE, LOGGER
 
+from ._calculate_clade_adherence_with_bootstrap._dtos import (
+    AdherenceResult,
+    AdherenceStatus,
+)
 from ._do_clade_adherence_test_for_single_sequence import (
     do_clade_adherence_test_for_single_sequence,
 )
@@ -19,12 +24,21 @@ from ._perform_adherence_test_of_child_clades import (
 )
 
 
-def perform_phylogenetic_adherence_test(
+class AdherenceTestResultGroup(Enum):
+    OUTGROUP = "outgroup"
+    INGROUP = "ingroup"
+
+
+def perform_single_sequence_phylogenetic_adherence_test(
     target_sequence: str,
     reference_set: ReferenceSet,
     tree_priors: TreePriors,
+    k_size: int = DEFAULT_KMER_SIZE,
     max_iterations: int = 1000,
-) -> Either[c_exc.MappedErrors, CladeWrapper | None]:
+) -> Either[
+    c_exc.MappedErrors,
+    tuple[CladeWrapper | AdherenceTestResultGroup, list[CladeWrapper]],
+]:
     """Perform phylogenetic adherence test.
 
     Description:
@@ -84,13 +98,13 @@ def perform_phylogenetic_adherence_test(
         # ? Get sequence kmers
         # ? --------------------------------------------------------------------
 
-        target_sequence_kmers: list[str] = [
+        query_kmers: set[str] = {
             kmer
             for kmer in KmersInverseIndices.generate_kmers(
                 dna_sequence=target_sequence.upper(),
-                k_size=DEFAULT_KMER_SIZE,
+                k_size=k_size,
             )
-        ]
+        }
 
         # ? --------------------------------------------------------------------
         # ? Collect hierarchical tree
@@ -115,11 +129,9 @@ def perform_phylogenetic_adherence_test(
         if (outgroup_clades_either := tree.get_outgroup_clade()).is_left:
             return outgroup_clades_either
 
-        outgroup_clades: CladeWrapper = outgroup_clades_either.value
-
         if (
             binding_either := do_clade_adherence_test_for_single_sequence(
-                query_kmers=target_sequence_kmers,
+                query_kmers=query_kmers,
                 clade_priors=tree_priors.outgroup,
                 kmer_indices=reference_set.msa.kmers_indices,
             )
@@ -127,7 +139,7 @@ def perform_phylogenetic_adherence_test(
             return binding_either
 
         if (
-            outgroup_joint_probability := binding_either.value.pop(
+            outgroup_adherence_test := binding_either.value.pop(
                 PriorGroup.OUTGROUP
             )
         ) is None:
@@ -136,6 +148,8 @@ def perform_phylogenetic_adherence_test(
                 + "adherence test for ingroup.",
                 logger=LOGGER,
             )()
+
+        LOGGER.debug(f"Output Adherence Result: {outgroup_adherence_test}")
 
         # ? --------------------------------------------------------------------
         # ? Perform adherence test for the outgroup-sister pairs
@@ -155,18 +169,24 @@ def perform_phylogenetic_adherence_test(
         # ? --------------------------------------------------------------------
 
         response_children: CladeAdherenceResult | None
-        joint_probability: float
+        joint_probability: AdherenceResult
         status = CladeAdherenceResultStatus.NEXT_ITERATION
         local_max_iterations = copy(max_iterations)
-        final_response: CladeWrapper | None = None
         response_clades: list[CladeWrapper] = deepcopy(ingroup_clades)
         current_iteration: int = 0
+
+        final_response: CladeWrapper | AdherenceTestResultGroup = (
+            AdherenceTestResultGroup.OUTGROUP
+        )
+
+        clade_path: list[CladeWrapper] = list()
 
         while (
             response_clades
             and status == CladeAdherenceResultStatus.NEXT_ITERATION
         ):
             clade = response_clades.pop(0)
+            clade_path.append(clade)
             current_iteration += 1
 
             if (children := clade.children) is None:
@@ -180,7 +200,7 @@ def perform_phylogenetic_adherence_test(
 
             if (
                 response_either := perform_adherence_test_of_child_clades(
-                    query_kmers=target_sequence_kmers,
+                    query_kmers=query_kmers,
                     clades=children,
                     tree_priors=tree_priors,
                     kmer_indices=reference_set.msa.kmers_indices,
@@ -194,17 +214,39 @@ def perform_phylogenetic_adherence_test(
                 status,
             ) = response_either.value
 
+            LOGGER.debug("")
+            LOGGER.debug(f"\tChildren Adherence Result: {response_children}")
+            LOGGER.debug("")
+            LOGGER.debug(f"\tStatus: {status}")
+
+            # ------------------------------------------------------------------
+            # Break the search if the adherence test is inconclusive due to
+            # absence of priors to perform comparisons.
+            # ------------------------------------------------------------------
+            if joint_probability.status == AdherenceStatus.NOT_ENOUGH_PRIORS:
+                LOGGER.warning(
+                    f"Unable to classify clade `{clade}`. Not enough "
+                    + "priors evidences to run comparisons."
+                )
+
+                break
+
             # ------------------------------------------------------------------
             # Break the search if the first iteration is inconclusive for
             # ingroup. The first iteration represents the test for the sister
             # clade of the outgroup, in other words, the tree entrypoint.
             # ------------------------------------------------------------------
+
             if (
                 current_iteration == 1
-                and outgroup_joint_probability < joint_probability
+                and outgroup_adherence_test.used_kmers
+                > joint_probability.used_kmers
             ):
-                LOGGER.debug("The processed sequence is an outgroup.")
-                final_response = outgroup_clades
+                LOGGER.debug(
+                    "The processed sequence does not differs from "
+                    + f"outgroup: {clade}"
+                )
+
                 break
 
             # ------------------------------------------------------------------
@@ -240,7 +282,7 @@ def perform_phylogenetic_adherence_test(
         # ? Return a positive response
         # ? --------------------------------------------------------------------
 
-        return right(final_response)
+        return right((final_response, clade_path))
 
     except Exception as exc:
         return c_exc.UseCaseError(exc, logger=LOGGER)()

@@ -25,10 +25,10 @@ classifiers = ["Programming Language :: Python :: 3.11"]
 # ? Entrypoints
 # ? ----------------------------------------------------------------------------
 
-# [project.scripts]
+[project.scripts]
 
 # The CLI entrypoint
-#cls="cls.ports.cli.main:classeq_cmd"
+cls="classeq.ports.cli.main:classeq_cmd"
 
 # ? ----------------------------------------------------------------------------
 # ? Assets

@@ -10,11 +10,13 @@ from classeq.settings import LOGGER
 def load_and_sanitize_sequences(
     source_file_path: Path,
     format: MsaSourceFormatEnum,
+    output_directory: Path,
 ) -> Either[c_exc.MappedErrors, MsaSource]:
     try:
         return MsaSource.new(
             source_file_path=source_file_path,
             format=format,
+            output_directory=output_directory,
         )
 
     except Exception as exc:

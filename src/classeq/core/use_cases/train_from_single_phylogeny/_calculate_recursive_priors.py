@@ -31,7 +31,7 @@ def calculate_recursive_priors(
     outgroups: list[CladeWrapper],
     ingroups: list[CladeWrapper],
     kmer_indices: KmersInverseIndices,
-    min_clade_size: int = 1,
+    min_clade_size: int,
 ) -> Either[c_exc.MappedErrors, TreePriors]:
     """Recursive calculate probabilities for each clade.
 

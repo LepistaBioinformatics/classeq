@@ -7,13 +7,18 @@ name = "pypi"
 biopython = "*"
 attrs = "*"
 clean-base = "*"
+fastapi = "*"
+uvicorn = "*"
+toytree = "*"
+pyside2 = "*"
+pyqt5 = "*"
 
 [dev-packages]
-classeq = {editable = true, path = "."}
 black = "*"
 mypy = "*"
 pre-commit = "*"
 pandas = "*"
+classeq = {editable = true, path = "."}
 
 [requires]
 python_version = "3.11"
