@@ -1,14 +1,18 @@
 from copy import deepcopy
+from typing import Any
 
 import clean_base.exceptions as c_exc
 from clean_base.either import Either, right
 
-from classeq.core.domain.dtos.clade import CladeWrapper
+from classeq.core.domain.dtos.clade import ClasseqClade
 from classeq.core.domain.dtos.kmer_inverse_index import KmersInverseIndices
 from classeq.core.domain.dtos.priors import PriorGroup, TreePriors
 from classeq.settings import LOGGER
 
-from .._calculate_clade_adherence_with_bootstrap._dtos import AdherenceResult
+from .._calculate_clade_adherence_with_bootstrap._dtos import (
+    AdherenceResult,
+    AdherenceTestStrategy,
+)
 from .._do_clade_adherence_test_for_single_sequence import (
     do_clade_adherence_test_for_single_sequence,
 )
@@ -17,9 +21,10 @@ from ._dtos import CladeAdherenceResult, CladeAdherenceResultStatus
 
 def perform_adherence_test_of_child_clades(
     query_kmers: set[str],
-    clades: list[CladeWrapper],
+    clades: list[ClasseqClade],
     tree_priors: TreePriors,
     kmer_indices: KmersInverseIndices,
+    **kwargs: Any,
 ) -> Either[
     c_exc.MappedErrors,
     tuple[
@@ -81,6 +86,10 @@ def perform_adherence_test_of_child_clades(
         contrasting_clades: set[CladeAdherenceResult] = set()
         sister_joint_probabilities: list[AdherenceResult] = []
 
+        adherence_strategy: AdherenceTestStrategy = kwargs.get(
+            "adherence_strategy", AdherenceTestStrategy(None)
+        )
+
         for clade in clades:
             LOGGER.debug("")
             LOGGER.debug(f"\tProcessing clade: {clade}")
@@ -98,6 +107,7 @@ def perform_adherence_test_of_child_clades(
                     query_kmers=query_kmers,
                     clade_priors=clade_priors,
                     kmer_indices=kmer_indices,
+                    **kwargs,
                 )
             ).is_left:
                 return adherence_test_either
@@ -118,14 +128,24 @@ def perform_adherence_test_of_child_clades(
                     logger=LOGGER,
                 )()
 
-            if ingroup.joint_probability < sister.joint_probability:
-                contrasting_clades.add(
-                    CladeAdherenceResult(
-                        clade=deepcopy(clade),
-                        ingroup_joint_probability=ingroup,
-                        sister_joint_probability=sister,
+            if adherence_strategy == AdherenceTestStrategy.JOINT_PROBABILITY:
+                if ingroup.joint_probability < sister.joint_probability:
+                    contrasting_clades.add(
+                        CladeAdherenceResult(
+                            clade=deepcopy(clade),
+                            ingroup_adherence_test=ingroup,
+                            sister_adherence_test=sister,
+                        )
                     )
-                )
+            else:
+                if ingroup.match_kmers > sister.match_kmers:
+                    contrasting_clades.add(
+                        CladeAdherenceResult(
+                            clade=deepcopy(clade),
+                            ingroup_adherence_test=ingroup,
+                            sister_adherence_test=sister,
+                        )
+                    )
 
             sister_joint_probabilities.append(sister)
 
@@ -161,7 +181,7 @@ def perform_adherence_test_of_child_clades(
             if clade_binding.clade.children is not None:
                 return right(
                     (
-                        clade_binding.ingroup_joint_probability,
+                        clade_binding.ingroup_adherence_test,
                         clade_binding,
                         CladeAdherenceResultStatus.NEXT_ITERATION,
                     )
@@ -169,7 +189,7 @@ def perform_adherence_test_of_child_clades(
 
             return right(
                 (
-                    clade_binding.ingroup_joint_probability,
+                    clade_binding.ingroup_adherence_test,
                     clade_binding,
                     CladeAdherenceResultStatus.CONCLUSIVE_INGROUP,
                 )
@@ -180,8 +200,8 @@ def perform_adherence_test_of_child_clades(
                 (
                     sorted(
                         contrasting_clades,
-                        key=lambda i: i.ingroup_joint_probability.joint_probability,
-                    )[0].ingroup_joint_probability,
+                        key=lambda i: i.ingroup_adherence_test.joint_probability,
+                    )[0].ingroup_adherence_test,
                     None,
                     CladeAdherenceResultStatus.INCONCLUSIVE,
                 )

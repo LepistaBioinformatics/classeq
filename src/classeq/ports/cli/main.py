@@ -17,6 +17,9 @@ from classeq.core.use_cases.load_source_files import load_source_files
 from classeq.core.use_cases.predict_taxonomies_recursively import (
     predict_for_multiple_fasta_file,
 )
+from classeq.core.use_cases.predict_taxonomies_recursively._calculate_clade_adherence_with_bootstrap._dtos import (
+    AdherenceTestStrategy,
+)
 from classeq.core.use_cases.train_from_single_phylogeny import (
     train_from_single_phylogeny,
 )
@@ -68,7 +71,7 @@ def pipe_cmd() -> None:
 
 
 @std_cmd.command(
-    "parse",
+    "load",
     help=(
         "Parse a FASTA file and TREE phylogeny into a JSON file. Run "
         + "'classeq std parse --help' for more information."
@@ -209,7 +212,7 @@ def __load_outgroups_from_file(file: Path) -> list[str]:
 
 
 @std_cmd.command(
-    "priors",
+    "train",
     help="Calculate priors of the individual phylogeny clades.",
 )
 @click.option(
@@ -272,7 +275,7 @@ def calculate_priors_cmd(
 
 
 @std_cmd.command(
-    "infer",
+    "predict",
     help="Try to infer identity of multi FASTA sequences.",
 )
 @click.option(
@@ -311,12 +314,26 @@ def calculate_priors_cmd(
     ),
     help="The path to the priors calculated in the `priors` step.",
 )
+@click.option(
+    "--adherence-strategy",
+    required=False,
+    show_default=True,
+    default=AdherenceTestStrategy(None).value,
+    type=click.Choice(
+        [
+            AdherenceTestStrategy.JOINT_PROBABILITY.value,
+            AdherenceTestStrategy.KMERS_INTERSECTION.value,
+        ],
+        case_sensitive=False,
+    ),
+    help="The adherence test strategy.",
+)
 @with_resource_monitoring
 def infer_identity_cmd(
     fasta_file_path: str,
     references_path: str,
     priors_path: str,
-    **_: Any,
+    adherence_strategy: str,
 ) -> None:
     """Try to infer identity of multi FASTA sequences."""
 
@@ -325,8 +342,7 @@ def infer_identity_cmd(
     try:
         with gzip.open(references_path, "r") as fin:
             json_bytes = fin.read()
-
-        json_str = json_bytes.decode("utf-8")
+            json_str = json_bytes.decode("utf-8")
 
         if (
             reference_set_either := ReferenceSet.from_dict(
@@ -339,8 +355,8 @@ def infer_identity_cmd(
 
         with gzip.open(priors_path, "r") as fin:
             json_bytes = fin.read()
+            json_str = json_bytes.decode("utf-8")
 
-        json_str = json_bytes.decode("utf-8")
         if (
             tree_priors_either := TreePriors.from_dict(content=loads(json_str))
         ).is_left:
@@ -354,6 +370,7 @@ def infer_identity_cmd(
                 fasta_format=MsaSourceFormatEnum.FASTA,
                 tree_priors=tree_priors_either.value,
                 reference_set=reference_set_either.value,
+                adherence_strategy=AdherenceTestStrategy(adherence_strategy),
             )
         ).is_left:
             LOGGER.error(response.value.msg)
@@ -361,8 +378,7 @@ def infer_identity_cmd(
             exit(1)
 
     except Exception as exc:
-        click.echo(f"Error: {exc}")
-        exit(1)
+        raise exc
 
 
 def coro(f: Callable[..., Any]) -> Any:
@@ -373,27 +389,31 @@ def coro(f: Callable[..., Any]) -> Any:
     return wrapper
 
 
-""" @classeq_cmd.command(
+@classeq_cmd.command(
     "serve",
     help=("Serve the phylogeny editor locally for visualize and edit TREE."),
 )
-@click.option(
-    "-t",
-    "--sanitized-tree-path",
-    required=True,
-    type=click.Path(
-        resolve_path=True,
-        readable=True,
-        exists=True,
-        dir_okay=True,
-    ),
-    help="The system path to the sanitized TREE file.",
-)
-@coro
-async def serve_cmd(
-    sanitized_tree_path: click.Path,
+# @click.option(
+#    "-t",
+#    "--sanitized-tree-path",
+#    required=True,
+#    type=click.Path(
+#        resolve_path=True,
+#        readable=True,
+#        exists=True,
+#        dir_okay=True,
+#    ),
+#    help="The system path to the sanitized TREE file.",
+# )
+# @coro
+def serve_cmd(
+    # sanitized_tree_path: click.Path,
 ) -> None:
-    import uvicorn
+    from classeq.ports.app.main import main
+
+    main()
+
+    """ import uvicorn
     from fastapi import FastAPI
     from fastapi.responses import FileResponse, RedirectResponse
     from fastapi.staticfiles import StaticFiles

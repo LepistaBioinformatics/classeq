@@ -12,6 +12,8 @@ uvicorn = "*"
 toytree = "*"
 pyside2 = "*"
 pyqt5 = "*"
+pylab-sdk = "*"
+matplotlib = "*"
 
 [dev-packages]
 black = "*"

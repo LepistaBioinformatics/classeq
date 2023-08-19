@@ -1,10 +1,11 @@
 from copy import copy, deepcopy
 from enum import Enum
+from typing import Any
 
 import clean_base.exceptions as c_exc
 from clean_base.either import Either, right
 
-from classeq.core.domain.dtos.clade import CladeWrapper
+from classeq.core.domain.dtos.clade import ClasseqClade
 from classeq.core.domain.dtos.kmer_inverse_index import KmersInverseIndices
 from classeq.core.domain.dtos.priors import PriorGroup, TreePriors
 from classeq.core.domain.dtos.reference_set import ReferenceSet
@@ -35,9 +36,10 @@ def perform_single_sequence_phylogenetic_adherence_test(
     tree_priors: TreePriors,
     k_size: int = DEFAULT_KMER_SIZE,
     max_iterations: int = 1000,
+    **kwargs: Any,
 ) -> Either[
     c_exc.MappedErrors,
-    tuple[CladeWrapper | AdherenceTestResultGroup, list[CladeWrapper]],
+    tuple[ClasseqClade | AdherenceTestResultGroup, list[ClasseqClade]],
 ]:
     """Perform phylogenetic adherence test.
 
@@ -113,7 +115,7 @@ def perform_single_sequence_phylogenetic_adherence_test(
         if (tree_either := reference_set.get_hierarchical_tree()).is_left:
             return tree_either
 
-        tree: CladeWrapper = tree_either.value
+        tree: ClasseqClade = tree_either.value
 
         if tree.is_root() is False:
             return c_exc.UseCaseError(
@@ -134,6 +136,7 @@ def perform_single_sequence_phylogenetic_adherence_test(
                 query_kmers=query_kmers,
                 clade_priors=tree_priors.outgroup,
                 kmer_indices=reference_set.msa.kmers_indices,
+                **kwargs,
             )
         ).is_left:
             return binding_either
@@ -158,7 +161,7 @@ def perform_single_sequence_phylogenetic_adherence_test(
         if (ingroup_clades_either := tree.get_ingroup_clades()).is_left:
             return ingroup_clades_either
 
-        ingroup_clades: list[CladeWrapper] = list(
+        ingroup_clades: list[ClasseqClade] = list(
             ingroup
             for ingroup in ingroup_clades_either.value
             if ingroup.parent == tree_priors.outgroup.parent
@@ -172,14 +175,14 @@ def perform_single_sequence_phylogenetic_adherence_test(
         joint_probability: AdherenceResult
         status = CladeAdherenceResultStatus.NEXT_ITERATION
         local_max_iterations = copy(max_iterations)
-        response_clades: list[CladeWrapper] = deepcopy(ingroup_clades)
+        response_clades: list[ClasseqClade] = deepcopy(ingroup_clades)
         current_iteration: int = 0
 
-        final_response: CladeWrapper | AdherenceTestResultGroup = (
+        final_response: ClasseqClade | AdherenceTestResultGroup = (
             AdherenceTestResultGroup.OUTGROUP
         )
 
-        clade_path: list[CladeWrapper] = list()
+        clade_path: list[ClasseqClade] = list()
 
         while (
             response_clades
@@ -204,6 +207,7 @@ def perform_single_sequence_phylogenetic_adherence_test(
                     clades=children,
                     tree_priors=tree_priors,
                     kmer_indices=reference_set.msa.kmers_indices,
+                    **kwargs,
                 )
             ).is_left:
                 return response_either
@@ -239,8 +243,8 @@ def perform_single_sequence_phylogenetic_adherence_test(
 
             if (
                 current_iteration == 1
-                and outgroup_adherence_test.used_kmers
-                > joint_probability.used_kmers
+                and outgroup_adherence_test.match_kmers
+                > joint_probability.match_kmers
             ):
                 LOGGER.debug(
                     "The processed sequence does not differs from "

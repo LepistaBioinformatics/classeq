@@ -3,7 +3,7 @@ from uuid import UUID
 import clean_base.exceptions as c_exc
 from clean_base.either import Either, right
 
-from classeq.core.domain.dtos.clade import CladeWrapper
+from classeq.core.domain.dtos.clade import ClasseqClade
 from classeq.core.domain.dtos.kmer_inverse_index import KmersInverseIndices
 from classeq.core.domain.dtos.priors import (
     IngroupCladePriors,
@@ -16,7 +16,7 @@ from classeq.core.domain.dtos.priors import (
     TreePriors,
 )
 from Bio.Phylo.BaseTree import Tree
-from classeq.core.domain.dtos.tree import TreeSource
+from classeq.core.domain.dtos.tree import ClasseqTree
 from classeq.settings import LOGGER
 
 from ._estimate_clade_kmer_specific_priors import (
@@ -26,10 +26,10 @@ from ._get_terminal_nodes import get_terminal_nodes
 
 
 def calculate_recursive_priors(
-    reference_tree: TreeSource,
-    root: CladeWrapper,
-    outgroups: list[CladeWrapper],
-    ingroups: list[CladeWrapper],
+    reference_tree: ClasseqTree,
+    root: ClasseqClade,
+    outgroups: list[ClasseqClade],
+    ingroups: list[ClasseqClade],
     kmer_indices: KmersInverseIndices,
     min_clade_size: int,
 ) -> Either[c_exc.MappedErrors, TreePriors]:
@@ -138,7 +138,7 @@ def calculate_recursive_priors(
             # ? Extract ingroup terminals
             # ? ----------------------------------------------------------------
 
-            ingroup: list[CladeWrapper] = get_terminal_nodes(
+            ingroup: list[ClasseqClade] = get_terminal_nodes(
                 target_nodes=[i for i in ingroups if i.parent == clade.id],
                 reference_nodes=ingroups,
             )
@@ -156,7 +156,7 @@ def calculate_recursive_priors(
             # ? Extract sister group terminals
             # ? ----------------------------------------------------------------
 
-            sister_group: list[CladeWrapper] = [
+            sister_group: list[ClasseqClade] = [
                 terminal
                 for terminal in get_terminal_nodes(
                     target_nodes=[

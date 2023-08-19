@@ -10,7 +10,7 @@ from clean_base.either import Either, right
 
 from classeq.core.domain.dtos.msa import MsaSource, MsaSourceFormatEnum
 from classeq.core.domain.dtos.reference_set import ReferenceSet
-from classeq.core.domain.dtos.tree import TreeSource
+from classeq.core.domain.dtos.tree import ClasseqTree
 from classeq.core.domain.dtos.tree_source_format import TreeSourceFormatEnum
 from classeq.settings import DEFAULT_KMER_SIZE, LOGGER
 
@@ -69,7 +69,7 @@ def load_source_files(
         ).is_left:
             return tree_either
 
-        tree: TreeSource = tree_either.value
+        tree: ClasseqTree = tree_either.value
 
         # ? --------------------------------------------------------------------
         # ? Check content matches
@@ -128,7 +128,7 @@ def load_source_files(
         if (linear_tree_either := references.build_linear_tree()).is_left:
             return linear_tree_either
 
-        tree_source = references.tree.source_file_path
+        tree_source = references.tree.newick_file_path
 
         if not train_output_dir.exists():
             train_output_dir.mkdir(parents=True)

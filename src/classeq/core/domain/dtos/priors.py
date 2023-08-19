@@ -14,6 +14,7 @@ class PriorGroup(Enum):
     OUTGROUP = "outgroup"
     INGROUP = "ingroup"
     SISTER = "sister"
+    NOISE = "noise"
 
     def __str__(self) -> str:
         return self.name
@@ -67,7 +68,7 @@ class LabeledPriors:
             cls(
                 labels=tuple([int(i) for i in content.get("labels")]),  # type: ignore
                 priors=defaultdict(float, content.get("priors")),  # type: ignore
-                group=eval(content.get("group")),  # type: ignore
+                group=PriorGroup(content.get("group").lower()),  # type: ignore
             )
         )
 
@@ -85,6 +86,11 @@ class IngroupLabeledPriors(LabeledPriors):
 @frozen(kw_only=True)
 class SisterGroupLabeledPriors(LabeledPriors):
     group: PriorGroup = field(default=PriorGroup.SISTER)
+
+
+@frozen(kw_only=True)
+class NoiseGroupLabeledPriors(LabeledPriors):
+    group: PriorGroup = field(default=PriorGroup.NOISE)
 
 
 @frozen(kw_only=True)
@@ -213,7 +219,6 @@ class IngroupCladePriors:
 
         ingroup_prior = next(i for i in priors if i.group == PriorGroup.INGROUP)
         sister_prior = next(i for i in priors if i.group == PriorGroup.SISTER)
-        # noise_prior = next(i for i in priors if i.group == PriorGroup.NOISE)
 
         return right(
             cls(

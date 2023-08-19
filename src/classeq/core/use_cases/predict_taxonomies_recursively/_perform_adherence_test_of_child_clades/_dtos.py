@@ -3,7 +3,7 @@ from hashlib import md5
 
 from attrs import define, field
 
-from classeq.core.domain.dtos.clade import CladeWrapper
+from classeq.core.domain.dtos.clade import ClasseqClade
 
 from .._calculate_clade_adherence_with_bootstrap._dtos import AdherenceResult
 
@@ -46,9 +46,9 @@ class CladeAdherenceResultStatus(Enum):
 
 @define
 class CladeAdherenceResult:
-    clade: CladeWrapper = field()
-    ingroup_joint_probability: AdherenceResult = field()
-    sister_joint_probability: AdherenceResult = field()
+    clade: ClasseqClade = field()
+    ingroup_adherence_test: AdherenceResult = field()
+    sister_adherence_test: AdherenceResult = field()
 
     # ? ------------------------------------------------------------------------
     # ? Life cycle hook methods
@@ -72,8 +72,8 @@ class CladeAdherenceResult:
                 "-".join(
                     [
                         self.clade.__hash__().__str__(),
-                        str(self.ingroup_joint_probability),
-                        str(self.sister_joint_probability),
+                        str(self.ingroup_adherence_test),
+                        str(self.sister_adherence_test),
                     ]
                 ).encode("utf-8")
             ).hexdigest(),
@@ -84,6 +84,6 @@ class CladeAdherenceResult:
         return (
             "CladeAdherenceResult( "
             + f"clade={self.clade}, "
-            + f"ingroup={self.ingroup_joint_probability.__str__()}, "
-            + f"sister={self.sister_joint_probability.__str__()} )"
+            + f"ingroup={self.ingroup_adherence_test.__str__()}, "
+            + f"sister={self.sister_adherence_test.__str__()} )"
         )

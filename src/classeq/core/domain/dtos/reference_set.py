@@ -1,16 +1,19 @@
 from collections import defaultdict
 from copy import deepcopy
 from typing import Any, DefaultDict, Self
-from uuid import UUID, uuid4
+from uuid import UUID
 
 import clean_base.exceptions as c_exc
 from attr import define, field
-from Bio.Phylo.BaseTree import Clade, Tree
 from clean_base.either import Either, right
 
-from classeq.core.domain.dtos.clade import CladeWrapper, NodeType
+from classeq.core.domain.dtos.biopython_wrappers import (
+    ExtendedBioPythonClade,
+    ExtendedBioPythonTree,
+)
+from classeq.core.domain.dtos.clade import ClasseqClade, NodeType
 from classeq.core.domain.dtos.msa import MsaSource
-from classeq.core.domain.dtos.tree import TreeSource
+from classeq.core.domain.dtos.tree import ClasseqTree
 from classeq.settings import LOGGER
 
 
@@ -20,10 +23,10 @@ class ReferenceSet:
     # ? Class attributes
     # ? ------------------------------------------------------------------------
 
-    tree: TreeSource = field()
+    tree: ClasseqTree = field()
     msa: MsaSource = field()
     labels_map: DefaultDict[str, int] = field()
-    linear_tree: tuple[CladeWrapper, ...] | None = field(default=None)
+    linear_tree: tuple[ClasseqClade, ...] | None = field(default=None)
 
     # ? ------------------------------------------------------------------------
     # ? Public class methods
@@ -47,7 +50,7 @@ class ReferenceSet:
                     logger=LOGGER,
                 )()
 
-        tree_either = TreeSource.from_dict(content=content.pop("tree"))
+        tree_either = ClasseqTree.from_dict(content=content.pop("tree"))
 
         if tree_either.is_left:
             return tree_either
@@ -57,11 +60,11 @@ class ReferenceSet:
         if msa_either.is_left:
             return msa_either
 
-        linear_tree: list[CladeWrapper] | None = None
+        linear_tree: list[ClasseqClade] | None = None
         if isinstance(linear_tree_content := content.pop("linear_tree"), list):
             for linear_tree_unit in linear_tree_content:
                 if (
-                    unit_either := CladeWrapper.from_dict(linear_tree_unit)
+                    unit_either := ClasseqClade.from_dict(linear_tree_unit)
                 ).is_left:
                     return unit_either
 
@@ -87,7 +90,7 @@ class ReferenceSet:
 
     def get_hierarchical_tree(
         self,
-    ) -> Either[c_exc.MappedErrors, CladeWrapper]:
+    ) -> Either[c_exc.MappedErrors, ClasseqClade]:
         try:
             # ? ----------------------------------------------------------------
             # ? Generate the linear tree
@@ -106,7 +109,7 @@ class ReferenceSet:
                     "`build_linear_tree` method is maybe not working. "
                     + f"Attribute `linear_tree` of {Self} is `None` after "
                     + "execute it. The expected behavior is to be of type"
-                    + f"`{tuple[CladeWrapper, ...]}`.",
+                    + f"`{tuple[ClasseqClade, ...]}`.",
                     logger=LOGGER,
                 )()
 
@@ -132,11 +135,11 @@ class ReferenceSet:
             # ? Start the tree expansion
             # ? ----------------------------------------------------------------
 
-            seed_tree: CladeWrapper = deepcopy(root)
+            seed_tree: ClasseqClade = deepcopy(root)
 
             def __expand_tree(
-                clade: CladeWrapper,
-                linear_tree: tuple[CladeWrapper, ...],
+                clade: ClasseqClade,
+                linear_tree: tuple[ClasseqClade, ...],
             ) -> None:
                 for child in [i for i in linear_tree if i.parent == clade.id]:
                     if clade.children is None:
@@ -165,7 +168,7 @@ class ReferenceSet:
         composed of a set of `CladeWrapper` elements.
         """
 
-        def __determine_node_type(clade: Clade) -> NodeType:
+        def __discover_node_type(clade: ExtendedBioPythonClade) -> NodeType:
             if clade.is_terminal():
                 if clade.name in self.tree.outgroups:
                     return NodeType.OUTGROUP
@@ -174,7 +177,7 @@ class ReferenceSet:
 
         def __collect_clades_recursively(
             parent: UUID | None,
-            clade: Clade,
+            clade: ExtendedBioPythonClade,
             is_root: bool = False,
         ) -> None:
             """Recursively collect nodes an parse to CladeWrappers.
@@ -184,11 +187,9 @@ class ReferenceSet:
                 clade (Clade): The target clade.
             """
 
-            current_clade_identifier = uuid4()
-
             linear_tree.add(
-                CladeWrapper(
-                    id=current_clade_identifier,
+                ClasseqClade(
+                    id=clade.id,
                     name=(
                         NodeType.ROOT.value
                         if is_root is True
@@ -197,7 +198,7 @@ class ReferenceSet:
                     type=(
                         NodeType.ROOT
                         if is_root is True
-                        else __determine_node_type(clade=clade)
+                        else __discover_node_type(clade=clade)
                     ),
                     parent=parent,
                     support=clade.confidence,
@@ -206,18 +207,17 @@ class ReferenceSet:
             )
 
             if len(clade.clades) > 0:
-                for clade in clade.clades:
+                for children in clade.clades:
                     __collect_clades_recursively(
-                        parent=current_clade_identifier,
-                        clade=clade,
+                        parent=clade.id,
+                        clade=children,
                     )
 
         try:
             if self.tree.sanitized_tree is None:
-                tree_either = self.tree.parse_and_reroot_tree(
-                    source_file_path=self.tree.source_file_path,
+                tree_either = self.tree.parse_and_reroot_phylojson_tree(
+                    newick_file_path=self.tree.phylojson_file_path,
                     outgroups=self.tree.outgroups,
-                    format=self.tree.tree_format,
                 )
 
                 if tree_either.is_left:
@@ -225,10 +225,10 @@ class ReferenceSet:
 
                 self.tree.sanitized_tree = tree_either.value
 
-            tree: Tree = deepcopy(self.tree.sanitized_tree)
-            root: Clade = deepcopy(tree.root)
+            tree: ExtendedBioPythonTree = deepcopy(self.tree.sanitized_tree)
+            root: ExtendedBioPythonClade = deepcopy(tree.root)
 
-            linear_tree: set[CladeWrapper] = set()
+            linear_tree: set[ClasseqClade] = set()
 
             __collect_clades_recursively(
                 parent=None,

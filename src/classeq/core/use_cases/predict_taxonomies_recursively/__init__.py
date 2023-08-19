@@ -1,6 +1,6 @@
 from copy import deepcopy
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal
 
 import clean_base.exceptions as c_exc
 from Bio import SeqIO
@@ -22,6 +22,7 @@ def predict_for_multiple_fasta_file(
     tree_priors: TreePriors,
     reference_set: ReferenceSet,
     fasta_format: MsaSourceFormatEnum = MsaSourceFormatEnum.FASTA,
+    **kwargs: Any,
 ) -> Either[c_exc.MappedErrors, Literal[True]]:
     try:
         records: list[SeqRecord] = list(
@@ -38,6 +39,7 @@ def predict_for_multiple_fasta_file(
                     target_sequence=str(record.seq),
                     reference_set=deepcopy(reference_set),
                     tree_priors=tree_priors,
+                    **kwargs,
                 )
             ).is_left:
                 return adherence_test_response_either

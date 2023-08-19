@@ -19,7 +19,7 @@ class NodeType(Enum):
 
 
 @define(kw_only=True)
-class CladeWrapper:
+class ClasseqClade:
     # ? ------------------------------------------------------------------------
     # ? Class attributes
     # ? ------------------------------------------------------------------------
@@ -81,7 +81,7 @@ class CladeWrapper:
             if key not in content:
                 return left(
                     c_exc.DadaTransferObjectError(
-                        f"Invalid content detected on parse `{CladeWrapper}`."
+                        f"Invalid content detected on parse `{ClasseqClade}`."
                         f" {key}` key is empty.",
                         logger=LOGGER,
                     )
@@ -90,7 +90,7 @@ class CladeWrapper:
         children: list[Self] = []
         if isinstance(child := content.get("children"), list):
             for child in content.get("children"):  # type: ignore
-                child_either = CladeWrapper.from_dict(content=child)
+                child_either = ClasseqClade.from_dict(content=child)
 
                 if child_either.is_left:
                     return child_either
@@ -104,9 +104,9 @@ class CladeWrapper:
                 type=eval(content.get("type")),  # type: ignore
                 support=content.get("support"),
                 branch_length=content.get("branch_length"),
-                parent=UUID(parent)
-                if (parent := content.get("parent"))
-                else None,
+                parent=(
+                    UUID(parent) if (parent := content.get("parent")) else None
+                ),
                 children=tuple(children),
             )
         )
@@ -185,7 +185,7 @@ class CladeWrapper:
         SPACE_PREFIX = f"{backbone_color}    {escape}"
 
         def __build_node_representations(
-            clade: CladeWrapper, prefix: str
+            clade: ClasseqClade, prefix: str
         ) -> None:
             if clade.children is None:
                 return

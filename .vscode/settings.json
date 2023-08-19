@@ -7,6 +7,7 @@
     "fastapi",
     "gapsfree",
     "getrusage",
+    "hbox",
     "kmer",
     "kmers",
     "ksize",
@@ -14,9 +15,13 @@
     "outgroup",
     "outgroups",
     "PHYLIP",
+    "phylojson",
+    "qdarktheme",
     "reroot",
     "RUSAGE",
-    "uvicorn"
+    "toytree",
+    "uvicorn",
+    "zoomslider"
   ],
   "python.analysis.typeCheckingMode": "off",
   "python.formatting.provider": "black"

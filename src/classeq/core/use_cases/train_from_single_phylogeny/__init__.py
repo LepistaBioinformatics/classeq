@@ -49,7 +49,7 @@ def train_from_single_phylogeny(
         # ? Persist results to file
         # ? --------------------------------------------------------------------
 
-        tree_source = references.tree.source_file_path
+        tree_source = references.tree.newick_file_path
         train_output_file_path = tree_source.parent.joinpath(
             ".".join(
                 [

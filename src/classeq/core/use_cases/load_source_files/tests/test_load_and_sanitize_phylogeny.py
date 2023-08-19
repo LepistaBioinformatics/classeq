@@ -2,7 +2,7 @@ from os import getenv
 from pathlib import Path
 from unittest import TestCase
 
-from classeq.core.domain.dtos.tree import TreeSource
+from classeq.core.domain.dtos.tree import ClasseqTree
 from classeq.core.domain.dtos.tree_source_format import TreeSourceFormatEnum
 from classeq.core.use_cases.load_source_files._load_and_sanitize_phylogeny import (
     load_and_sanitize_phylogeny,
@@ -34,7 +34,7 @@ class LoadAndSanitizePhylogenyTest(TestCase):
             support_value_cutoff=70,
         )
 
-        tree: TreeSource = response.value
+        tree: ClasseqTree = response.value
 
         self.assertTrue(tree.sanitized_tree.rooted)
 

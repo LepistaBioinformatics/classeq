@@ -1,6 +1,18 @@
-from enum import Enum
+from __future__ import annotations
 
-from attrs import field, frozen
+from enum import Enum
+from typing import Any
+
+from attrs import define, field
+
+
+class AdherenceTestStrategy(Enum):
+    KMERS_INTERSECTION = "kmers-intersection"
+    JOINT_PROBABILITY = "joint-probability"
+
+    @classmethod
+    def _missing_(cls, _: Any = None) -> AdherenceTestStrategy:
+        return cls.JOINT_PROBABILITY
 
 
 class AdherenceStatus(Enum):
@@ -9,20 +21,25 @@ class AdherenceStatus(Enum):
     UNDEFINED = "undefined"
 
 
-@frozen(kw_only=True)
+@define(kw_only=True)
 class AdherenceResult:
-    used_kmers: int = field()
+    match_kmers: int = field()
     query_kmers_size: int = field()
     subject_kmers_size: int = field()
     status: AdherenceStatus = field(default=AdherenceStatus.UNDEFINED)
     joint_probability: float = field(default=-999)
+    adherence_p_value: float = field(default=-999)
+    strategy: AdherenceTestStrategy = field(
+        default=AdherenceTestStrategy.JOINT_PROBABILITY
+    )
 
     def __str__(self) -> str:
         return (
             "AdherenceResult( "
-            + f"used={self.used_kmers}, "
+            + f"match_kmers={self.match_kmers}, "
             + f"q={self.query_kmers_size}, "
             + f"s={self.subject_kmers_size}, "
             + f"status={self.status.name}, "
-            + "joint_probability=%0.10f )" % self.joint_probability
+            + "joint_probability=%0.10f, " % self.joint_probability
+            + "adherence_p_value=%0.6f )" % self.adherence_p_value
         )

@@ -1,12 +1,12 @@
 from typing import Iterator
 
-from classeq.core.domain.dtos.clade import CladeWrapper
+from classeq.core.domain.dtos.clade import ClasseqClade
 
 
 def get_terminal_nodes(
-    target_nodes: list[CladeWrapper],
-    reference_nodes: list[CladeWrapper],
-) -> list[CladeWrapper]:
+    target_nodes: list[ClasseqClade],
+    reference_nodes: list[ClasseqClade],
+) -> list[ClasseqClade]:
     """Recursively get nodes of type NodeType.TERMINAL.
 
     Args:
@@ -21,8 +21,8 @@ def get_terminal_nodes(
     """
 
     def get_children(
-        target_nodes: list[CladeWrapper],
-    ) -> Iterator[CladeWrapper]:
+        target_nodes: list[ClasseqClade],
+    ) -> Iterator[ClasseqClade]:
         """Performs a recursive search for terminal nodes.
 
         Args:
@@ -34,7 +34,7 @@ def get_terminal_nodes(
                 NodeType.TERMINAL.
         """
 
-        node: CladeWrapper
+        node: ClasseqClade
         for node in target_nodes:
             if node.is_terminal() or node.is_outgroup():
                 yield node
