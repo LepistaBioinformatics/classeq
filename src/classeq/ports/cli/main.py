@@ -1,10 +1,8 @@
 import gzip
-from asyncio import run
-from functools import wraps
 from json import loads
 from pathlib import Path
 from sys import argv
-from typing import Any, Callable
+from typing import Any
 
 import click
 
@@ -381,70 +379,25 @@ def infer_identity_cmd(
         raise exc
 
 
-def coro(f: Callable[..., Any]) -> Any:
-    @wraps(f)
-    def wrapper(*args: list[Any], **kwargs: dict[str, Any]) -> Any:
-        return run(f(*args, **kwargs))
-
-    return wrapper
-
-
 @classeq_cmd.command(
     "serve",
     help=("Serve the phylogeny editor locally for visualize and edit TREE."),
 )
-# @click.option(
-#    "-t",
-#    "--sanitized-tree-path",
-#    required=True,
-#    type=click.Path(
-#        resolve_path=True,
-#        readable=True,
-#        exists=True,
-#        dir_okay=True,
-#    ),
-#    help="The system path to the sanitized TREE file.",
-# )
-# @coro
+@click.option(
+    "-t",
+    "--phylo-json-tree",
+    required=True,
+    type=click.Path(
+        resolve_path=True,
+        readable=True,
+        exists=True,
+        dir_okay=True,
+    ),
+    help="The system path to the sanitized TREE file as PHYLO-JSON format.",
+)
 def serve_cmd(
-    # sanitized_tree_path: click.Path,
+    phylo_json_tree: str,
 ) -> None:
     from classeq.ports.app.main import main
 
-    main()
-
-    """ import uvicorn
-    from fastapi import FastAPI
-    from fastapi.responses import FileResponse, RedirectResponse
-    from fastapi.staticfiles import StaticFiles
-
-    try:
-        app = FastAPI(title="Classeq Phylogeny Editor")
-
-        @app.get("/tree")
-        async def root() -> dict[str, str]:
-            return {"message": "Hello World"}
-
-        @app.get("/")
-        async def index() -> RedirectResponse:
-            return RedirectResponse("/index.html")
-
-        app.mount(
-            "/",
-            StaticFiles(directory="static"),
-            name="static",
-        )
-
-        config = uvicorn.Config(
-            app,
-            port=5000,
-            log_level="info",
-        )
-
-        server = uvicorn.Server(config)
-        await server.serve()
-
-    except KeyboardInterrupt:
-        pass
-    except Exception as exc:
-        raise exc """
+    main(phylo_json_tree=Path(phylo_json_tree))

@@ -169,9 +169,8 @@ class ClasseqClade:
             return f"type({self.type.name}): {self.name}"
 
         nodes = 0 if self.children is None else len(self.children)
-        return (
-            f"type({self.type.name}): [{nodes} nodes] {self.support} {self.id}"
-        )
+        name = self.name if self.name is not None else self.id
+        return f"type({self.type.name}): [{nodes} nodes] {self.support} {name}"
 
     def get_pretty_tree(self) -> str:
         str_repr: list[str] = []

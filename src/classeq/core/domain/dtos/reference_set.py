@@ -189,7 +189,7 @@ class ReferenceSet:
 
             linear_tree.add(
                 ClasseqClade(
-                    id=clade.id,
+                    id=clade._id,
                     name=(
                         NodeType.ROOT.value
                         if is_root is True
@@ -209,7 +209,7 @@ class ReferenceSet:
             if len(clade.clades) > 0:
                 for children in clade.clades:
                     __collect_clades_recursively(
-                        parent=clade.id,
+                        parent=clade._id,
                         clade=children,
                     )
 

@@ -37,17 +37,23 @@ class ExtendedBioPythonClade(ExtendedBioPythonElement, Clade):
     # ? Class attributes
     # ? ------------------------------------------------------------------------
 
-    id: UUID
+    _id: UUID
+    _is_outgroup: bool
 
     # ? ------------------------------------------------------------------------
     # ? Life cycle hook methods
     # ? ------------------------------------------------------------------------
 
     def __init__(
-        self, id: UUID | None = None, *args: Any, **kwargs: Any
+        self,
+        id: UUID | None = None,
+        is_outgroup: bool | None = None,
+        *args: Any,
+        **kwargs: Any,
     ) -> None:
         super().__init__(*args, **kwargs)
-        self.id = id or uuid4()
+        self._id = id or uuid4()
+        self._is_outgroup = is_outgroup or False
 
     # ? ------------------------------------------------------------------------
     # ? Public instance methods
@@ -55,7 +61,8 @@ class ExtendedBioPythonClade(ExtendedBioPythonElement, Clade):
 
     def to_dict(self) -> dict[str, Any]:
         return {
-            "id": self.id,
+            "id": self._id,
+            "is_outgroup": self._is_outgroup,
             "branch_length": self.branch_length,
             "name": self.name,
             "confidence": self.confidence,
@@ -74,7 +81,8 @@ class ExtendedBioPythonClade(ExtendedBioPythonElement, Clade):
         content: dict[str, Any],
     ) -> Self:
         return cls(
-            id=content.get("id"),
+            id=UUID(content.get("id")),
+            is_outgroup=content.get("is_outgroup"),
             branch_length=content.get("branch_length"),
             name=content.get("name"),
             confidence=content.get("confidence"),
@@ -89,6 +97,7 @@ class ExtendedBioPythonClade(ExtendedBioPythonElement, Clade):
     def from_bio_python_clade(
         cls,
         clade: Clade,
+        outgroups: list[str],
     ) -> Self:
         """Recursively copy a BioPython Clade object and its children.
 
@@ -110,6 +119,7 @@ class ExtendedBioPythonClade(ExtendedBioPythonElement, Clade):
                     confidence=clade.confidence,
                     color=clade.color,
                     width=clade.width,
+                    is_outgroup=clade.name in outgroups,
                 )
 
                 copied_clade.clades = recursive_parse_clades(
@@ -129,6 +139,7 @@ class ExtendedBioPythonClade(ExtendedBioPythonElement, Clade):
             confidence=clade.confidence,
             color=clade.color,
             width=clade.width,
+            is_outgroup=clade.name in outgroups,
         )
 
 
@@ -153,6 +164,16 @@ class ExtendedBioPythonTree(Tree):
         }
 
     # ? ------------------------------------------------------------------------
+    # ? Public instance methods
+    # ? ------------------------------------------------------------------------
+
+    def set_clade_name(self, clade_id: UUID, name: str) -> None:
+        for clade in [
+            clade for clade in self.find_clades() if clade._id == clade_id
+        ]:
+            setattr(clade, "name", name)
+
+    # ? ------------------------------------------------------------------------
     # ? Public class methods
     # ? ------------------------------------------------------------------------
 
@@ -169,11 +190,14 @@ class ExtendedBioPythonTree(Tree):
         )
 
     @classmethod
-    def from_bio_python_tree(cls, tree: Tree) -> Self:
+    def from_bio_python_tree(cls, tree: Tree, outgroups: list[str]) -> Self:
         inner_tree = deepcopy(tree)
 
         return cls(
-            root=ExtendedBioPythonClade.from_bio_python_clade(inner_tree.root),
+            root=ExtendedBioPythonClade.from_bio_python_clade(
+                inner_tree.root,
+                outgroups=outgroups,
+            ),
             rooted=inner_tree.rooted,
             id=inner_tree.id,
             name=inner_tree.name,

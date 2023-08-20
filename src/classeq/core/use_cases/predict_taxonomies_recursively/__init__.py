@@ -24,6 +24,7 @@ def predict_for_multiple_fasta_file(
     fasta_format: MsaSourceFormatEnum = MsaSourceFormatEnum.FASTA,
     **kwargs: Any,
 ) -> Either[c_exc.MappedErrors, Literal[True]]:
+    print(reference_set)
     try:
         records: list[SeqRecord] = list(
             SeqIO.parse(str(fasta_path), fasta_format.value)

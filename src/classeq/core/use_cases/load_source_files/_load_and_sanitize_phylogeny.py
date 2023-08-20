@@ -3,10 +3,13 @@ from pathlib import Path
 
 import clean_base.exceptions as c_exc
 from Bio import Phylo
-from Bio.Phylo.BaseTree import Clade, Tree
+from Bio.Phylo.BaseTree import Tree
 from clean_base.either import Either, right
 
-from classeq.core.domain.dtos.biopython_wrappers import ExtendedBioPythonTree
+from classeq.core.domain.dtos.biopython_wrappers import (
+    ExtendedBioPythonClade,
+    ExtendedBioPythonTree,
+)
 from classeq.core.domain.dtos.tree import ClasseqTree
 from classeq.core.domain.dtos.tree_source_format import TreeSourceFormatEnum
 from classeq.settings import LOGGER, TEMP_INPUT_FILE_SUFFIX
@@ -96,6 +99,15 @@ def load_and_sanitize_phylogeny(
         sanitized_tree: Tree = sanitized_tree_either.value
 
         # ? --------------------------------------------------------------------
+        # ? Convert default BioPython's Tree to ExtendedBioPythonTree
+        # ? --------------------------------------------------------------------
+
+        sanitized_tree = ExtendedBioPythonTree.from_bio_python_tree(
+            tree=sanitized_tree,
+            outgroups=outgroups,
+        )
+
+        # ? --------------------------------------------------------------------
         # ? Collapse outgroup internal nodes
         # ? --------------------------------------------------------------------
 
@@ -107,12 +119,12 @@ def load_and_sanitize_phylogeny(
             if clade.name in outgroups
         ]
 
-        common_ancestor: Clade = sanitized_tree.common_ancestor(
-            targets=tree_outgroups
+        common_ancestor: ExtendedBioPythonClade = (
+            sanitized_tree.common_ancestor(targets=tree_outgroups)
         )
 
-        clade: Clade
-        collapsable_clades: set[Clade] = set()
+        clade: ExtendedBioPythonClade
+        collapsable_clades: set[ExtendedBioPythonClade] = set()
 
         for clade in common_ancestor.clades:
             if all([t.name in outgroups for t in clade.get_terminals()]):
@@ -120,14 +132,6 @@ def load_and_sanitize_phylogeny(
 
         sanitized_tree.collapse_all(
             lambda c: c.__hash__() in [i.__hash__() for i in collapsable_clades]
-        )
-
-        # ? --------------------------------------------------------------------
-        # ? Convert default BioPython's Tree to ExtendedBioPythonTree
-        # ? --------------------------------------------------------------------
-
-        sanitized_classeq_tree = ExtendedBioPythonTree.from_bio_python_tree(
-            tree=sanitized_tree
         )
 
         # ? --------------------------------------------------------------------
@@ -153,7 +157,7 @@ def load_and_sanitize_phylogeny(
         LOGGER.info(f"\t{cleaned_tree_file_path.relative_to(Path.cwd())}")
 
         Phylo.write(
-            sanitized_classeq_tree,
+            sanitized_tree,
             cleaned_tree_file_path,
             format=format.value,
         )
@@ -166,7 +170,7 @@ def load_and_sanitize_phylogeny(
         LOGGER.info(f"\t{cleaned_json_file_path.relative_to(Path.cwd())}")
 
         with cleaned_json_file_path.open("w+") as f:
-            dump(sanitized_classeq_tree.to_dict(), f, indent=4, default=str)
+            dump(sanitized_tree.to_dict(), f, indent=4, default=str)
 
         # ? --------------------------------------------------------------------
         # ? Return a positive response
@@ -177,11 +181,9 @@ def load_and_sanitize_phylogeny(
                 newick_file_path=cleaned_tree_file_path,
                 phylojson_file_path=cleaned_json_file_path,
                 tree_format=format,
-                tree_headers=[
-                    h.name for h in sanitized_classeq_tree.get_terminals()
-                ],
+                tree_headers=[h.name for h in sanitized_tree.get_terminals()],
                 outgroups=outgroups,
-                sanitized_tree=sanitized_classeq_tree,
+                sanitized_tree=sanitized_tree,
             )
         )
 

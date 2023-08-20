@@ -1,6 +1,7 @@
 {
     "root": {
-        "id": "3203e4d2-0f02-4ad5-b707-8c2930827dde",
+        "id": "d8f4d81e-1b1d-4c14-98c0-2b29f42b1bca",
+        "is_outgroup": false,
         "branch_length": null,
         "name": null,
         "confidence": null,
@@ -8,7 +9,8 @@
         "width": null,
         "clades": [
             {
-                "id": "b04c9e53-a71f-4f02-a2db-8ddc7e7a169d",
+                "id": "97e64d33-248a-4401-b90c-5bb6ecfaec4d",
+                "is_outgroup": false,
                 "branch_length": 0.161096,
                 "name": null,
                 "confidence": 100,
@@ -16,7 +18,8 @@
                 "width": null,
                 "clades": [
                     {
-                        "id": "a928d796-f7a5-4540-9759-436b758a62e3",
+                        "id": "6a225600-f36f-4315-8a27-6fab306f3a9d",
+                        "is_outgroup": false,
                         "branch_length": 0.0330524,
                         "name": null,
                         "confidence": 97,
@@ -24,7 +27,8 @@
                         "width": null,
                         "clades": [
                             {
-                                "id": "3ae6ae4b-ad81-477e-a4e1-304a74b0d278",
+                                "id": "cbc0c97c-3339-4a7b-96de-bede51f4f43f",
+                                "is_outgroup": false,
                                 "branch_length": 0.033698,
                                 "name": null,
                                 "confidence": 98,
@@ -32,7 +36,8 @@
                                 "width": null,
                                 "clades": [
                                     {
-                                        "id": "0e7b9581-4af6-47fb-8192-2d07134d5856",
+                                        "id": "3cdf39f5-aa66-4750-bab2-a9ffcf93d134",
+                                        "is_outgroup": false,
                                         "branch_length": 0.00362217,
                                         "name": "Col_fioriniae_CBS_20035",
                                         "confidence": null,
@@ -41,7 +46,8 @@
                                         "clades": []
                                     },
                                     {
-                                        "id": "144cce52-2fc5-4c39-aaef-39509624e86a",
+                                        "id": "5fca0a95-419e-4cda-b107-3c0e90807aa7",
+                                        "is_outgroup": false,
                                         "branch_length": 0.00362218,
                                         "name": "Col_fioriniae_CBS_16786",
                                         "confidence": null,
@@ -50,7 +56,8 @@
                                         "clades": []
                                     },
                                     {
-                                        "id": "11a8d758-db9f-421d-b503-49c712c85196",
+                                        "id": "3a52a261-5dac-42c9-83d4-49e21499f492",
+                                        "is_outgroup": false,
                                         "branch_length": 0.00452545,
                                         "name": "Col_cuscutae_CBS_129940",
                                         "confidence": null,
@@ -59,7 +66,8 @@
                                         "clades": []
                                     },
                                     {
-                                        "id": "01e1e8f3-b415-47d1-b968-12aa61acce83",
+                                        "id": "44563958-c464-4907-896c-cb5d526a2c1a",
+                                        "is_outgroup": false,
                                         "branch_length": 0.012679320000000001,
                                         "name": "Col_fioriniae_CBS_29367",
                                         "confidence": null,
@@ -68,7 +76,8 @@
                                         "clades": []
                                     },
                                     {
-                                        "id": "c33bc127-7778-465a-b8d0-7b830b7924fe",
+                                        "id": "5c42525a-0415-4c7c-8bcd-fde508c82917",
+                                        "is_outgroup": false,
                                         "branch_length": 0.00362219,
                                         "name": "Col_fioriniae_CBS_129947",
                                         "confidence": null,
@@ -77,7 +86,8 @@
                                         "clades": []
                                     },
                                     {
-                                        "id": "79f1a4a0-08ff-4172-b977-31bc5a3cc11b",
+                                        "id": "816df071-3ee5-42d0-92a3-d82ee5c11218",
+                                        "is_outgroup": false,
                                         "branch_length": 0.00452546,
                                         "name": "Col_cuscutae_CBS_126523",
                                         "confidence": null,
@@ -86,7 +96,8 @@
                                         "clades": []
                                     },
                                     {
-                                        "id": "1afc26ea-b29b-4a59-8044-edf4f96fd5a1",
+                                        "id": "85e8d64d-578f-47d0-8476-a1b1e1e1f078",
+                                        "is_outgroup": false,
                                         "branch_length": 0.00859252,
                                         "name": "Col_cuscutae_IMI_363003",
                                         "confidence": null,
@@ -95,7 +106,8 @@
                                         "clades": []
                                     },
                                     {
-                                        "id": "974387ea-1c3e-4ec9-8314-984a4d535dd7",
+                                        "id": "0e4aa6c1-562b-43bb-9c80-32bc9c9d9a2c",
+                                        "is_outgroup": false,
                                         "branch_length": 0.00859241,
                                         "name": "Col_cuscutae_CBS_98169",
                                         "confidence": null,
@@ -104,7 +116,8 @@
                                         "clades": []
                                     },
                                     {
-                                        "id": "6b7f25eb-9925-4b6d-a806-9e5978e5dd7d",
+                                        "id": "5433b622-5ceb-40a0-b08b-2671950b4f9f",
+                                        "is_outgroup": false,
                                         "branch_length": 0.0036222,
                                         "name": "Col_fioriniae_CBS_129946",
                                         "confidence": null,
@@ -113,7 +126,8 @@
                                         "clades": []
                                     },
                                     {
-                                        "id": "8daa9d25-c2dc-4c0c-bedf-27d823ae47d2",
+                                        "id": "c4912c1b-be5e-4720-b43e-ffa7bf959694",
+                                        "is_outgroup": false,
                                         "branch_length": 0.00452547,
                                         "name": "Col_fioriniae_IMI_324991",
                                         "confidence": null,
@@ -122,7 +136,8 @@
                                         "clades": []
                                     },
                                     {
-                                        "id": "000e1209-70fa-4ef9-a50c-55b2daf21ea2",
+                                        "id": "4ffd82d2-b422-46ae-adf9-8164bca40ab7",
+                                        "is_outgroup": false,
                                         "branch_length": 0.00362221,
                                         "name": "Col_fioriniae_CBS_127601",
                                         "confidence": null,
@@ -131,7 +146,8 @@
                                         "clades": []
                                     },
                                     {
-                                        "id": "6312d030-fe5c-4437-8dbe-52f2e6adf463",
+                                        "id": "5f87ec6e-187c-4c96-911f-70baba0a34de",
+                                        "is_outgroup": false,
                                         "branch_length": 0.00452548,
                                         "name": "Col_fioriniae_CBS_129948",
                                         "confidence": null,
@@ -140,7 +156,8 @@
                                         "clades": []
                                     },
                                     {
-                                        "id": "d3d9f98b-96ec-4ff6-b678-f9f8eee221ad",
+                                        "id": "0ce414aa-712a-4671-9705-fd044ee21b00",
+                                        "is_outgroup": false,
                                         "branch_length": 0.0036222199999999998,
                                         "name": "Col_cuscutae_IMI_384569",
                                         "confidence": null,
@@ -149,7 +166,8 @@
                                         "clades": []
                                     },
                                     {
-                                        "id": "9919ccd1-b2c5-4ab0-984d-22aa00e1d4c9",
+                                        "id": "1e25ee27-29df-4e7b-a1cb-600b6e1d52d9",
+                                        "is_outgroup": false,
                                         "branch_length": 0.00452549,
                                         "name": "Col_fioriniae_CBS_126526",
                                         "confidence": null,
@@ -158,7 +176,8 @@
                                         "clades": []
                                     },
                                     {
-                                        "id": "f782a1ae-99c5-443b-9694-69c97d85a509",
+                                        "id": "c13c0d0f-a71e-4c7b-a262-2f7f8c58a211",
+                                        "is_outgroup": false,
                                         "branch_length": 0.0036222299999999997,
                                         "name": "Col_cuscutae_IMI_345578",
                                         "confidence": null,
@@ -167,7 +186,8 @@
                                         "clades": []
                                     },
                                     {
-                                        "id": "c3176712-3f50-4f42-a5d2-d62b895e1ff2",
+                                        "id": "2d78f91a-b3a6-4eb9-ae0c-298cba8e478e",
+                                        "is_outgroup": false,
                                         "branch_length": 0.0045255,
                                         "name": "Col_fioriniae_CBS_126509",
                                         "confidence": null,
@@ -176,7 +196,8 @@
                                         "clades": []
                                     },
                                     {
-                                        "id": "07e6fd1c-1ec0-419d-886f-205a989aa8b0",
+                                        "id": "6054fba7-55a0-4efd-b006-4824100d18ad",
+                                        "is_outgroup": false,
                                         "branch_length": 0.0036222399999999997,
                                         "name": "Col_cuscutae_CSL_318",
                                         "confidence": null,
@@ -185,7 +206,8 @@
                                         "clades": []
                                     },
                                     {
-                                        "id": "1452d2ea-3246-44b9-9a0d-fd7877d4d42e",
+                                        "id": "8be6c3e5-4878-4eef-acd4-f304e753c3b3",
+                                        "is_outgroup": false,
                                         "branch_length": 0.00452551,
                                         "name": "Col_fioriniae_CBS_126508",
                                         "confidence": null,
@@ -194,7 +216,8 @@
                                         "clades": []
                                     },
                                     {
-                                        "id": "ae0ea8fc-5d7a-4097-ab11-edee95127416",
+                                        "id": "82ac761b-30c4-4f37-b435-7f260f726f34",
+                                        "is_outgroup": false,
                                         "branch_length": 0.0036222499999999996,
                                         "name": "Col_cuscutae_CBS_128498",
                                         "confidence": null,
@@ -203,7 +226,8 @@
                                         "clades": []
                                     },
                                     {
-                                        "id": "68dd4a87-d6ed-44ab-ae30-0736200f64cc",
+                                        "id": "b0dd4127-ebc5-41d8-ae7a-cee20cef4c9b",
+                                        "is_outgroup": false,
                                         "branch_length": 0.00452552,
                                         "name": "Col_fioriniae_CBS_125956_",
                                         "confidence": null,
@@ -212,7 +236,8 @@
                                         "clades": []
                                     },
                                     {
-                                        "id": "40a6a6d9-e96d-485c-8606-dbc833f5279d",
+                                        "id": "0447b41f-2769-4275-b99b-b15c86e24e56",
+                                        "is_outgroup": false,
                                         "branch_length": 0.0036222599999999995,
                                         "name": "Col_cuscutae_CBS_125970",
                                         "confidence": null,
@@ -221,7 +246,8 @@
                                         "clades": []
                                     },
                                     {
-                                        "id": "c0dd252c-64ed-463e-ae9a-4ce8d1f634d9",
+                                        "id": "00a82dac-99d4-4672-a45e-e8e6ee1f3aa2",
+                                        "is_outgroup": false,
                                         "branch_length": 0.0036222599999999995,
                                         "name": "Col_fioriniae_CBS_49092",
                                         "confidence": null,
@@ -230,7 +256,8 @@
                                         "clades": []
                                     },
                                     {
-                                        "id": "eda5cde8-9234-4fe7-a56c-ce8ad9f5110e",
+                                        "id": "961ec19c-2513-4d2d-a3e0-78fc36983eb3",
+                                        "is_outgroup": false,
                                         "branch_length": 0.00452553,
                                         "name": "Col_fioriniae_CBS_125396",
                                         "confidence": null,
@@ -239,7 +266,8 @@
                                         "clades": []
                                     },
                                     {
-                                        "id": "180bfbb9-3311-44bf-9aca-916a8a875b3d",
+                                        "id": "e66fd55f-b4a3-4baf-a3c3-56613882c082",
+                                        "is_outgroup": false,
                                         "branch_length": 0.00452554,
                                         "name": "Col_fioriniae_CBS_124958",
                                         "confidence": null,
@@ -248,7 +276,8 @@
                                         "clades": []
                                     },
                                     {
-                                        "id": "607c3818-478c-40e0-b797-9c1ba96cf085",
+                                        "id": "da485bfc-93b3-4bfc-bc8e-f0164ea1cf41",
+                                        "is_outgroup": false,
                                         "branch_length": 0.00452555,
                                         "name": "Col_fioriniae_ATCC_12097",
                                         "confidence": null,
@@ -257,7 +286,8 @@
                                         "clades": []
                                     },
                                     {
-                                        "id": "ebf08b22-2fdf-4d12-9952-12ee21872975",
+                                        "id": "7f934063-96ea-42cb-ace0-f9a7330987e1",
+                                        "is_outgroup": false,
                                         "branch_length": 0.00452556,
                                         "name": "Col_cuscutae_CSL_473",
                                         "confidence": null,
@@ -266,7 +296,8 @@
                                         "clades": []
                                     },
                                     {
-                                        "id": "f7e5ffb2-6de6-43d1-9c43-764fb68bad2c",
+                                        "id": "434deda2-8b54-401d-97b6-8474ce6ca155",
+                                        "is_outgroup": false,
                                         "branch_length": 0.00452557,
                                         "name": "Col_cuscutae_CBS_128517",
                                         "confidence": null,
@@ -275,7 +306,8 @@
                                         "clades": []
                                     },
                                     {
-                                        "id": "75cd5f06-7cae-4b51-bef4-07450d1fe850",
+                                        "id": "d6120d9b-7279-4de0-b1e7-13771f53c313",
+                                        "is_outgroup": false,
                                         "branch_length": 0.00452557,
                                         "name": "Col_cuscutae_CBS_78686",
                                         "confidence": null,
@@ -286,7 +318,8 @@
                                 ]
                             },
                             {
-                                "id": "8248fd70-5b02-4146-8842-a6012cd97af7",
+                                "id": "09de295c-f80d-4b4b-ba7a-7dbf945487a1",
+                                "is_outgroup": false,
                                 "branch_length": 0.0142366,
                                 "name": null,
                                 "confidence": 80,
@@ -294,7 +327,8 @@
                                 "width": null,
                                 "clades": [
                                     {
-                                        "id": "dc690638-380d-476c-8fc0-66b4f70b2ecd",
+                                        "id": "5bf7c97c-915b-44bd-8787-101d72c13f23",
+                                        "is_outgroup": false,
                                         "branch_length": 0.0242118,
                                         "name": null,
                                         "confidence": 99,
@@ -302,7 +336,8 @@
                                         "width": null,
                                         "clades": [
                                             {
-                                                "id": "92d360e8-cf5c-427f-8aa9-de1dbbf57315",
+                                                "id": "ac7f4c2c-cdaf-43e0-a215-76adf137dfaa",
+                                                "is_outgroup": false,
                                                 "branch_length": 0.00406997,
                                                 "name": "Col_acutatum_CBS_14429",
                                                 "confidence": null,
@@ -311,7 +346,8 @@
                                                 "clades": []
                                             },
                                             {
-                                                "id": "f10cd8b8-943b-4828-be22-4e075f3520e7",
+                                                "id": "3ab43dbe-dc70-41f0-a075-4e34a5671570",
+                                                "is_outgroup": false,
                                                 "branch_length": 0.00408133,
                                                 "name": "Col_acutatum_CBS_129919",
                                                 "confidence": null,
@@ -320,7 +356,8 @@
                                                 "clades": []
                                             },
                                             {
-                                                "id": "c8a15165-d1ad-47a9-b6e9-def74d9d50f6",
+                                                "id": "1a102f17-cb70-44fb-bb96-26946dd5c11e",
+                                                "is_outgroup": false,
                                                 "branch_length": 3.0000000000000004e-08,
                                                 "name": "Col_acutatum_CBS_112990",
                                                 "confidence": null,
@@ -329,7 +366,8 @@
                                                 "clades": []
                                             },
                                             {
-                                                "id": "959ee741-7344-428a-86e7-7cb7c46c453e",
+                                                "id": "c7527ff0-62ea-4651-860a-8f233f3b7ce3",
+                                                "is_outgroup": false,
                                                 "branch_length": 0.00408134,
                                                 "name": "Col_acutatum_CBS_127539",
                                                 "confidence": null,
@@ -338,7 +376,8 @@
                                                 "clades": []
                                             },
                                             {
-                                                "id": "2d38f921-4616-4cec-9ac0-47ab5de4c9f2",
+                                                "id": "bc244e81-f7bc-43be-8c2c-ce042ed8692f",
+                                                "is_outgroup": false,
                                                 "branch_length": 4e-08,
                                                 "name": "Col_acutatum_CBS_110735",
                                                 "confidence": null,
@@ -347,7 +386,8 @@
                                                 "clades": []
                                             },
                                             {
-                                                "id": "f13dcab7-447e-434d-8df9-2adc4b672ac9",
+                                                "id": "05ddac4f-5458-4b04-90a7-c6a3bf00b275",
+                                                "is_outgroup": false,
                                                 "branch_length": 0.01237003,
                                                 "name": "Col_acutatum_CBS_128499",
                                                 "confidence": null,
@@ -356,7 +396,8 @@
                                                 "clades": []
                                             },
                                             {
-                                                "id": "87f42683-df62-4809-8174-38713949dde7",
+                                                "id": "6376e686-0ec5-4b6b-b536-4ebe67238bac",
+                                                "is_outgroup": false,
                                                 "branch_length": 0.00818725,
                                                 "name": "Col_acutatum_IMI_216370",
                                                 "confidence": null,
@@ -365,7 +406,8 @@
                                                 "clades": []
                                             },
                                             {
-                                                "id": "0fc045b6-b1a3-4a64-a009-2ac754b38cf7",
+                                                "id": "9110b776-cb90-4e7e-b9e7-fdd63e84e212",
+                                                "is_outgroup": false,
                                                 "branch_length": 0.00818725,
                                                 "name": "Col_acutatum_CBS_112759",
                                                 "confidence": null,
@@ -374,7 +416,8 @@
                                                 "clades": []
                                             },
                                             {
-                                                "id": "d5344c5e-c1d6-4668-84f2-ddb5d13eb49e",
+                                                "id": "e36053e0-0c6e-4b7d-9878-c824b7207d52",
+                                                "is_outgroup": false,
                                                 "branch_length": 0.00408135,
                                                 "name": "Col_acutatum_CBS_126506",
                                                 "confidence": null,
@@ -383,7 +426,8 @@
                                                 "clades": []
                                             },
                                             {
-                                                "id": "5519ef70-bf5b-48eb-a188-6e0db793768b",
+                                                "id": "99f9d664-89e3-4230-a639-99bef455b267",
+                                                "is_outgroup": false,
                                                 "branch_length": 5e-08,
                                                 "name": "Col_acutatum_CBS_127540",
                                                 "confidence": null,
@@ -392,7 +436,8 @@
                                                 "clades": []
                                             },
                                             {
-                                                "id": "6c628ff8-8119-4980-81d7-50abc5fff52f",
+                                                "id": "c88e62e6-f4ca-4191-9f4d-7e7db391e68c",
+                                                "is_outgroup": false,
                                                 "branch_length": 0.01237004,
                                                 "name": "Col_acutatum_CBS_112996",
                                                 "confidence": null,
@@ -401,7 +446,8 @@
                                                 "clades": []
                                             },
                                             {
-                                                "id": "84d0d822-cb76-4e5f-9d55-767e878660bc",
+                                                "id": "54e9d3ae-4b7e-4f1f-b5bc-df55806674a3",
+                                                "is_outgroup": false,
                                                 "branch_length": 0.00408136,
                                                 "name": "Col_acutatum_CBS_126505",
                                                 "confidence": null,
@@ -410,7 +456,8 @@
                                                 "clades": []
                                             },
                                             {
-                                                "id": "b7827c23-d217-48ed-9d1b-7ce5bec01cdf",
+                                                "id": "b864eab3-c6ae-45e3-bd72-9ab94ea8a7f3",
+                                                "is_outgroup": false,
                                                 "branch_length": 0.00408136,
                                                 "name": "Col_acutatum_CSL_287",
                                                 "confidence": null,
@@ -419,7 +466,8 @@
                                                 "clades": []
                                             },
                                             {
-                                                "id": "76b67bb2-b060-4fd7-92ca-d3ced1d7cdb7",
+                                                "id": "bddbbb24-16ec-4214-b770-1d9b682db540",
+                                                "is_outgroup": false,
                                                 "branch_length": 6e-08,
                                                 "name": "Col_acutatum_IMI_384175",
                                                 "confidence": null,
@@ -428,7 +476,8 @@
                                                 "clades": []
                                             },
                                             {
-                                                "id": "735f28d6-d18c-4912-ba10-70dc2db47183",
+                                                "id": "3370be29-c68d-495d-9efc-ac9fc2d923ce",
+                                                "is_outgroup": false,
                                                 "branch_length": 0.01237005,
                                                 "name": "Col_acutatum_CBS_111993",
                                                 "confidence": null,
@@ -437,7 +486,8 @@
                                                 "clades": []
                                             },
                                             {
-                                                "id": "cbbe4479-a943-4e41-b44b-e2b0235ec3c1",
+                                                "id": "04ee5373-27ad-4b40-9c2c-e4c5b159153f",
+                                                "is_outgroup": false,
                                                 "branch_length": 0.01237005,
                                                 "name": "Col_acutatum_CBS_36973",
                                                 "confidence": null,
@@ -446,7 +496,8 @@
                                                 "clades": []
                                             },
                                             {
-                                                "id": "48879791-3377-4cae-b4b5-d347683d9c91",
+                                                "id": "a8817860-6e31-46ab-9629-cd09144264d7",
+                                                "is_outgroup": false,
                                                 "branch_length": 6.999999999999999e-08,
                                                 "name": "Col_acutatum_IMI_336479",
                                                 "confidence": null,
@@ -455,7 +506,8 @@
                                                 "clades": []
                                             },
                                             {
-                                                "id": "4ed07fd7-f0af-4f18-b92b-6f3744c5c157",
+                                                "id": "1caa850f-9de2-4745-80a5-4b2a1f7b0f8a",
+                                                "is_outgroup": false,
                                                 "branch_length": 7.999999999999999e-08,
                                                 "name": "Col_acutatum_CBS_127602",
                                                 "confidence": null,
@@ -464,7 +516,8 @@
                                                 "clades": []
                                             },
                                             {
-                                                "id": "a98394dd-5a99-4c24-af75-cf42d0f78b60",
+                                                "id": "ac4bffda-b8a6-4b24-b177-6582513509cf",
+                                                "is_outgroup": false,
                                                 "branch_length": 8.999999999999999e-08,
                                                 "name": "Col_acutatum_CBS_127598",
                                                 "confidence": null,
@@ -473,7 +526,8 @@
                                                 "clades": []
                                             },
                                             {
-                                                "id": "c8b87114-973e-4c50-8775-26cb7765b1a2",
+                                                "id": "92c2944d-26d8-4035-919e-5e5684d840de",
+                                                "is_outgroup": false,
                                                 "branch_length": 9.999999999999998e-08,
                                                 "name": "Col_acutatum_CBS_115393",
                                                 "confidence": null,
@@ -482,7 +536,8 @@
                                                 "clades": []
                                             },
                                             {
-                                                "id": "2fd77a6e-7aff-41fe-92f6-860480609f26",
+                                                "id": "14fc73a9-37fc-409e-a319-927f035804ad",
+                                                "is_outgroup": false,
                                                 "branch_length": 9.999999999999998e-08,
                                                 "name": "Col_acutatum_CBS_113006",
                                                 "confidence": null,
@@ -493,7 +548,8 @@
                                         ]
                                     },
                                     {
-                                        "id": "04f94489-609b-4c29-afd8-14317b4a14a9",
+                                        "id": "bb9e601d-5470-4dff-969c-07e6e1db3937",
+                                        "is_outgroup": false,
                                         "branch_length": 0.00943854,
                                         "name": null,
                                         "confidence": 80,
@@ -501,7 +557,8 @@
                                         "width": null,
                                         "clades": [
                                             {
-                                                "id": "5fc37b11-0cde-431e-8834-7e35de04d805",
+                                                "id": "59a0c1c7-580c-4d24-a701-f27925b90ce8",
+                                                "is_outgroup": false,
                                                 "branch_length": 0.00440992,
                                                 "name": null,
                                                 "confidence": 77,
@@ -509,7 +566,8 @@
                                                 "width": null,
                                                 "clades": [
                                                     {
-                                                        "id": "fd53cc37-5d5e-457d-91fe-9fb8d39954e5",
+                                                        "id": "3332b932-74ea-4f5b-b959-a48ce3af9ed5",
+                                                        "is_outgroup": false,
                                                         "branch_length": 0.0119465,
                                                         "name": null,
                                                         "confidence": 90,
@@ -517,7 +575,8 @@
                                                         "width": null,
                                                         "clades": [
                                                             {
-                                                                "id": "4d4e284e-a456-4b38-a678-c0460c46145d",
+                                                                "id": "5112baf1-7e43-45f8-8f3c-5c1547116505",
+                                                                "is_outgroup": false,
                                                                 "branch_length": 0.033923930000000005,
                                                                 "name": "Col_cairnsense_BRIP_63642",
                                                                 "confidence": null,
@@ -526,7 +585,8 @@
                                                                 "clades": []
                                                             },
                                                             {
-                                                                "id": "5a478651-ffa4-4f75-96e8-d17ffa935737",
+                                                                "id": "0a753eb3-fa65-4057-8f8f-9f365ae9a974",
+                                                                "is_outgroup": false,
                                                                 "branch_length": 0.00408421,
                                                                 "name": "Col_nymphaeae_CBS_126528",
                                                                 "confidence": null,
@@ -535,7 +595,8 @@
                                                                 "clades": []
                                                             },
                                                             {
-                                                                "id": "20868455-9f40-4937-ac5b-7ca2773c3f25",
+                                                                "id": "16729d31-2343-4a79-a7f4-0c9c1e800512",
+                                                                "is_outgroup": false,
                                                                 "branch_length": 0.02505956,
                                                                 "name": "Col_chrysanthemi_CBS_126518",
                                                                 "confidence": null,
@@ -544,7 +605,8 @@
                                                                 "clades": []
                                                             },
                                                             {
-                                                                "id": "1e4f8d8a-7374-40a0-9ecd-5a9c6d62ca43",
+                                                                "id": "1690f7d2-9b68-4119-8cb8-e2dc11c686be",
+                                                                "is_outgroup": false,
                                                                 "branch_length": 0.02505956,
                                                                 "name": "Col_chrysanthemi_IMI_364540",
                                                                 "confidence": null,
@@ -553,7 +615,8 @@
                                                                 "clades": []
                                                             },
                                                             {
-                                                                "id": "9f9c91d9-8d3f-44f6-8f1e-33ae51d3867e",
+                                                                "id": "b3e21b47-49fb-4f95-bfb8-e902f41daf13",
+                                                                "is_outgroup": false,
                                                                 "branch_length": 0.01634563,
                                                                 "name": "Col_scovillei_CBS_120708",
                                                                 "confidence": null,
@@ -562,7 +625,8 @@
                                                                 "clades": []
                                                             },
                                                             {
-                                                                "id": "853f0e95-3811-4872-b72a-f8a07b1a8b47",
+                                                                "id": "cfca6186-c530-4d0c-aac3-5210dcc9d54c",
+                                                                "is_outgroup": false,
                                                                 "branch_length": 0.01634563,
                                                                 "name": "Col_scovillei_CBS_126529",
                                                                 "confidence": null,
@@ -571,7 +635,8 @@
                                                                 "clades": []
                                                             },
                                                             {
-                                                                "id": "3bad9c35-f696-4ac2-a522-661186db06bb",
+                                                                "id": "effd2c79-10be-4f61-b659-7b24266975ad",
+                                                                "is_outgroup": false,
                                                                 "branch_length": 0.0040842199999999995,
                                                                 "name": "Col_nymphaeae_CBS_100064",
                                                                 "confidence": null,
@@ -580,7 +645,8 @@
                                                                 "clades": []
                                                             },
                                                             {
-                                                                "id": "ff96400d-e86c-4e0b-b43b-d3e1edec29da",
+                                                                "id": "fb41aa2f-ce6f-4e4e-be5c-f44ca7ef3e96",
+                                                                "is_outgroup": false,
                                                                 "branch_length": 0.0040842199999999995,
                                                                 "name": "Col_nymphaeae_CBS_127612",
                                                                 "confidence": null,
@@ -589,7 +655,8 @@
                                                                 "clades": []
                                                             },
                                                             {
-                                                                "id": "2d215b8f-050f-4336-991a-6405e9b7fdf0",
+                                                                "id": "ddce5820-a989-4638-80fd-8329a2feb751",
+                                                                "is_outgroup": false,
                                                                 "branch_length": 0.00851248,
                                                                 "name": "Col_cosmi_CBS_85373",
                                                                 "confidence": null,
@@ -598,7 +665,8 @@
                                                                 "clades": []
                                                             },
                                                             {
-                                                                "id": "6f393ad4-3b70-43eb-873f-4a3248259f4b",
+                                                                "id": "a269cdb9-76c5-4c80-aaa5-7cfe46597cfa",
+                                                                "is_outgroup": false,
                                                                 "branch_length": 0.0040834999999999995,
                                                                 "name": "Col_walleri_CBS_125472",
                                                                 "confidence": null,
@@ -607,7 +675,8 @@
                                                                 "clades": []
                                                             },
                                                             {
-                                                                "id": "2265506c-bd32-4293-b522-8307ec75f094",
+                                                                "id": "7235576e-5693-44b2-a404-725f34d6cd2b",
+                                                                "is_outgroup": false,
                                                                 "branch_length": 0.0040883099999999995,
                                                                 "name": null,
                                                                 "confidence": 73,
@@ -615,7 +684,8 @@
                                                                 "width": null,
                                                                 "clades": [
                                                                     {
-                                                                        "id": "4b2c2864-4fbf-4483-ae27-8668d7c6e089",
+                                                                        "id": "e7e2be7b-65f0-470a-ae0e-e97e2f336264",
+                                                                        "is_outgroup": false,
                                                                         "branch_length": 0.0040925,
                                                                         "name": null,
                                                                         "confidence": 71,
@@ -623,7 +693,8 @@
                                                                         "width": null,
                                                                         "clades": [
                                                                             {
-                                                                                "id": "8c2a067a-e69a-4fc2-84fc-10bb86217dea",
+                                                                                "id": "9ae9113a-9b3d-4238-bbd5-1769ee5fc329",
+                                                                                "is_outgroup": false,
                                                                                 "branch_length": 0.00411318,
                                                                                 "name": null,
                                                                                 "confidence": 70,
@@ -631,7 +702,8 @@
                                                                                 "width": null,
                                                                                 "clades": [
                                                                                     {
-                                                                                        "id": "356150a3-a6c8-489c-9731-707dd0b1eba4",
+                                                                                        "id": "bde4504e-21bd-4b39-9ded-214771acfb32",
+                                                                                        "is_outgroup": false,
                                                                                         "branch_length": 2e-08,
                                                                                         "name": "Col_nymphaeae_IMI_301119",
                                                                                         "confidence": null,
@@ -640,7 +712,8 @@
                                                                                         "clades": []
                                                                                     },
                                                                                     {
-                                                                                        "id": "e8738614-9cfc-4c03-8ec9-c46bb9386c64",
+                                                                                        "id": "bf8873cb-97ff-499b-b8ef-f1e43c1ce4e5",
+                                                                                        "is_outgroup": false,
                                                                                         "branch_length": 2e-08,
                                                                                         "name": "Col_sp_1985",
                                                                                         "confidence": null,
@@ -649,7 +722,8 @@
                                                                                         "clades": []
                                                                                     },
                                                                                     {
-                                                                                        "id": "8e60194f-4aaf-4a88-b1dd-081ed3998b89",
+                                                                                        "id": "3275aad1-7128-46c4-bc5b-78ee89e31dc1",
+                                                                                        "is_outgroup": false,
                                                                                         "branch_length": 3.0000000000000004e-08,
                                                                                         "name": "Col_nymphaeae_CBS_23149",
                                                                                         "confidence": null,
@@ -658,7 +732,8 @@
                                                                                         "clades": []
                                                                                     },
                                                                                     {
-                                                                                        "id": "9a55e286-2fef-44f2-a704-de83882f08d6",
+                                                                                        "id": "6e1877b3-6f88-4c15-a51c-3aae51c1d192",
+                                                                                        "is_outgroup": false,
                                                                                         "branch_length": 3.0000000000000004e-08,
                                                                                         "name": "Col_sp_2056",
                                                                                         "confidence": null,
@@ -667,7 +742,8 @@
                                                                                         "clades": []
                                                                                     },
                                                                                     {
-                                                                                        "id": "92f4d26c-4fb1-4704-b8b0-90996cb1327d",
+                                                                                        "id": "1e475fad-a34c-440d-93b0-17abbad48cf2",
+                                                                                        "is_outgroup": false,
                                                                                         "branch_length": 4e-08,
                                                                                         "name": "Col_nymphaeae_CBS_122111",
                                                                                         "confidence": null,
@@ -676,7 +752,8 @@
                                                                                         "clades": []
                                                                                     },
                                                                                     {
-                                                                                        "id": "139df9f5-a24f-42c4-a53d-ba18521ba229",
+                                                                                        "id": "94bf83db-7513-40d9-92f7-ba5502847e54",
+                                                                                        "is_outgroup": false,
                                                                                         "branch_length": 4e-08,
                                                                                         "name": "Col_sp_1989",
                                                                                         "confidence": null,
@@ -685,7 +762,8 @@
                                                                                         "clades": []
                                                                                     },
                                                                                     {
-                                                                                        "id": "a3289a4d-464d-417b-920d-d2804a5fdc3f",
+                                                                                        "id": "1f424b27-f77a-4b3c-babe-14c1a6322c1d",
+                                                                                        "is_outgroup": false,
                                                                                         "branch_length": 4e-08,
                                                                                         "name": "Col_sp_2058",
                                                                                         "confidence": null,
@@ -694,7 +772,8 @@
                                                                                         "clades": []
                                                                                     },
                                                                                     {
-                                                                                        "id": "4ca47b41-7c99-4942-a97f-42fc77583a7e",
+                                                                                        "id": "7c501df6-9af8-4dc6-895b-496ec1f5edaa",
+                                                                                        "is_outgroup": false,
                                                                                         "branch_length": 5e-08,
                                                                                         "name": "Col_nymphaeae_CBS_122110",
                                                                                         "confidence": null,
@@ -703,7 +782,8 @@
                                                                                         "clades": []
                                                                                     },
                                                                                     {
-                                                                                        "id": "075952a0-b7cb-4a11-9ef7-13b98559c78f",
+                                                                                        "id": "364a78cd-e13a-4177-9be4-2b28a2508c92",
+                                                                                        "is_outgroup": false,
                                                                                         "branch_length": 6e-08,
                                                                                         "name": "Col_nymphaeae_CBS_112202",
                                                                                         "confidence": null,
@@ -712,7 +792,8 @@
                                                                                         "clades": []
                                                                                     },
                                                                                     {
-                                                                                        "id": "63b386bf-9b9d-4432-a14d-ffae25930412",
+                                                                                        "id": "6fc356e7-ccdd-4711-8b1c-9754b36dfc44",
+                                                                                        "is_outgroup": false,
                                                                                         "branch_length": 6e-08,
                                                                                         "name": "Col_nymphaeae_CBS_17351",
                                                                                         "confidence": null,
@@ -723,7 +804,8 @@
                                                                                 ]
                                                                             },
                                                                             {
-                                                                                "id": "5d08cd16-89ab-46fe-9d58-e6e4223e10c6",
+                                                                                "id": "a5b7c854-a156-4557-a093-3355457734b3",
+                                                                                "is_outgroup": false,
                                                                                 "branch_length": 2e-08,
                                                                                 "name": "Col_nymphaeae_CBS_119294",
                                                                                 "confidence": null,
@@ -732,7 +814,8 @@
                                                                                 "clades": []
                                                                             },
                                                                             {
-                                                                                "id": "67818da6-16c4-4f76-a0c7-7ac424d93882",
+                                                                                "id": "8edc5b66-4e02-4098-b0f5-8c3c7fecb6c6",
+                                                                                "is_outgroup": false,
                                                                                 "branch_length": 2e-08,
                                                                                 "name": "Col_nymphaeae_IMI_370491",
                                                                                 "confidence": null,
@@ -743,7 +826,8 @@
                                                                         ]
                                                                     },
                                                                     {
-                                                                        "id": "75be1037-7229-4ba0-9424-a8a623aaa6f1",
+                                                                        "id": "e51fadaf-7675-468e-9bf6-6f2908a2000d",
+                                                                        "is_outgroup": false,
                                                                         "branch_length": 2e-08,
                                                                         "name": "Col_nymphaeae_CBS_51678",
                                                                         "confidence": null,
@@ -752,7 +836,8 @@
                                                                         "clades": []
                                                                     },
                                                                     {
-                                                                        "id": "eedb90e4-9830-41a3-8ea6-781441b8bad6",
+                                                                        "id": "01b84ed5-14d7-413e-8f0a-25135ef2b3b8",
+                                                                        "is_outgroup": false,
                                                                         "branch_length": 3.0000000000000004e-08,
                                                                         "name": "Col_nymphaeae_CSL_455",
                                                                         "confidence": null,
@@ -761,7 +846,8 @@
                                                                         "clades": []
                                                                     },
                                                                     {
-                                                                        "id": "e53505c6-9adc-4d14-a96e-347427dac426",
+                                                                        "id": "9f0ed698-9965-47fc-9a4f-cca7149570f8",
+                                                                        "is_outgroup": false,
                                                                         "branch_length": 4e-08,
                                                                         "name": "Col_nymphaeae_CBS_48282",
                                                                         "confidence": null,
@@ -770,7 +856,8 @@
                                                                         "clades": []
                                                                     },
                                                                     {
-                                                                        "id": "3d1c729b-8bfb-4743-99fe-bbfca2964d58",
+                                                                        "id": "484b9410-21c7-48f3-bbe4-2dd20541720a",
+                                                                        "is_outgroup": false,
                                                                         "branch_length": 5e-08,
                                                                         "name": "Col_nymphaeae_CBS_15827",
                                                                         "confidence": null,
@@ -779,7 +866,8 @@
                                                                         "clades": []
                                                                     },
                                                                     {
-                                                                        "id": "37964ef3-5a80-41b7-be2c-a5e32914e4c7",
+                                                                        "id": "aea22780-539f-407d-8975-b9c8f03d739a",
+                                                                        "is_outgroup": false,
                                                                         "branch_length": 5e-08,
                                                                         "name": "Col_nymphaeae_CBS_52677",
                                                                         "confidence": null,
@@ -790,7 +878,8 @@
                                                                 ]
                                                             },
                                                             {
-                                                                "id": "71e58d8d-3f1a-49d9-94ac-ba9bd80cecec",
+                                                                "id": "87526669-761a-40e6-8c53-e065eb475842",
+                                                                "is_outgroup": false,
                                                                 "branch_length": 0.00820246,
                                                                 "name": "Col_guajavae_IMI_350839",
                                                                 "confidence": null,
@@ -799,7 +888,8 @@
                                                                 "clades": []
                                                             },
                                                             {
-                                                                "id": "5c40017d-eef9-4762-9845-79717ccc05f3",
+                                                                "id": "f2e5af6c-6c4d-4de5-a172-3f1013e52f4f",
+                                                                "is_outgroup": false,
                                                                 "branch_length": 0.01674434,
                                                                 "name": "Col_nymphaeae_CBS_129926",
                                                                 "confidence": null,
@@ -808,7 +898,8 @@
                                                                 "clades": []
                                                             },
                                                             {
-                                                                "id": "6cfc920e-4cc6-4e32-a660-6e323150b453",
+                                                                "id": "dbff9166-2c77-46b2-a034-9e8bbe2f555a",
+                                                                "is_outgroup": false,
                                                                 "branch_length": 0.01674435,
                                                                 "name": "Col_citri_ZJUC41",
                                                                 "confidence": null,
@@ -817,7 +908,8 @@
                                                                 "clades": []
                                                             },
                                                             {
-                                                                "id": "fd1919b1-8df8-405b-8cdd-0016409b5ee4",
+                                                                "id": "3b4b0cf5-c83e-43bb-bbef-a1eade388566",
+                                                                "is_outgroup": false,
                                                                 "branch_length": 0.01674435,
                                                                 "name": "Col_nymphaeae_IMI_360386",
                                                                 "confidence": null,
@@ -828,7 +920,8 @@
                                                         ]
                                                     },
                                                     {
-                                                        "id": "3c18640d-0ca2-4b07-8016-08f36e474130",
+                                                        "id": "ebb6b7ed-9eb3-4dcb-a391-985d3ceab42f",
+                                                        "is_outgroup": false,
                                                         "branch_length": 0.00813292,
                                                         "name": null,
                                                         "confidence": 70,
@@ -836,7 +929,8 @@
                                                         "width": null,
                                                         "clades": [
                                                             {
-                                                                "id": "9cb9669d-58c2-43ae-8517-4bd0379906b6",
+                                                                "id": "e1bfdea7-3dce-4d0a-ad7c-c798cc86f81d",
+                                                                "is_outgroup": false,
                                                                 "branch_length": 0.0338279,
                                                                 "name": null,
                                                                 "confidence": 100,
@@ -844,7 +938,8 @@
                                                                 "width": null,
                                                                 "clades": [
                                                                     {
-                                                                        "id": "226bc8ba-cd0a-46f8-9175-662b41465e39",
+                                                                        "id": "dfdec6c6-f8b0-4a2e-9029-437f985af3c1",
+                                                                        "is_outgroup": false,
                                                                         "branch_length": 1e-08,
                                                                         "name": "Col_simmondsii_IMI_313840",
                                                                         "confidence": null,
@@ -853,7 +948,8 @@
                                                                         "clades": []
                                                                     },
                                                                     {
-                                                                        "id": "a84ed494-1897-4d70-bb9e-7da1f891026f",
+                                                                        "id": "10cb216d-79e0-4a2d-a06e-1250dd7a5c46",
+                                                                        "is_outgroup": false,
                                                                         "branch_length": 0.00404059,
                                                                         "name": "Col_simmondsii_CBS_111531",
                                                                         "confidence": null,
@@ -862,7 +958,8 @@
                                                                         "clades": []
                                                                     },
                                                                     {
-                                                                        "id": "2b7b10d3-f16b-4f5b-af89-46bfd043b891",
+                                                                        "id": "b7d180cd-b8a6-4a23-9acc-4af22aae5ca8",
+                                                                        "is_outgroup": false,
                                                                         "branch_length": 0.0040406,
                                                                         "name": "Col_simmondsii_CBS_29567",
                                                                         "confidence": null,
@@ -871,7 +968,8 @@
                                                                         "clades": []
                                                                     },
                                                                     {
-                                                                        "id": "10b48b6d-aefe-4d2f-b8d1-126272bf8726",
+                                                                        "id": "a85bf5c6-c865-4418-bb16-5cd92180db47",
+                                                                        "is_outgroup": false,
                                                                         "branch_length": 0.00404061,
                                                                         "name": "Col_simmondsii_CBS_126524",
                                                                         "confidence": null,
@@ -880,7 +978,8 @@
                                                                         "clades": []
                                                                     },
                                                                     {
-                                                                        "id": "d6c6fa05-3215-4cee-bf57-fb30d594cf45",
+                                                                        "id": "25cc44f7-376b-4fa6-b396-540f9f87095b",
+                                                                        "is_outgroup": false,
                                                                         "branch_length": 0.00404061,
                                                                         "name": "Col_simmondsii_CBS_122122",
                                                                         "confidence": null,
@@ -891,7 +990,8 @@
                                                                 ]
                                                             },
                                                             {
-                                                                "id": "90fe1992-e89f-4739-9c6b-b47ae43e20c8",
+                                                                "id": "76c1215f-ccd9-4b56-8150-1f6bc1d02715",
+                                                                "is_outgroup": false,
                                                                 "branch_length": 0.02875403,
                                                                 "name": "Col_brisbanense_CBS_29267",
                                                                 "confidence": null,
@@ -900,7 +1000,8 @@
                                                                 "clades": []
                                                             },
                                                             {
-                                                                "id": "62b3fa0e-9317-4589-bece-83ee55bbbb52",
+                                                                "id": "e8011579-24b2-4efd-a645-4ca13bfff43e",
+                                                                "is_outgroup": false,
                                                                 "branch_length": 0.01221186,
                                                                 "name": "Col_indonesiense_CBS_127551",
                                                                 "confidence": null,
@@ -909,7 +1010,8 @@
                                                                 "clades": []
                                                             },
                                                             {
-                                                                "id": "b3e9c90f-1656-4421-9940-16663d848e36",
+                                                                "id": "ec186fe6-d227-4cd4-8f6a-22834f720d5f",
+                                                                "is_outgroup": false,
                                                                 "branch_length": 0.0040456599999999995,
                                                                 "name": "Col_sloanei_IMI_364297",
                                                                 "confidence": null,
@@ -918,7 +1020,8 @@
                                                                 "clades": []
                                                             },
                                                             {
-                                                                "id": "6d270ad4-6aff-45b0-9c9f-772bae1692ef",
+                                                                "id": "31d83c73-7407-4ea3-8ea1-57b8ed8e4737",
+                                                                "is_outgroup": false,
                                                                 "branch_length": 0.016235,
                                                                 "name": "Col_laticiphilum_CBS_112989",
                                                                 "confidence": null,
@@ -927,7 +1030,8 @@
                                                                 "clades": []
                                                             },
                                                             {
-                                                                "id": "9ecbefd0-76b7-45d6-90f8-af04722eb748",
+                                                                "id": "bd998862-8129-4fae-937c-788d695448dc",
+                                                                "is_outgroup": false,
                                                                 "branch_length": 0.016235,
                                                                 "name": "Col_laticiphilum_CBS_129827",
                                                                 "confidence": null,
@@ -936,7 +1040,8 @@
                                                                 "clades": []
                                                             },
                                                             {
-                                                                "id": "154ee0fc-1b7c-430e-a6c9-59067e0560d6",
+                                                                "id": "02f270b4-a46f-44ae-bcb3-39464c09a8ee",
+                                                                "is_outgroup": false,
                                                                 "branch_length": 0.00809817,
                                                                 "name": "Col_paxtonii_CBS_50297",
                                                                 "confidence": null,
@@ -945,7 +1050,8 @@
                                                                 "clades": []
                                                             },
                                                             {
-                                                                "id": "ea5c3814-4e9c-4195-a505-702d7adb4370",
+                                                                "id": "49bc591c-ddc6-4752-a766-25c08c2a571d",
+                                                                "is_outgroup": false,
                                                                 "branch_length": 0.00809817,
                                                                 "name": "Col_paxtonii_IMI_165753",
                                                                 "confidence": null,
@@ -958,7 +1064,8 @@
                                                 ]
                                             },
                                             {
-                                                "id": "bbf1fd74-5fc4-4f7c-8126-0af666f0e9a7",
+                                                "id": "943ff3ff-80ba-4d3f-83eb-a5976557867f",
+                                                "is_outgroup": false,
                                                 "branch_length": 0.0128374,
                                                 "name": null,
                                                 "confidence": 89,
@@ -966,7 +1073,8 @@
                                                 "width": null,
                                                 "clades": [
                                                     {
-                                                        "id": "45bc883a-be13-4cec-8885-4436058ea60a",
+                                                        "id": "d9058e47-76a3-471b-b092-37edc4996d05",
+                                                        "is_outgroup": false,
                                                         "branch_length": 0.020583419999999998,
                                                         "name": "Col_melonis_CBS_15984",
                                                         "confidence": null,
@@ -975,7 +1083,8 @@
                                                         "clades": []
                                                     },
                                                     {
-                                                        "id": "c6bcd077-ff4b-4aea-901d-27e91934860a",
+                                                        "id": "d97df230-905b-45ff-b830-ac0930b5dfba",
+                                                        "is_outgroup": false,
                                                         "branch_length": 0.00823514,
                                                         "name": "Col_cuscutae_IMI_304802",
                                                         "confidence": null,
@@ -984,7 +1093,8 @@
                                                         "clades": []
                                                     },
                                                     {
-                                                        "id": "ab385dc8-873a-45f9-af59-17a7e3051b43",
+                                                        "id": "479b90ef-2d5b-42c7-a865-52a70ab1cd8b",
+                                                        "is_outgroup": false,
                                                         "branch_length": 0.01654663,
                                                         "name": null,
                                                         "confidence": 98,
@@ -992,7 +1102,8 @@
                                                         "width": null,
                                                         "clades": [
                                                             {
-                                                                "id": "2a837a78-3a43-428c-9e44-00d4165875b2",
+                                                                "id": "b11f87b7-38a6-4394-9845-21ca85fe9b89",
+                                                                "is_outgroup": false,
                                                                 "branch_length": 1e-08,
                                                                 "name": "Col_sp_2031",
                                                                 "confidence": null,
@@ -1001,7 +1112,8 @@
                                                                 "clades": []
                                                             },
                                                             {
-                                                                "id": "fa88037f-a038-4c0e-93e1-dd6054fc6795",
+                                                                "id": "22ea93af-7e7f-46fa-ad59-9cac9b7e3781",
+                                                                "is_outgroup": false,
                                                                 "branch_length": 2e-08,
                                                                 "name": "Col_tamarilloi_CBS_129814",
                                                                 "confidence": null,
@@ -1010,7 +1122,8 @@
                                                                 "clades": []
                                                             },
                                                             {
-                                                                "id": "7cac871a-e614-40cd-a2d2-c7d04c6a22d0",
+                                                                "id": "96797260-e081-4f33-9d86-6f0a1632ca31",
+                                                                "is_outgroup": false,
                                                                 "branch_length": 3.0000000000000004e-08,
                                                                 "name": "Col_tamarilloi_CBS_129811",
                                                                 "confidence": null,
@@ -1019,7 +1132,8 @@
                                                                 "clades": []
                                                             },
                                                             {
-                                                                "id": "a747e191-524c-448f-8df9-9fb8f669eaa1",
+                                                                "id": "3cd11b98-901d-42f5-a29b-541225652bc7",
+                                                                "is_outgroup": false,
                                                                 "branch_length": 3.0000000000000004e-08,
                                                                 "name": "Col_tamarilloi_CBS_129954",
                                                                 "confidence": null,
@@ -1030,7 +1144,8 @@
                                                         ]
                                                     },
                                                     {
-                                                        "id": "424d02df-4951-499e-939c-70351ccfd578",
+                                                        "id": "0f1ba0b1-8124-470d-a540-c6abc0d59d76",
+                                                        "is_outgroup": false,
                                                         "branch_length": 0.00409285,
                                                         "name": "Col_sp_CBS_129810",
                                                         "confidence": null,
@@ -1039,7 +1154,8 @@
                                                         "clades": []
                                                     },
                                                     {
-                                                        "id": "97c16dde-2e8c-4b29-bbce-5b3079129a9b",
+                                                        "id": "433bf945-67d0-434d-a90f-806ca57ba1f4",
+                                                        "is_outgroup": false,
                                                         "branch_length": 0.00409025,
                                                         "name": "Col_sp_CBS_101611",
                                                         "confidence": null,
@@ -1048,7 +1164,8 @@
                                                         "clades": []
                                                     },
                                                     {
-                                                        "id": "8023bd96-2703-4ac0-996d-7252b25dd5d7",
+                                                        "id": "dfa2ded8-c0fe-4d92-811b-4b0aa98d327f",
+                                                        "is_outgroup": false,
                                                         "branch_length": 0.00818908,
                                                         "name": "Col_lupini_CBS_129944",
                                                         "confidence": null,
@@ -1057,7 +1174,8 @@
                                                         "clades": []
                                                     },
                                                     {
-                                                        "id": "8eddc40c-ddaa-4e23-9b38-20c96d52bf2f",
+                                                        "id": "046927e0-e32a-42ad-9eb2-d65c844fe4bc",
+                                                        "is_outgroup": false,
                                                         "branch_length": 0.00820922,
                                                         "name": "Col_sp_CBS_129820",
                                                         "confidence": null,
@@ -1066,7 +1184,8 @@
                                                         "clades": []
                                                     },
                                                     {
-                                                        "id": "b50219bf-b7ba-43bb-88a6-2c8d40dab911",
+                                                        "id": "a8342e78-084a-4d6a-9ede-dbd78db55900",
+                                                        "is_outgroup": false,
                                                         "branch_length": 0.01228104,
                                                         "name": null,
                                                         "confidence": 85,
@@ -1074,7 +1193,8 @@
                                                         "width": null,
                                                         "clades": [
                                                             {
-                                                                "id": "311cbcbc-8e9c-4855-9782-70681559bcc3",
+                                                                "id": "51dc3fd0-d929-4c50-a3c2-fff8034ef406",
+                                                                "is_outgroup": false,
                                                                 "branch_length": 0.0040759,
                                                                 "name": "Col_limetticola_CBS_11414",
                                                                 "confidence": null,
@@ -1083,7 +1203,8 @@
                                                                 "clades": []
                                                             },
                                                             {
-                                                                "id": "d92f5ff0-fea1-4af1-80ba-b9fde0c6b38a",
+                                                                "id": "6b95b8f0-781b-4582-a687-c5475e9c3d12",
+                                                                "is_outgroup": false,
                                                                 "branch_length": 0.00818077,
                                                                 "name": "Col_costaricense_CBS_21178",
                                                                 "confidence": null,
@@ -1092,7 +1213,8 @@
                                                                 "clades": []
                                                             },
                                                             {
-                                                                "id": "fdb9fc72-5036-4a1d-8c76-b5c54e4db96f",
+                                                                "id": "6ecfe946-bf42-4120-94a6-3199045539d8",
+                                                                "is_outgroup": false,
                                                                 "branch_length": 0.00818077,
                                                                 "name": "Col_costaricense_CBS_33075",
                                                                 "confidence": null,
@@ -1101,7 +1223,8 @@
                                                                 "clades": []
                                                             },
                                                             {
-                                                                "id": "5f400987-01c0-4b03-b0ae-c4a503feec8f",
+                                                                "id": "0a2f89d2-bcc7-43d2-a758-9bac84a5e646",
+                                                                "is_outgroup": false,
                                                                 "branch_length": 3.0000000000000004e-08,
                                                                 "name": null,
                                                                 "confidence": 95,
@@ -1109,7 +1232,8 @@
                                                                 "width": null,
                                                                 "clades": [
                                                                     {
-                                                                        "id": "c1df7258-daeb-40ad-b700-5c0eaaca36e1",
+                                                                        "id": "5c3d6867-52ed-4263-9000-fef6a220d66b",
+                                                                        "is_outgroup": false,
                                                                         "branch_length": 0.00462389,
                                                                         "name": "Col_sp_1957",
                                                                         "confidence": null,
@@ -1118,7 +1242,8 @@
                                                                         "clades": []
                                                                     },
                                                                     {
-                                                                        "id": "3879aa1d-cc03-40c4-bc89-c60e656e9c2c",
+                                                                        "id": "3e0f9afc-694e-441c-854f-eaa7117af9a3",
+                                                                        "is_outgroup": false,
                                                                         "branch_length": 2e-08,
                                                                         "name": "Col_sp_1959",
                                                                         "confidence": null,
@@ -1127,7 +1252,8 @@
                                                                         "clades": []
                                                                     },
                                                                     {
-                                                                        "id": "5625c528-e3cf-4539-a80a-dd45a6818060",
+                                                                        "id": "8d3f4d33-b452-4b0a-8de4-4e3aa5b8569b",
+                                                                        "is_outgroup": false,
                                                                         "branch_length": 3.0000000000000004e-08,
                                                                         "name": "Col_sp_1960",
                                                                         "confidence": null,
@@ -1136,7 +1262,8 @@
                                                                         "clades": []
                                                                     },
                                                                     {
-                                                                        "id": "535df07c-ba8f-4dab-baf9-b4f46e22c8ce",
+                                                                        "id": "9eef1255-2408-4005-afa2-0b19e3ccc285",
+                                                                        "is_outgroup": false,
                                                                         "branch_length": 3.0000000000000004e-08,
                                                                         "name": "Col_sp_1966",
                                                                         "confidence": null,
@@ -1147,7 +1274,8 @@
                                                                 ]
                                                             },
                                                             {
-                                                                "id": "d84d1d01-56a0-49de-a9c4-df88469d1198",
+                                                                "id": "4eef7a6e-16b5-44f0-bef2-b1d6ee67b4e8",
+                                                                "is_outgroup": false,
                                                                 "branch_length": 4e-08,
                                                                 "name": "Col_paranaense_CBS_134729",
                                                                 "confidence": null,
@@ -1156,7 +1284,8 @@
                                                                 "clades": []
                                                             },
                                                             {
-                                                                "id": "cc7955dd-6296-422b-bb94-76ec9c47d656",
+                                                                "id": "ed25e9c9-5adb-4a2c-9dda-f114c67cc4d5",
+                                                                "is_outgroup": false,
                                                                 "branch_length": 4e-08,
                                                                 "name": "Col_sp_IMI_384185",
                                                                 "confidence": null,
@@ -1167,7 +1296,8 @@
                                                         ]
                                                     },
                                                     {
-                                                        "id": "b4af962b-2332-4b0f-98a2-f9918186830d",
+                                                        "id": "d82900ac-9db0-4ec1-8268-8a957b6674c2",
+                                                        "is_outgroup": false,
                                                         "branch_length": 0.00818909,
                                                         "name": "Col_lupini_IMI_375715",
                                                         "confidence": null,
@@ -1176,7 +1306,8 @@
                                                         "clades": []
                                                     },
                                                     {
-                                                        "id": "9031f48e-4e05-4577-a752-2ec3672c7b2f",
+                                                        "id": "024aa276-1da8-4c7d-998f-5c0c9920094a",
+                                                        "is_outgroup": false,
                                                         "branch_length": 0.0081891,
                                                         "name": "Col_lupini_IMI_351261",
                                                         "confidence": null,
@@ -1185,7 +1316,8 @@
                                                         "clades": []
                                                     },
                                                     {
-                                                        "id": "74306f5a-ab41-4276-a5bd-8e494573bae3",
+                                                        "id": "8c48fb76-043c-46d9-b3d1-d42c942ba0a5",
+                                                        "is_outgroup": false,
                                                         "branch_length": 0.0081891,
                                                         "name": "Col_lupini_CBS_46676",
                                                         "confidence": null,
@@ -1202,7 +1334,8 @@
                         ]
                     },
                     {
-                        "id": "fe577b21-852a-4490-9c77-4275b45d6280",
+                        "id": "fcf53dc6-e264-48dd-b19b-0f64ac9b3f51",
+                        "is_outgroup": false,
                         "branch_length": 0.0259945,
                         "name": null,
                         "confidence": 93,
@@ -1210,7 +1343,8 @@
                         "width": null,
                         "clades": [
                             {
-                                "id": "41c9d504-50c7-4feb-9d4a-84f95043f30a",
+                                "id": "025b087b-21a5-4ee2-bdf3-bdeda4943364",
+                                "is_outgroup": false,
                                 "branch_length": 0.0253664,
                                 "name": null,
                                 "confidence": 98,
@@ -1218,7 +1352,8 @@
                                 "width": null,
                                 "clades": [
                                     {
-                                        "id": "24978ccd-6d9b-46ce-b456-567f2402949c",
+                                        "id": "54b16d14-4ee3-4028-b7f3-c4971a2f27f7",
+                                        "is_outgroup": false,
                                         "branch_length": 0.00396324,
                                         "name": "Col_salicis_CBS_11514",
                                         "confidence": null,
@@ -1227,7 +1362,8 @@
                                         "clades": []
                                     },
                                     {
-                                        "id": "228ce0b5-a589-4228-bd14-f0db64ce40a2",
+                                        "id": "a6f93364-f129-41f4-9966-1164d38916b5",
+                                        "is_outgroup": false,
                                         "branch_length": 0.00396325,
                                         "name": "Col_salicis_CBS_11314",
                                         "confidence": null,
@@ -1236,7 +1372,8 @@
                                         "clades": []
                                     },
                                     {
-                                        "id": "df4cd9de-aa37-4d9f-9435-a80e4ee3725c",
+                                        "id": "c2ffdc8a-a164-4a5a-98ad-cf9575e1a82b",
+                                        "is_outgroup": false,
                                         "branch_length": 0.00396325,
                                         "name": "Col_salicis_CBS_19156",
                                         "confidence": null,
@@ -1245,7 +1382,8 @@
                                         "clades": []
                                     },
                                     {
-                                        "id": "b66cab27-5941-40c1-b8ce-730904676b76",
+                                        "id": "4c0f6f6c-1046-41f4-9800-fa67809e5ab3",
+                                        "is_outgroup": false,
                                         "branch_length": 3.0000000000000004e-08,
                                         "name": "Col_salicis_CBS_23949",
                                         "confidence": null,
@@ -1254,7 +1392,8 @@
                                         "clades": []
                                     },
                                     {
-                                        "id": "ab4948b6-f79a-40cc-adaf-229faee6f2a9",
+                                        "id": "2f91a4df-ca21-47c1-a065-5dd5da5755e0",
+                                        "is_outgroup": false,
                                         "branch_length": 4e-08,
                                         "name": "Col_salicis_CBS_18097",
                                         "confidence": null,
@@ -1263,7 +1402,8 @@
                                         "clades": []
                                     },
                                     {
-                                        "id": "ccad8cfe-23f4-4cde-a4f2-bf12fe6b6d80",
+                                        "id": "7f61aa18-085f-4e98-a954-ddc36b66c91e",
+                                        "is_outgroup": false,
                                         "branch_length": 4e-08,
                                         "name": "Col_salicis_CBS_46583",
                                         "confidence": null,
@@ -1272,7 +1412,8 @@
                                         "clades": []
                                     },
                                     {
-                                        "id": "441b00eb-60f4-4e68-a802-8ef5dababbab",
+                                        "id": "95a48939-0953-48a7-b9db-77f240958f0e",
+                                        "is_outgroup": false,
                                         "branch_length": 0.0039695699999999995,
                                         "name": "Col_salicis_CBS_128559",
                                         "confidence": null,
@@ -1281,7 +1422,8 @@
                                         "clades": []
                                     },
                                     {
-                                        "id": "3f2e6238-e74c-404a-b2a3-3e87c392f56a",
+                                        "id": "38314c2e-d582-48a5-832a-1b7c2dd547ba",
+                                        "is_outgroup": false,
                                         "branch_length": 0.0039695699999999995,
                                         "name": "Col_salicis_CBS_129972",
                                         "confidence": null,
@@ -1290,7 +1432,8 @@
                                         "clades": []
                                     },
                                     {
-                                        "id": "75e8b563-d815-45a8-b855-234ff0f5ab1e",
+                                        "id": "f9037f87-894e-47a8-a59b-b3dac5b0b278",
+                                        "is_outgroup": false,
                                         "branch_length": 0.0039695699999999995,
                                         "name": "Col_salicis_IMI_345585",
                                         "confidence": null,
@@ -1299,7 +1442,8 @@
                                         "clades": []
                                     },
                                     {
-                                        "id": "6f911d9b-aaad-46d6-948e-521cfe86f47d",
+                                        "id": "e8db93fb-d8d5-4923-abb9-8aabd3c1c65d",
+                                        "is_outgroup": false,
                                         "branch_length": 0.0039695699999999995,
                                         "name": "Col_salicis_CBS_129356",
                                         "confidence": null,
@@ -1310,15 +1454,17 @@
                                 ]
                             },
                             {
-                                "id": "71484024-b894-4a25-87ef-8df12b6d37af",
+                                "id": "e642d2a7-b476-4402-a29b-b93b893ea95b",
+                                "is_outgroup": false,
                                 "branch_length": 0.02153098,
-                                "name": null,
+                                "name": "Col_Godetiae_Group",
                                 "confidence": 83,
                                 "color": null,
                                 "width": null,
                                 "clades": [
                                     {
-                                        "id": "8fd45051-5926-4155-9caa-c753c048ce9a",
+                                        "id": "49cb5c61-f081-4219-8ba1-87a03a3f6118",
+                                        "is_outgroup": false,
                                         "branch_length": 0.00407971,
                                         "name": "Col_godetiae_CBS_127561",
                                         "confidence": null,
@@ -1327,7 +1473,8 @@
                                         "clades": []
                                     },
                                     {
-                                        "id": "f73cab3b-7140-45a8-9912-a61f74ba208c",
+                                        "id": "da9d8ece-831f-4b1c-8025-370225396776",
+                                        "is_outgroup": false,
                                         "branch_length": 3.0000000000000004e-08,
                                         "name": "Col_godetiae_CBS_129809",
                                         "confidence": null,
@@ -1336,7 +1483,8 @@
                                         "clades": []
                                     },
                                     {
-                                        "id": "6f4fc955-5bea-4170-943d-e9b526283817",
+                                        "id": "dc928b46-6942-4eab-a50e-b039c18d2fac",
+                                        "is_outgroup": false,
                                         "branch_length": 3.0000000000000004e-08,
                                         "name": "Col_godetiae_CBS_129917",
                                         "confidence": null,
@@ -1345,7 +1493,8 @@
                                         "clades": []
                                     },
                                     {
-                                        "id": "2a344081-a121-4db7-b315-a321526cb4f1",
+                                        "id": "96f4a51b-5684-4259-abde-0bf65524bdcf",
+                                        "is_outgroup": false,
                                         "branch_length": 0.02485668,
                                         "name": "Col_pyricola_CBS_128531",
                                         "confidence": null,
@@ -1354,7 +1503,8 @@
                                         "clades": []
                                     },
                                     {
-                                        "id": "3f1f8b95-0fc5-4522-8c3b-b9e09785b655",
+                                        "id": "4e9679fe-ab74-4e94-a7d0-da59b226af5a",
+                                        "is_outgroup": false,
                                         "branch_length": 0.0041139,
                                         "name": "Col_johnstonii_CBS_128532",
                                         "confidence": null,
@@ -1363,7 +1513,8 @@
                                         "clades": []
                                     },
                                     {
-                                        "id": "779f83b8-f20b-470b-a3a0-75b94f27a58f",
+                                        "id": "89e98e3e-bcde-40bc-8371-efd4cb19ac44",
+                                        "is_outgroup": false,
                                         "branch_length": 0.0041139,
                                         "name": "Col_johnstonii_IMI_357027",
                                         "confidence": null,
@@ -1372,7 +1523,8 @@
                                         "clades": []
                                     },
                                     {
-                                        "id": "24f15a92-9a23-441e-beab-0dd485bd2429",
+                                        "id": "9f1ebe82-0846-4f8b-8402-995137a217d5",
+                                        "is_outgroup": false,
                                         "branch_length": 0.00816213,
                                         "name": "Col_godetiae_IMI_351262",
                                         "confidence": null,
@@ -1381,7 +1533,8 @@
                                         "clades": []
                                     },
                                     {
-                                        "id": "9b001fd3-365e-40a8-a1b2-f982a2aad25a",
+                                        "id": "3094a004-26da-4aea-9413-c67cb1703cbb",
+                                        "is_outgroup": false,
                                         "branch_length": 0.00816214,
                                         "name": "Col_godetiae_IMI_351248",
                                         "confidence": null,
@@ -1390,7 +1543,8 @@
                                         "clades": []
                                     },
                                     {
-                                        "id": "de665e0e-a60a-453b-91cc-7288afe41e31",
+                                        "id": "662ca9a3-65d1-4fca-899e-5189a6a88f10",
+                                        "is_outgroup": false,
                                         "branch_length": 0.00408111,
                                         "name": "Col_godetiae_IMI_376331",
                                         "confidence": null,
@@ -1399,7 +1553,8 @@
                                         "clades": []
                                     },
                                     {
-                                        "id": "52e40b15-1085-43ce-b706-24404604ac85",
+                                        "id": "2b0b324b-12cc-4939-9ce5-89823ff918e5",
+                                        "is_outgroup": false,
                                         "branch_length": 0.00817562,
                                         "name": "Col_godetiae_CBS_79672",
                                         "confidence": null,
@@ -1408,7 +1563,8 @@
                                         "clades": []
                                     },
                                     {
-                                        "id": "3192593d-7d22-4b94-9b95-8326e8e9b43a",
+                                        "id": "d7b1b953-25ca-46d4-af97-bbb693849ee2",
+                                        "is_outgroup": false,
                                         "branch_length": 0.00816215,
                                         "name": "Col_godetiae_CBS_19853",
                                         "confidence": null,
@@ -1417,7 +1573,8 @@
                                         "clades": []
                                     },
                                     {
-                                        "id": "2c3fb70a-3396-4148-a62d-c573fc7c6743",
+                                        "id": "314701eb-d9f7-46ca-aa98-eb84b1f6ce82",
+                                        "is_outgroup": false,
                                         "branch_length": 0.00408112,
                                         "name": "Col_godetiae_CBS_15525",
                                         "confidence": null,
@@ -1426,7 +1583,8 @@
                                         "clades": []
                                     },
                                     {
-                                        "id": "b471d762-30c8-4b8a-b50a-69b7f0bc5d50",
+                                        "id": "580fa912-2c5e-47a5-a752-a97e4006912c",
+                                        "is_outgroup": false,
                                         "branch_length": 0.00408112,
                                         "name": "Col_godetiae_CBS_131332",
                                         "confidence": null,
@@ -1435,7 +1593,8 @@
                                         "clades": []
                                     },
                                     {
-                                        "id": "dd0b21a9-fe36-4305-a588-0bd07f62e557",
+                                        "id": "2e468a44-f0ca-4e7a-8186-93c7d0a9c7f2",
+                                        "is_outgroup": false,
                                         "branch_length": 0.00817563,
                                         "name": "Col_godetiae_CBS_17159",
                                         "confidence": null,
@@ -1444,7 +1603,8 @@
                                         "clades": []
                                     },
                                     {
-                                        "id": "7a7d85a4-13e3-49b6-88c2-900ab4ecfc32",
+                                        "id": "4964b5d4-602a-40aa-8790-dc4e53b0eca0",
+                                        "is_outgroup": false,
                                         "branch_length": 0.00816216,
                                         "name": "Col_godetiae_CBS_19332",
                                         "confidence": null,
@@ -1453,7 +1613,8 @@
                                         "clades": []
                                     },
                                     {
-                                        "id": "9004c633-9930-4446-a045-d655bdecf219",
+                                        "id": "40bcec36-8ca5-4952-b6e6-7c6139b11348",
+                                        "is_outgroup": false,
                                         "branch_length": 0.00817564,
                                         "name": "Col_godetiae_CBS_16050",
                                         "confidence": null,
@@ -1462,7 +1623,8 @@
                                         "clades": []
                                     },
                                     {
-                                        "id": "c9bed9e5-f089-4223-aa37-d51f9065bfdb",
+                                        "id": "e1c80e05-54ec-466e-8022-c492188db424",
+                                        "is_outgroup": false,
                                         "branch_length": 0.00816217,
                                         "name": "Col_godetiae_CBS_129911",
                                         "confidence": null,
@@ -1471,7 +1633,8 @@
                                         "clades": []
                                     },
                                     {
-                                        "id": "e0463d31-f3fa-47e7-b5fe-c0ffc22e8ed6",
+                                        "id": "ccabc680-e6b9-4051-a5f1-ebbaeadc34fb",
+                                        "is_outgroup": false,
                                         "branch_length": 0.00816217,
                                         "name": "Col_godetiae_CBS_129934",
                                         "confidence": null,
@@ -1480,7 +1643,8 @@
                                         "clades": []
                                     },
                                     {
-                                        "id": "0d93d0bc-0792-4e69-9f8f-858f10025979",
+                                        "id": "904d1f9b-3c29-45bf-bd6b-cccf7208d461",
+                                        "is_outgroup": false,
                                         "branch_length": 0.00817565,
                                         "name": "Col_godetiae_CBS_13344",
                                         "confidence": null,
@@ -1489,7 +1653,8 @@
                                         "clades": []
                                     },
                                     {
-                                        "id": "299119aa-b669-4df5-8bce-dacd07d48776",
+                                        "id": "f0b48538-12b8-4629-b40f-729fae948b04",
+                                        "is_outgroup": false,
                                         "branch_length": 0.00817566,
                                         "name": "Col_godetiae_CBS_129951",
                                         "confidence": null,
@@ -1498,7 +1663,8 @@
                                         "clades": []
                                     },
                                     {
-                                        "id": "3e9697cc-b868-443f-9498-8a8983fd5c3e",
+                                        "id": "881a73be-0237-4fea-8074-b6d66ffa6fea",
+                                        "is_outgroup": false,
                                         "branch_length": 0.00817567,
                                         "name": "Col_godetiae_CBS_129942",
                                         "confidence": null,
@@ -1507,7 +1673,8 @@
                                         "clades": []
                                     },
                                     {
-                                        "id": "d2b26a52-9424-4a31-b433-303c9924b206",
+                                        "id": "38563901-868c-4abc-b12a-baa57b087208",
+                                        "is_outgroup": false,
                                         "branch_length": 0.00817568,
                                         "name": "Col_godetiae_CBS_126522",
                                         "confidence": null,
@@ -1516,7 +1683,8 @@
                                         "clades": []
                                     },
                                     {
-                                        "id": "f3bc4fc9-63b5-42d0-b09f-dd257c50f2a2",
+                                        "id": "95123e46-68d3-41c0-a626-40d3cf6b2f92",
+                                        "is_outgroup": false,
                                         "branch_length": 0.00817569,
                                         "name": "Col_godetiae_CBS_126520",
                                         "confidence": null,
@@ -1525,7 +1693,8 @@
                                         "clades": []
                                     },
                                     {
-                                        "id": "348b4b9c-5e1f-44e9-8766-ba31b40ddc77",
+                                        "id": "3cf818af-7f5d-49d0-b61d-01a45c3228b4",
+                                        "is_outgroup": false,
                                         "branch_length": 0.0081757,
                                         "name": "Col_godetiae_CBS_126512",
                                         "confidence": null,
@@ -1534,7 +1703,8 @@
                                         "clades": []
                                     },
                                     {
-                                        "id": "37b1d527-6060-49b0-995d-10641b8cafb5",
+                                        "id": "02ed57a7-28ad-4a7e-bfc3-69b29007e0a2",
+                                        "is_outgroup": false,
                                         "branch_length": 0.0081757,
                                         "name": "Col_godetiae_IMI_362149b",
                                         "confidence": null,
@@ -1545,7 +1715,8 @@
                                 ]
                             },
                             {
-                                "id": "d10e7157-4213-4f1a-87db-b57feb6bd856",
+                                "id": "bb7e4464-b0f2-498d-a970-9b7b9019bc40",
+                                "is_outgroup": false,
                                 "branch_length": 0.025903790000000003,
                                 "name": "Col_australe_CBS_116478",
                                 "confidence": null,
@@ -1554,7 +1725,8 @@
                                 "clades": []
                             },
                             {
-                                "id": "0738a732-be2c-466e-a3e9-fd7198a14d6e",
+                                "id": "036fd2d8-9405-4d75-88aa-8c3b2c3d4fa6",
+                                "is_outgroup": false,
                                 "branch_length": 0.025903790000000003,
                                 "name": "Col_australe_CBS_131325",
                                 "confidence": null,
@@ -1563,7 +1735,8 @@
                                 "clades": []
                             },
                             {
-                                "id": "e360def3-6b23-4e6c-bde5-c956b02927a2",
+                                "id": "138c5489-7a37-40f9-b7f2-71ca84b96cd6",
+                                "is_outgroup": false,
                                 "branch_length": 0.026569440000000003,
                                 "name": "Col_rhombiforme_CBS_129953",
                                 "confidence": null,
@@ -1572,7 +1745,8 @@
                                 "clades": []
                             },
                             {
-                                "id": "c9329a1f-9392-4f51-9226-a59a316fa4fa",
+                                "id": "4e667d53-610a-4148-b7e8-75dfbe5cdd8d",
+                                "is_outgroup": false,
                                 "branch_length": 0.026569440000000003,
                                 "name": "Col_rhombiforme_CBS_131322",
                                 "confidence": null,
@@ -1581,7 +1755,8 @@
                                 "clades": []
                             },
                             {
-                                "id": "554e75e6-8457-4b42-b2f5-d37db5d7831c",
+                                "id": "01de6b73-9fe9-4a5c-95ed-aa2ce451cd1b",
+                                "is_outgroup": false,
                                 "branch_length": 0.01968912,
                                 "name": "Col_kinghornii_CBS_19835",
                                 "confidence": null,
@@ -1590,7 +1765,8 @@
                                 "clades": []
                             },
                             {
-                                "id": "58fe366e-e074-44da-be28-9fb719b60df9",
+                                "id": "18c2235d-7434-4a1c-882b-c4ef2eb278cb",
+                                "is_outgroup": false,
                                 "branch_length": 0.009911660000000001,
                                 "name": "Col_phormii_CBS_102054",
                                 "confidence": null,
@@ -1599,7 +1775,8 @@
                                 "clades": []
                             },
                             {
-                                "id": "f5c7b5eb-e456-448e-877c-4d36b7a981f0",
+                                "id": "85b81456-9028-4fe4-ad07-424a59215e75",
+                                "is_outgroup": false,
                                 "branch_length": 0.009911660000000001,
                                 "name": "Col_phormii_CBS_118201",
                                 "confidence": null,
@@ -1612,7 +1789,8 @@
                 ]
             },
             {
-                "id": "f23850af-56be-4d24-8b3d-0ea6a3107235",
+                "id": "067a49c9-4d22-467c-88e8-6acfd59e7f60",
+                "is_outgroup": true,
                 "branch_length": 0.01727002,
                 "name": "Col_orchidophilum_LCTJ_05",
                 "confidence": null,
@@ -1621,7 +1799,8 @@
                 "clades": []
             },
             {
-                "id": "4de9aace-79c5-48dc-a378-71b62ac87aea",
+                "id": "db0522d5-2754-4e45-a7f0-d94925d331d4",
+                "is_outgroup": true,
                 "branch_length": 0.02320565,
                 "name": "Col_orchidophilum_COUFAL0219",
                 "confidence": null,
@@ -1630,7 +1809,8 @@
                 "clades": []
             },
             {
-                "id": "a61aae5d-539b-4170-b81c-09ae6256db72",
+                "id": "1ebbffae-fdca-4df4-87fd-1a8be493cbfc",
+                "is_outgroup": true,
                 "branch_length": 0.03436791,
                 "name": "Col_orchidophilum_BJ103_2",
                 "confidence": null,
@@ -1639,7 +1819,8 @@
                 "clades": []
             },
             {
-                "id": "0ab0697b-f08c-4047-bcc9-99f7780d06b0",
+                "id": "44bc25ce-52b2-4fbe-bf70-507f57eea093",
+                "is_outgroup": true,
                 "branch_length": 0.01298583,
                 "name": "Col_orchidophilum_LCTJ_03",
                 "confidence": null,
@@ -1648,7 +1829,8 @@
                 "clades": []
             },
             {
-                "id": "cc2da768-e95b-4699-9a96-bb3d1b3bdaad",
+                "id": "dcad4048-95a9-4fae-a1aa-768be70bf306",
+                "is_outgroup": true,
                 "branch_length": 0.027847620000000003,
                 "name": "Col_orchidophilum_CBS_63180",
                 "confidence": null,
@@ -1657,7 +1839,8 @@
                 "clades": []
             },
             {
-                "id": "7895e89a-5dc3-47cc-8ad9-3218a8d84608",
+                "id": "02c6fcae-a31e-4cfb-9a8d-4bc6fb4a9503",
+                "is_outgroup": true,
                 "branch_length": 0.027847620000000003,
                 "name": "Col_orchidophilum_CBS_63280",
                 "confidence": null,
@@ -1666,7 +1849,8 @@
                 "clades": []
             },
             {
-                "id": "3da6b77f-b239-4496-84fd-a2b90a134ef2",
+                "id": "9cfc91f2-a271-413b-ab7b-d14688d0ab8c",
+                "is_outgroup": true,
                 "branch_length": 0.01725112,
                 "name": "Col_orchidophilum_LCTJ_06",
                 "confidence": null,
@@ -1675,7 +1859,8 @@
                 "clades": []
             },
             {
-                "id": "8f6d8f9c-3b25-4685-9079-967991b0dc02",
+                "id": "1dc2eec2-7925-4b0d-b1b9-555158144ee8",
+                "is_outgroup": true,
                 "branch_length": 0.03204817,
                 "name": "Col_orchidophilum_CBS_119291",
                 "confidence": null,
@@ -1684,7 +1869,8 @@
                 "clades": []
             },
             {
-                "id": "37569528-2401-4274-84b2-cc5a3565ee42",
+                "id": "1b4df53c-490a-4e1e-90ba-d68b48f4fdab",
+                "is_outgroup": true,
                 "branch_length": 0.03204817,
                 "name": "Col_orchidophilum_IMI_309357",
                 "confidence": null,
@@ -1693,7 +1879,8 @@
                 "clades": []
             },
             {
-                "id": "ad9d0572-a024-4d03-bc74-530ea81c8bfb",
+                "id": "10808143-706a-40f6-875f-5374569602d8",
+                "is_outgroup": true,
                 "branch_length": 0.03204817,
                 "name": "Col_orchidophilum_BS06",
                 "confidence": null,
@@ -1702,7 +1889,8 @@
                 "clades": []
             },
             {
-                "id": "a2e8ef7e-7072-4340-90f8-2552b34ce380",
+                "id": "ff399c0d-db4d-4aba-910e-690ddeb0a0c2",
+                "is_outgroup": true,
                 "branch_length": 0.017251130000000003,
                 "name": "Col_orchidophilum_LCTJ_04",
                 "confidence": null,
@@ -1711,7 +1899,8 @@
                 "clades": []
             },
             {
-                "id": "ad948c94-b835-4996-8ab6-c1c35e341ab0",
+                "id": "d65925dc-ba6b-4e1b-a355-13b88050b513",
+                "is_outgroup": true,
                 "branch_length": 0.017251130000000003,
                 "name": "Col_orchidophilum_LCTJ_02",
                 "confidence": null,
@@ -1720,7 +1909,8 @@
                 "clades": []
             },
             {
-                "id": "347e4ea3-0f53-47d7-b63a-4098bee1e8e3",
+                "id": "49d93cee-40f8-4321-8247-88679f0b7815",
+                "is_outgroup": true,
                 "branch_length": 0.03204818,
                 "name": "Col_orchidophilum_BS10",
                 "confidence": null,
@@ -1729,7 +1919,8 @@
                 "clades": []
             },
             {
-                "id": "3a90f2cc-48bc-4328-9650-0f9c0d2f546c",
+                "id": "1f2b2d11-ddbb-4475-8345-118d6d464551",
+                "is_outgroup": true,
                 "branch_length": 0.032048190000000004,
                 "name": "Col_orchidophilum_BS11",
                 "confidence": null,
@@ -1738,7 +1929,8 @@
                 "clades": []
             },
             {
-                "id": "98b35527-18d8-44d3-bccf-3f3d58b80e16",
+                "id": "ebd27bbc-c765-461c-9a6c-87b2f9c7acee",
+                "is_outgroup": true,
                 "branch_length": 0.032048190000000004,
                 "name": "Col_orchidophilum_BS05",
                 "confidence": null,
