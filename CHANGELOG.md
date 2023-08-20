@@ -1,3 +1,9 @@
+## v0.3.0 (2023-08-20)
+
+### Feat
+
+- include prediction final status into the user output file
+
 ## v0.2.1 (2023-08-20)
 
 ### Refactor
