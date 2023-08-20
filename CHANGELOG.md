@@ -1,3 +1,9 @@
+## v0.2.1 (2023-08-20)
+
+### Refactor
+
+- remove trash temp file
+
 ## v0.2.0 (2023-08-20)
 
 ### Feat
