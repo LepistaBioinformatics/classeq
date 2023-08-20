@@ -39,7 +39,11 @@ def perform_single_sequence_phylogenetic_adherence_test(
     **kwargs: Any,
 ) -> Either[
     c_exc.MappedErrors,
-    tuple[ClasseqClade | AdherenceTestResultGroup, list[ClasseqClade]],
+    tuple[
+        ClasseqClade | AdherenceTestResultGroup,
+        list[ClasseqClade],
+        CladeAdherenceResultStatus,
+    ],
 ]:
     """Perform phylogenetic adherence test.
 
@@ -237,6 +241,7 @@ def perform_single_sequence_phylogenetic_adherence_test(
                     + "priors evidences to run comparisons."
                 )
 
+                status = CladeAdherenceResultStatus.CONCLUSIVE_OUTGROUP
                 break
 
             # ------------------------------------------------------------------
@@ -255,6 +260,8 @@ def perform_single_sequence_phylogenetic_adherence_test(
                     + f"outgroup: {clade}"
                 )
 
+                status = CladeAdherenceResultStatus.CONCLUSIVE_OUTGROUP
+                clade_path = list()
                 break
 
             # ------------------------------------------------------------------
@@ -286,11 +293,15 @@ def perform_single_sequence_phylogenetic_adherence_test(
                 LOGGER.critical("Max iterations reached.")
                 break
 
+        if status == CladeAdherenceResultStatus.NEXT_ITERATION:
+            status = CladeAdherenceResultStatus.CONCLUSIVE_INGROUP
+            LOGGER.debug("Max resolution reached")
+
         # ? --------------------------------------------------------------------
         # ? Return a positive response
         # ? --------------------------------------------------------------------
 
-        return right((final_response, clade_path))
+        return right((final_response, clade_path, status))
 
     except Exception as exc:
         return c_exc.UseCaseError(exc, logger=LOGGER)()

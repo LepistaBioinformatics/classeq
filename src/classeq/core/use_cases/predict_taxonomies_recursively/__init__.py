@@ -55,7 +55,7 @@ def predict_for_multiple_fasta_file(
             SeqIO.parse(str(fasta_path), fasta_format.value)
         )
 
-        response: defaultdict[str, list[ClasseqClade]] = defaultdict()
+        response: defaultdict[str, dict[str, Any]] = defaultdict()
 
         for record in records:
             LOGGER.debug("-" * 80)
@@ -75,6 +75,7 @@ def predict_for_multiple_fasta_file(
             (
                 adherence_final_response,
                 adherence_test_path,
+                status,
             ) = adherence_test_response_either.value
 
             resolved_path_names = __resolve_path_name(
@@ -88,7 +89,10 @@ def predict_for_multiple_fasta_file(
             LOGGER.debug(f"Adherence Test Path: {resolved_path_names}")
             LOGGER.debug("")
 
-            response[record.id] = resolved_path_names
+            response[record.id] = {
+                "phylogeny_path": resolved_path_names,
+                "status": status,
+            }
 
             LOGGER.debug(
                 "\n"
@@ -126,27 +130,33 @@ def predict_for_multiple_fasta_file(
                 {
                     "input": str(fasta_path),
                     "annotations": annotated_phylojson_path,
-                    "output": {
-                        k: [
-                            {
-                                **{
-                                    y: z
-                                    for y, z in i.to_dict(
-                                        omit_children=True
-                                    ).items()
-                                    if y in ["name", "id", "support", "parent"]
-                                },
-                                "depth": index + 1,
-                            }
-                            for index, i in enumerate(v)
-                        ]
+                    "output": [
+                        {
+                            "target": k,
+                            "status": v.pop("status").value,
+                            "prediction": [
+                                {
+                                    **{
+                                        y: z
+                                        for y, z in i.to_dict(
+                                            omit_children=True
+                                        ).items()
+                                        if y
+                                        in ["name", "id", "support", "parent"]
+                                    },
+                                    "depth": index + 1,
+                                }
+                                for index, i in enumerate(
+                                    v.pop("phylogeny_path")
+                                )
+                            ],
+                        }
                         for k, v in response.items()
-                    },
+                    ],
                 },
                 f,
                 indent=4,
                 default=str,
-                sort_keys=True,
             )
 
         return right(True)

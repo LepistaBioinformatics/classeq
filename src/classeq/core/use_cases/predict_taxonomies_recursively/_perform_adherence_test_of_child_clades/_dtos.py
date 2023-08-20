@@ -9,38 +9,12 @@ from .._calculate_clade_adherence_with_bootstrap._dtos import AdherenceResult
 
 
 class CladeAdherenceResultStatus(Enum):
-    """The status of the clade adherence test.
-
-    Description:
-        This class defines the status of the clade adherence test. The status
-        can be one of the following:
-            - `next-iteration`: The test is inconclusive and the test should
-                continue to the next iteration.
-            - `conclusive-ingroup`: The test is conclusive and the sequence is
-                in the ingroup.
-            - `conclusive-sister`: The test is conclusive and the sequence is
-                in the sister group.
-            - `inconclusive`: The test is inconclusive and the sequence is not
-                in the ingroup or sister group.
-            - `not-possible`: The test is not possible because the clade is a
-                leaf node.
-
-    Attributes:
-        NEXT_ITERATION (str): The test is inconclusive and the test should
-            continue to the next iteration.
-        CONCLUSIVE_INGROUP (str): The test is conclusive and the sequence is
-            in the ingroup.
-        CONCLUSIVE_SISTER (str): The test is conclusive and the sequence is
-            in the sister group.
-        MAX_DEPTH_REACHED (str): The maximum depth of the tree was reached.
-        NOT_POSSIBLE (str): The test is not possible because the clade is a
-            leaf node.
-
-    """
+    """The status of the clade adherence test."""
 
     INCONCLUSIVE = "inconclusive"
     NEXT_ITERATION = "next-iteration"
     CONCLUSIVE_INGROUP = "conclusive-ingroup"
+    CONCLUSIVE_OUTGROUP = "conclusive-outgroup"
     MAX_RESOLUTION_REACHED = "max-resolution-reached"
 
 
