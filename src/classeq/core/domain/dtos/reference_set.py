@@ -50,14 +50,14 @@ class ReferenceSet:
                     logger=LOGGER,
                 )()
 
-        tree_either = ClasseqTree.from_dict(content=content.pop("tree"))
-
-        if tree_either.is_left:
+        if (
+            tree_either := ClasseqTree.from_dict(content=content.pop("tree"))
+        ).is_left:
             return tree_either
 
-        msa_either = MsaSource.from_dict(content=content.pop("msa"))
-
-        if msa_either.is_left:
+        if (
+            msa_either := MsaSource.from_dict(content=content.pop("msa"))
+        ).is_left:
             return msa_either
 
         linear_tree: list[ClasseqClade] | None = None
@@ -90,14 +90,15 @@ class ReferenceSet:
 
     def get_hierarchical_tree(
         self,
+        force_reload_tree: bool = False,
     ) -> Either[c_exc.MappedErrors, ClasseqClade]:
         try:
             # ? ----------------------------------------------------------------
             # ? Generate the linear tree
             # ? ----------------------------------------------------------------
 
-            if self.linear_tree is None:
-                linear_tree_either = self.build_linear_tree()
+            if self.linear_tree is None or force_reload_tree is True:
+                linear_tree_either = self.build_linear_tree(force_reload_tree)
 
                 if linear_tree_either.is_left:
                     return linear_tree_either
@@ -163,6 +164,7 @@ class ReferenceSet:
 
     def build_linear_tree(
         self,
+        force_reload_tree: bool = False,
     ) -> Either[c_exc.MappedErrors, bool]:
         """Convert the original Bio.Phylo.BaseTree.Tree to a linear version
         composed of a set of `CladeWrapper` elements.
@@ -214,13 +216,13 @@ class ReferenceSet:
                     )
 
         try:
-            if self.tree.sanitized_tree is None:
-                tree_either = self.tree.parse_and_reroot_phylojson_tree(
-                    newick_file_path=self.tree.phylojson_file_path,
-                    outgroups=self.tree.outgroups,
-                )
-
-                if tree_either.is_left:
+            if self.tree.sanitized_tree is None or force_reload_tree is True:
+                if (
+                    tree_either := self.tree.parse_and_reroot_phylojson_tree(
+                        phylojson_file_path=self.tree.phylojson_file_path,
+                        outgroups=self.tree.outgroups,
+                    )
+                ).is_left:
                     return tree_either
 
                 self.tree.sanitized_tree = tree_either.value

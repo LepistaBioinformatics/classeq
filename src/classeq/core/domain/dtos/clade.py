@@ -115,6 +115,26 @@ class ClasseqClade:
     # ? Public instance methods
     # ? ------------------------------------------------------------------------
 
+    def to_dict(self, omit_children: bool = False) -> dict[str, Any]:
+        children = None
+
+        if omit_children is False:
+            children = (
+                [child.to_dict() for child in self.children]
+                if self.children is not None
+                else None
+            )
+
+        return {
+            "name": self.name,
+            "id": self.id,
+            "type": self.type,
+            "support": self.support,
+            "branch_length": self.branch_length,
+            "parent": self.parent,
+            "children": children,
+        }
+
     def get_ingroup_clades(
         self,
     ) -> Either[c_exc.MappedErrors, list[Self]]:
@@ -231,7 +251,7 @@ class ClasseqClade:
                     )
 
                     colored_support = f"\033[37m{int_support}{escape}"
-                    colored_id = f"\033[94m{child.id}{escape}"
+                    colored_id = f"\033[94m{child.name or child.id}{escape}"
 
                     if entries_length - 1 == index:
                         indent_sep = SPACE_PREFIX

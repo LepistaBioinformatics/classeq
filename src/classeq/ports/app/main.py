@@ -55,6 +55,7 @@ class TreeEditor(QMainWindow):
         self.setMinimumHeight(150)
 
         self.__main = QWidget(self)
+        self.__main.setFocus()
         self.setCentralWidget(self.__main)
 
         self.__add_widgets()
@@ -233,6 +234,8 @@ class TreeEditor(QMainWindow):
                     )
                 )
 
+                button.setFocus()
+
                 parent.treeWidget().setItemWidget(parent, 0, button)
 
             for index, element in enumerate(
@@ -293,7 +296,10 @@ class TreeEditor(QMainWindow):
             child: ExtendedBioPythonClade
             for child in sorted(
                 clade.clades,
-                key=lambda x: x.name if x.name else x._id.__str__(),
+                key=lambda x: (
+                    x.clades.__len__(),
+                    x.name if x.name else x._id.__str__(),
+                ),
             ):
                 item = QTreeWidgetItem(parent)
                 child_item = build_root_clade(clade=child, parent=item)
@@ -323,7 +329,10 @@ class TreeEditor(QMainWindow):
         )
 
         if ok:
-            self.__tree.set_clade_name(clade_id=clade_id, name=text)  # type: ignore
+            self.__tree.set_clade_name(  # type: ignore
+                clade_id=clade_id,
+                name=(text if text != "" and text is not None else None),
+            )
 
             if self.__tree is not None:
                 with self.__tree_file_path.open("w") as f:

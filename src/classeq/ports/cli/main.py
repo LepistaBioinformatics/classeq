@@ -310,7 +310,19 @@ def calculate_priors_cmd(
         exists=True,
         dir_okay=True,
     ),
-    help="The path to the priors calculated in the `priors` step.",
+    help="The path to the priors calculated in the `train` step.",
+)
+@click.option(
+    "-t",
+    "--annotated-phylojson-path",
+    required=False,
+    type=click.Path(
+        resolve_path=True,
+        readable=True,
+        exists=True,
+        dir_okay=True,
+    ),
+    help="The path to the annotated phylogeny in PHYLO-JSON format.",
 )
 @click.option(
     "--adherence-strategy",
@@ -326,12 +338,20 @@ def calculate_priors_cmd(
     ),
     help="The adherence test strategy.",
 )
-@with_resource_monitoring
+@click.option(
+    "--calculate-bootstrap",
+    is_flag=True,
+    show_default=True,
+    default=False,
+    help="Calculate bootstrap probability of clades if True.",
+)
 def infer_identity_cmd(
     fasta_file_path: str,
     references_path: str,
     priors_path: str,
     adherence_strategy: str,
+    annotated_phylojson_path: str | None = None,
+    calculate_bootstrap: bool = False,
 ) -> None:
     """Try to infer identity of multi FASTA sequences."""
 
@@ -369,11 +389,15 @@ def infer_identity_cmd(
                 tree_priors=tree_priors_either.value,
                 reference_set=reference_set_either.value,
                 adherence_strategy=AdherenceTestStrategy(adherence_strategy),
+                annotated_phylojson_path=(
+                    Path(annotated_phylojson_path)
+                    if annotated_phylojson_path is not None
+                    else None
+                ),
+                calculate_bootstrap=calculate_bootstrap,
             )
         ).is_left:
-            LOGGER.error(response.value.msg)
-            click.echo("Error: Something went wrong.")
-            exit(1)
+            raise Exception(response.value.msg)
 
     except Exception as exc:
         raise exc

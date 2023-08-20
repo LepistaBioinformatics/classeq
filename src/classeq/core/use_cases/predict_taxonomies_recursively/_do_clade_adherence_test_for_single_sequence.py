@@ -30,7 +30,7 @@ def do_clade_adherence_test_for_single_sequence(
     clade_priors: IngroupCladePriors | OutgroupCladePriors,
     kmer_indices: KmersInverseIndices,
     calculate_bootstrap: bool = False,
-    bootstrap_replicates: int = 100,
+    bootstrap_replicates: int = 50,
     adherence_strategy: AdherenceTestStrategy = AdherenceTestStrategy(None),
 ) -> Either[c_exc.MappedErrors, dict[PriorGroup, AdherenceResult]]:
     """Calculate the probability of a sequence belongs to a clade.
@@ -59,7 +59,7 @@ def do_clade_adherence_test_for_single_sequence(
     """
 
     try:
-        seed(999_999_999)
+        seed(987_654_321)
 
         # ? --------------------------------------------------------------------
         # ? Validate entries
@@ -105,21 +105,6 @@ def do_clade_adherence_test_for_single_sequence(
                 i for i in clade_priors.priors if i.group == PriorGroup.SISTER
             )
 
-            if calculate_bootstrap is True:
-                noise_group_priors = {
-                    **input_labeled_priors.priors,
-                    **sister_labeled_priors.priors,
-                }
-
-                noise_labels = set(
-                    sorted(
-                        [
-                            *list(input_labeled_priors.labels),
-                            *list(sister_labeled_priors.labels),
-                        ]
-                    )
-                )
-
             for group in [
                 input_labeled_priors,
                 sister_labeled_priors,
@@ -138,6 +123,20 @@ def do_clade_adherence_test_for_single_sequence(
                 adherence = adherence_either.value
 
                 if calculate_bootstrap is True:
+                    noise_group_priors = {
+                        **input_labeled_priors.priors,
+                        **sister_labeled_priors.priors,
+                    }
+
+                    noise_labels = set(
+                        sorted(
+                            [
+                                *list(input_labeled_priors.labels),
+                                *list(sister_labeled_priors.labels),
+                            ]
+                        )
+                    )
+
                     if (
                         calculation_either := __calculate_bootstrap(
                             query_kmers=query_kmers,
@@ -178,6 +177,9 @@ def do_clade_adherence_test_for_single_sequence(
                             )
                             / bootstrap_replicates
                         )
+
+                    del noise_group_priors
+                    del noise_labels
 
                 LOGGER.debug(f"\t\t{group.group}: {adherence}")
 
