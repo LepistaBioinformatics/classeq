@@ -1,3 +1,15 @@
+## v0.2.0 (2023-08-20)
+
+### Feat
+
+- implements the output file persistence after predictions
+- implements the annotation port to update phylogeny nodes on runtime
+- implements the phylojson parsing of tree to allow annotations
+
+### Fix
+
+- fix calculation of the adherence test and start the creation of the app port
+
 ## v0.1.0 (2023-07-22)
 
 ### Feat
