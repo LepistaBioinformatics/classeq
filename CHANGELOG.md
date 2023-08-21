@@ -1,3 +1,9 @@
+## v0.3.1 (2023-08-21)
+
+### Fix
+
+- fix user interface issues to improve the user experience
+
 ## v0.3.0 (2023-08-20)
 
 ### Feat
