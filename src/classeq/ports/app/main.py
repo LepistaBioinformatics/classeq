@@ -145,6 +145,7 @@ class TreeEditor(QMainWindow):
                 )
             ),
         }:
+            self.__nodes_tree_widget.clearSelection()
             self.__nodes_tree_widget.setItemSelected(item, True)
             self.__nodes_tree_widget.scrollToItem(item)
 
