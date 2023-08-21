@@ -28,7 +28,7 @@ classifiers = ["Programming Language :: Python :: 3.11"]
 [project.scripts]
 
 # The CLI entrypoint
-cls="classeq.ports.cli.main:classeq_cmd"
+cls = "classeq.ports.cli.main:classeq_cmd"
 
 # ? ----------------------------------------------------------------------------
 # ? Assets
@@ -38,7 +38,7 @@ cls="classeq.ports.cli.main:classeq_cmd"
 # files.
 #
 #[tool.setuptools.package-data]
-#classeq = ["assets/*.tsv.gz"]
+#classeq = ["assets/*.png", "assets/.qss"]
 
 # ? ----------------------------------------------------------------------------
 # ? Code consistence
@@ -48,7 +48,7 @@ cls="classeq.ports.cli.main:classeq_cmd"
 python_version = 3.11
 exclude = ["build/", "dist/", "docs/", "venv/"]
 ignore_missing_imports = "True"
-follow_imports  = "normal"
+follow_imports = "normal"
 warn_redundant_casts = "True"
 warn_unused_ignores = "False"
 disallow_any_generics = "True"
@@ -65,4 +65,4 @@ warn_untyped_fields = "True"
 
 [tool.flake8]
 ignore = "E722, W503, E501, E203"
-per-file-ignore="**/__init__.py: F401"
+per-file-ignore = "**/__init__.py: F401"

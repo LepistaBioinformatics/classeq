@@ -6,7 +6,8 @@ from uuid import UUID
 
 import clean_base.exceptions as c_exc
 from clean_base.either import Either, right
-from PySide2.QtCore import QRect, Qt
+from PySide2 import QtCore, QtGui
+from PySide2.QtCore import QRect
 from PySide2.QtWidgets import (
     QAbstractItemView,
     QApplication,
@@ -55,7 +56,6 @@ class TreeEditor(QMainWindow):
         self.setMinimumHeight(150)
 
         self.__main = QWidget(self)
-        self.__main.setFocus()
         self.setCentralWidget(self.__main)
 
         self.__add_widgets()
@@ -88,10 +88,14 @@ class TreeEditor(QMainWindow):
         # ? --------------------------------------------------------------------
 
         self.__search_field = QLineEdit()
-        self.__search_field.setFocusPolicy(Qt.StrongFocus)
+        self.__search_field.setFocusPolicy(QtCore.Qt.StrongFocus)
         self.__search_field.setObjectName("search_field")
         self.__search_field.setStyleSheet("font-size: 16px; height: 50px;")
         self.__search_field.setPlaceholderText("Search for a node")
+
+        self.__search_field.textChanged.connect(
+            lambda text: self.__on_text_changed(text)
+        )
 
         primary_hbox.addWidget(self.__search_field)
 
@@ -112,6 +116,7 @@ class TreeEditor(QMainWindow):
             )
         )
 
+        inner_tree_items.setColumnCount(6)
         inner_tree_items.setColumnWidth(0, 700)
         inner_tree_items.setColumnWidth(1, 80)
         inner_tree_items.setColumnWidth(2, 80)
@@ -119,10 +124,29 @@ class TreeEditor(QMainWindow):
         inner_tree_items.setColumnWidth(4, 300)
         inner_tree_items.setColumnWidth(5, 50)
         inner_tree_items.setSelectionMode(QAbstractItemView.ExtendedSelection)
-
+        inner_tree_items.setSortingEnabled(True)
         primary_hbox.addWidget(inner_tree_items)
 
         return
+
+    def __on_text_changed(self, text: str) -> None:
+        if text == "" or text is None:
+            return
+
+        for item in {
+            *set(
+                self.__nodes_tree_widget.findItems(
+                    text, QtCore.Qt.MatchRecursive, 0
+                )
+            ),
+            *set(
+                self.__nodes_tree_widget.findItems(
+                    text, QtCore.Qt.MatchRecursive, 4
+                )
+            ),
+        }:
+            self.__nodes_tree_widget.setItemSelected(item, True)
+            self.__nodes_tree_widget.scrollToItem(item)
 
     def __build_main_menu(self, parent: Any) -> None:
         self.menubar = self.menuBar()
@@ -227,14 +251,21 @@ class TreeEditor(QMainWindow):
                         "QPushButton {background-color: #4CAF50;}"
                     )
 
-                button.clicked.connect(
-                    lambda: self.__annotate_node(
+                button.setFocusPolicy(QtCore.Qt.NoFocus)
+
+                button.mouseDoubleClickEvent = (
+                    lambda event: self.__annotate_node(
                         clade_id=clade._id,
                         current_value=clade.name,
+                        event=event,
                     )
                 )
 
-                button.setFocus()
+                button.keyPressEvent = lambda event: self.__annotate_node(
+                    clade_id=clade._id,
+                    current_value=clade.name,
+                    event=event,
+                )
 
                 parent.treeWidget().setItemWidget(parent, 0, button)
 
@@ -257,21 +288,29 @@ class TreeEditor(QMainWindow):
                     (
                         "If Clade is Outgroup",
                         parent.setText,
-                        clade._is_outgroup.__str__()
-                        if clade._is_outgroup
-                        else "",
+                        (
+                            clade._is_outgroup.__str__()
+                            if clade._is_outgroup
+                            else ""
+                        ),
                     ),
                     (
                         "If Clade is Terminal",
                         parent.setText,
-                        clade.is_terminal().__str__()
-                        if clade.is_terminal()
-                        else "",
+                        (
+                            clade.is_terminal().__str__()
+                            if clade.is_terminal()
+                            else ""
+                        ),
                     ),
                     (
                         "The node unique identifier",
                         parent.setText,
-                        clade._id.__str__() if not clade.is_terminal() else "",
+                        (
+                            clade._id.__str__()
+                            if not clade.is_terminal()
+                            else ""
+                        ),
                     ),
                 ]
             ):
@@ -296,10 +335,7 @@ class TreeEditor(QMainWindow):
             child: ExtendedBioPythonClade
             for child in sorted(
                 clade.clades,
-                key=lambda x: (
-                    x.clades.__len__(),
-                    x.name if x.name else x._id.__str__(),
-                ),
+                key=lambda x: x.clades.__len__(),
             ):
                 item = QTreeWidgetItem(parent)
                 child_item = build_root_clade(clade=child, parent=item)
@@ -319,6 +355,7 @@ class TreeEditor(QMainWindow):
         self,
         clade_id: UUID,
         current_value: str | None,
+        event: QtGui.QMouseEvent,
     ) -> None:
         text, ok = QInputDialog.getText(
             self,
@@ -342,6 +379,16 @@ class TreeEditor(QMainWindow):
                     self.__set_tree_widget_content(
                         tree=ExtendedBioPythonTree.from_dict(content=load(f))
                     )
+
+            item = self.__nodes_tree_widget.findItems(
+                clade_id.__str__(), QtCore.Qt.MatchRecursive, 4
+            )[0]
+
+            self.__nodes_tree_widget.setItemSelected(item, True)
+            self.__nodes_tree_widget.scrollToItem(
+                item,
+                QAbstractItemView.PositionAtCenter,
+            )
 
         return
 

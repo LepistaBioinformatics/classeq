@@ -358,6 +358,10 @@ def infer_identity_cmd(
     LOGGER.debug(" ".join(argv))
 
     try:
+        # ? --------------------------------------------------------------------
+        # ? Load the reference set
+        # ? --------------------------------------------------------------------
+
         with gzip.open(references_path, "r") as fin:
             json_bytes = fin.read()
             json_str = json_bytes.decode("utf-8")
@@ -371,6 +375,10 @@ def infer_identity_cmd(
             click.echo("Error: Something went wrong.")
             exit(1)
 
+        # ? --------------------------------------------------------------------
+        # ? Load the priors
+        # ? --------------------------------------------------------------------
+
         with gzip.open(priors_path, "r") as fin:
             json_bytes = fin.read()
             json_str = json_bytes.decode("utf-8")
@@ -381,6 +389,10 @@ def infer_identity_cmd(
             LOGGER.error(tree_priors_either.value.msg)
             click.echo("Error: Something went wrong.")
             exit(1)
+
+        # ? --------------------------------------------------------------------
+        # ? Predict the taxonomies
+        # ? --------------------------------------------------------------------
 
         if (
             response := predict_for_multiple_fasta_file(

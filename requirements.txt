@@ -1,0 +1,10 @@
+-i https://pypi.org/simple
+attrs==23.1.0
+biopython==1.81
+clean-base==0.1.1
+numpy==1.25.2 ; python_version >= '3.9'
+pyqt5==5.15.9
+pyqt5-qt5==5.15.2
+pyqt5-sip==12.12.2 ; python_version >= '3.7'
+pyside2==5.13.2
+shiboken2==5.13.2

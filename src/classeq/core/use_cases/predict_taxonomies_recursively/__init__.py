@@ -66,7 +66,7 @@ def predict_for_multiple_fasta_file(
                 adherence_test_response_either := perform_single_sequence_phylogenetic_adherence_test(
                     target_sequence=str(record.seq),
                     reference_set=deepcopy(reference_set),
-                    tree_priors=tree_priors,
+                    tree_priors=deepcopy(tree_priors),
                     **kwargs,
                 )
             ).is_left:
