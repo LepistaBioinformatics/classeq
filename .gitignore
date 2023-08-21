@@ -7,7 +7,6 @@ build
 dist
 **/__pycache__
 *.pyc
-Pipfile.lock
 *.csv
 *#
 *.log
