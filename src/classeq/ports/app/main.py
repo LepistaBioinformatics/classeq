@@ -193,7 +193,10 @@ class TreeEditor(QMainWindow):
         ]:
             name_items.extend(item)
 
-        self.__nodes_tree_widget.scrollToItem(name_items[0])
+        self.__nodes_tree_widget.scrollToItem(
+            name_items[0],
+            QAbstractItemView.PositionAtCenter,
+        )
 
         for item in set(name_items):
             self.__nodes_tree_widget.setItemSelected(item, True)
