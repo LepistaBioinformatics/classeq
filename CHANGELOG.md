@@ -1,3 +1,9 @@
+## v0.3.5 (2023-08-22)
+
+### Fix
+
+- fix error on manage directories using cwd and refatorate predict use cases to modularize sub-use-cases
+
 ## v0.3.4 (2023-08-21)
 
 ### Fix
