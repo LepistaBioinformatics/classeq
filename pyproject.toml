@@ -21,6 +21,7 @@ requires-python = ">=3.11"
 keywords = ["Machine Learning", "Bioinformatics", "Phylogeny"]
 classifiers = ["Programming Language :: Python :: 3.11"]
 
+
 # ? ----------------------------------------------------------------------------
 # ? Entrypoints
 # ? ----------------------------------------------------------------------------
@@ -37,8 +38,8 @@ cls = "classeq.ports.cli.main:classeq_cmd"
 # Remove hashtag if non python files should be included at the installation
 # files.
 #
-#[tool.setuptools.package-data]
-#classeq = ["assets/*.png", "assets/.qss"]
+# [tool.setuptools.package-data]
+# classeq = ["assets/*.png", "assets/*.qss"]
 
 # ? ----------------------------------------------------------------------------
 # ? Code consistence

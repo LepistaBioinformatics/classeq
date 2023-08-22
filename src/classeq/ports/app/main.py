@@ -469,6 +469,12 @@ def main(phylo_json_tree: Path) -> None:
     """
 
     app = QApplication(sys.argv)
+
+    QtCore.QDir.addSearchPath(
+        "assets",
+        Path(__file__).absolute().parent.joinpath("assets").__str__(),
+    )
+
     window = TreeEditor(tree_file_path=phylo_json_tree)
     window.show()
     app.setStyleSheet(STYLE_SHEET_DARK.read_text())

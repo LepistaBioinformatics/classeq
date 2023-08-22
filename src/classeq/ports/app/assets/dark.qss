@@ -283,27 +283,27 @@ QMenu::separator {
 /* TreeView */
 
 QTreeView::branch:has-siblings:!adjoins-item {
-    border-image: url(src/classeq/ports/app/assets/vline.png) 0;
+	border-image: url(assets:/vline.png) 0;
 }
 
 QTreeView::branch:has-siblings:adjoins-item {
-    border-image: url(src/classeq/ports/app/assets/branch-more.png) 0;
+	border-image: url(assets:/branch-more.png) 0;
 }
 
 QTreeView::branch:!has-children:!has-siblings:adjoins-item {
-    border-image: url(src/classeq/ports/app/assets/branch-end.png) 0;
+	border-image: url(assets:/branch-end.png) 0;
 }
 
 QTreeView::branch:has-children:!has-siblings:closed,
 QTreeView::branch:closed:has-children:has-siblings {
 	border-image: none;
-	image: url(src/classeq/ports/app/assets/branch-closed.png);
+	image: url(assets:/branch-closed.png);
 }
 
 QTreeView::branch:open:has-children:!has-siblings,
 QTreeView::branch:open:has-children:has-siblings  {
 	border-image: none;
-	image: url(src/classeq/ports/app/assets/branch-open.png);
+	image: url(assets:/branch-open.png);
 }
 
 QTreeView::item::hover {
