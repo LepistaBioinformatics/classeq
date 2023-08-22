@@ -1,3 +1,9 @@
+## v0.3.4 (2023-08-21)
+
+### Fix
+
+- fix the search by uuids of clades
+
 ## v0.3.3 (2023-08-21)
 
 ### Fix
