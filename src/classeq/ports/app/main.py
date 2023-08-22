@@ -1,7 +1,7 @@
 import sys
 from json import dump, load
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Generator, Literal
 from uuid import UUID
 
 import clean_base.exceptions as c_exc
@@ -130,24 +130,73 @@ class TreeEditor(QMainWindow):
         return
 
     def __on_text_changed(self, text: str) -> None:
-        if text == "" or text is None:
+        self.__nodes_tree_widget.clearSelection()
+
+        if text == "" or text is None or text.__len__() < 3:
             return
 
-        for item in {
-            *set(
-                self.__nodes_tree_widget.findItems(
-                    text, QtCore.Qt.MatchRecursive, 0
-                )
+        name_items: list[QTreeWidgetItem] = []
+        names_field_index = 0
+        ids_field_index = 4
+        children: list[QTreeWidgetItem] = []
+
+        def recursive_find_in_children(
+            items: list[QTreeWidgetItem],
+            text: str,
+            field_index: int,
+        ) -> Generator[list[QTreeWidgetItem], None, None]:
+            """Recursively find the nodes that match the search criteria.
+
+            Args:
+                items (list[QTreeWidgetItem]): The list of items to search.
+                text (str): The text to search for.
+                field_index (int): The field index to search for.
+
+            Yields:
+                Generator[list[QTreeWidgetItem], None, None]: The list of nodes
+                    that match the search criteria.
+
+            """
+
+            for item in items:
+                for child in [item.child(i) for i in range(item.childCount())]:
+                    if child.text(field_index).lower().find(text.lower()) != -1:
+                        children.append(child)
+
+                    if child.childCount() > 0:
+                        yield from recursive_find_in_children(
+                            [child.child(i) for i in range(child.childCount())],
+                            text,
+                            field_index,
+                        )
+                yield children
+
+        for item in [
+            *recursive_find_in_children(
+                items=self.__nodes_tree_widget.findItems(
+                    None,
+                    QtCore.Qt.MatchRecursive,
+                    names_field_index,
+                ),
+                text=text,
+                field_index=names_field_index,
             ),
-            *set(
-                self.__nodes_tree_widget.findItems(
-                    text, QtCore.Qt.MatchRecursive, 4
-                )
+            *recursive_find_in_children(
+                items=self.__nodes_tree_widget.findItems(
+                    None,
+                    QtCore.Qt.MatchContains,
+                    ids_field_index,
+                ),
+                text=text,
+                field_index=ids_field_index,
             ),
-        }:
-            self.__nodes_tree_widget.clearSelection()
+        ]:
+            name_items.extend(item)
+
+        self.__nodes_tree_widget.scrollToItem(name_items[0])
+
+        for item in set(name_items):
             self.__nodes_tree_widget.setItemSelected(item, True)
-            self.__nodes_tree_widget.scrollToItem(item)
 
     def __build_main_menu(self, parent: Any) -> None:
         self.menubar = self.menuBar()
