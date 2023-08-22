@@ -1,3 +1,9 @@
+## v0.3.3 (2023-08-21)
+
+### Fix
+
+- include the center option to focus on the first element found into a single search
+
 ## v0.3.2 (2023-08-21)
 
 ### Fix
