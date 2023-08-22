@@ -1,3 +1,10 @@
+## v0.3.2 (2023-08-21)
+
+### Fix
+
+- fix the nodes search to allow subsearches and case insensitive searches
+- include clear selection option on search nodes into treeview of app
+
 ## v0.3.1 (2023-08-21)
 
 ### Fix
