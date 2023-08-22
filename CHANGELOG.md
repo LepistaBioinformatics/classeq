@@ -1,3 +1,9 @@
+## v0.3.6 (2023-08-22)
+
+### Fix
+
+- fix url of images that compose user-interface
+
 ## v0.3.5 (2023-08-22)
 
 ### Fix
