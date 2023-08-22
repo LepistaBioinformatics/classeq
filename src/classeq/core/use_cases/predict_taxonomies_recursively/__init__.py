@@ -114,18 +114,17 @@ def predict_for_multiple_fasta_file(
             output_file_path = fasta_path.parent.joinpath(
                 fasta_path.stem
             ).with_suffix(".json")
+        else:
+            if output_file_path.suffix != ".json":
+                output_file_path = output_file_path.with_suffix(".json")
 
-        LOGGER.info(
-            f"Saving output to `{output_file_path.relative_to(Path.cwd())}`"
-        )
+        LOGGER.info(f"Saving output to `{output_file_path}`")
 
         if output_file_path.exists():
-            LOGGER.warning(
-                f"Output file `{output_file_path.relative_to(Path.cwd())}` overwritten"
-            )
+            LOGGER.warning(f"Output file `{output_file_path}` overwritten")
             output_file_path.unlink()
 
-        with output_file_path.open("w") as f:
+        with output_file_path.open("w+") as f:
             dump(
                 {
                     "input": str(fasta_path),

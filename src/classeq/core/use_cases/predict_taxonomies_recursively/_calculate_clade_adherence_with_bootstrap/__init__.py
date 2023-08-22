@@ -7,7 +7,7 @@ from classeq.core.domain.dtos.kmer_inverse_index import KmersInverseIndices
 from classeq.core.domain.dtos.priors import LabeledPriors
 from classeq.settings import LOGGER
 
-from .._calculate_probability_of_group_contains_kmer import (
+from ._calculate_probability_of_group_contains_kmer import (
     calculate_probability_of_group_contains_kmer,
 )
 from ._dtos import AdherenceResult, AdherenceStatus, AdherenceTestStrategy

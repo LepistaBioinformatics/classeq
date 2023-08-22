@@ -23,8 +23,6 @@ from classeq.core.use_cases.train_from_single_phylogeny import (
 )
 from classeq.settings import LOGGER
 
-from .decorators import with_resource_monitoring
-
 # ? ----------------------------------------------------------------------------
 # ? Initialize the CLI groups
 # ? ----------------------------------------------------------------------------
@@ -150,7 +148,6 @@ def pipe_cmd() -> None:
         + "be into a separate line."
     ),
 )
-@with_resource_monitoring
 def parse_source_files_cmd(
     fasta_file_path: str,
     tree_file_path: str,
@@ -225,7 +222,6 @@ def __load_outgroups_from_file(file: Path) -> list[str]:
     ),
     help="The path to the reference file set calculated during data loading.",
 )
-@with_resource_monitoring
 def calculate_priors_cmd(
     references: str,
     **_: Any,
@@ -313,6 +309,13 @@ def calculate_priors_cmd(
     help="The path to the priors calculated in the `train` step.",
 )
 @click.option(
+    "-o",
+    "--output-file-path",
+    required=False,
+    type=click.Path(exists=False),
+    help="The path to persist predictions output.",
+)
+@click.option(
     "-t",
     "--annotated-phylojson-path",
     required=False,
@@ -352,6 +355,7 @@ def infer_identity_cmd(
     adherence_strategy: str,
     annotated_phylojson_path: str | None = None,
     calculate_bootstrap: bool = False,
+    output_file_path: str | None = None,
 ) -> None:
     """Try to infer identity of multi FASTA sequences."""
 
@@ -407,6 +411,11 @@ def infer_identity_cmd(
                     else None
                 ),
                 calculate_bootstrap=calculate_bootstrap,
+                output_file_path=(
+                    Path(output_file_path)
+                    if output_file_path is not None
+                    else None
+                ),
             )
         ).is_left:
             raise Exception(response.value.msg)

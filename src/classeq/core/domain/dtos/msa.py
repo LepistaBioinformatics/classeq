@@ -97,9 +97,9 @@ class MsaSource:
             )
 
             LOGGER.info("Sanitized MSA should be persisted to:")
-            LOGGER.info(f"\t{cleaned_file_path.relative_to(Path.cwd())}")
+            LOGGER.info(f"\t{cleaned_file_path}")
 
-            with cleaned_file_path.open("w") as out:
+            with cleaned_file_path.open("w+") as out:
                 for record in SeqIO.parse(
                     handle=source_file_path,
                     format=format.value,

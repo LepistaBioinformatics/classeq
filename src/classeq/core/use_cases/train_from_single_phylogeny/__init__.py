@@ -1,6 +1,5 @@
 import gzip
 from json import dump
-from pathlib import Path
 
 import clean_base.exceptions as c_exc
 from attrs import asdict
@@ -62,7 +61,7 @@ def train_from_single_phylogeny(
         )
 
         LOGGER.info("Train output file would be persisted to:")
-        LOGGER.info(f"\t{train_output_file_path.relative_to(Path.cwd())}")
+        LOGGER.info(f"\t{train_output_file_path}")
 
         with gzip.open(
             train_output_file_path, "wt", encoding="utf-8"

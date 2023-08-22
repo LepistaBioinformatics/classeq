@@ -35,6 +35,9 @@ def load_source_files(
             else output_directory
         )
 
+        if not train_output_dir.is_dir():
+            train_output_dir.mkdir(parents=True)
+
         # ? --------------------------------------------------------------------
         # ? Load MSA
         # ? --------------------------------------------------------------------
@@ -146,7 +149,7 @@ def load_source_files(
         )
 
         LOGGER.info("Load output file would be persisted to:")
-        LOGGER.info(f"\t{train_output_file_path.relative_to(Path.cwd())}")
+        LOGGER.info(f"\t{train_output_file_path}")
 
         with gzip.open(
             train_output_file_path, "wt", encoding="utf-8"

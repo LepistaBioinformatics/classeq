@@ -1,5 +1,4 @@
 from copy import copy, deepcopy
-from enum import Enum
 from typing import Any
 
 import clean_base.exceptions as c_exc
@@ -11,23 +10,19 @@ from classeq.core.domain.dtos.priors import PriorGroup, TreePriors
 from classeq.core.domain.dtos.reference_set import ReferenceSet
 from classeq.settings import DEFAULT_KMER_SIZE, LOGGER
 
-from ._calculate_clade_adherence_with_bootstrap._dtos import (
+from .._calculate_clade_adherence_with_bootstrap._dtos import (
     AdherenceResult,
     AdherenceStatus,
 )
-from ._do_clade_adherence_test_for_single_sequence import (
+from .._do_clade_adherence_test_for_single_sequence import (
     do_clade_adherence_test_for_single_sequence,
 )
-from ._perform_adherence_test_of_child_clades import (
+from .._perform_adherence_test_of_child_clades import (
     CladeAdherenceResult,
     CladeAdherenceResultStatus,
     perform_adherence_test_of_child_clades,
 )
-
-
-class AdherenceTestResultGroup(Enum):
-    OUTGROUP = "outgroup"
-    INGROUP = "ingroup"
+from ._dtos import AdherenceTestResultGroup
 
 
 def perform_single_sequence_phylogenetic_adherence_test(
@@ -57,6 +52,9 @@ def perform_single_sequence_phylogenetic_adherence_test(
         target_sequence (str): The sequence to be tested.
         reference_set (ReferenceSet): The reference set.
         tree_priors (TreePriors): The tree priors.
+        k_size (int, optional): The kmer size. Defaults to DEFAULT_KMER_SIZE.
+        max_iterations (int, optional): The maximum number of iterations.
+            Defaults to 1000.
 
     Returns:
         Either[c_exc.MappedErrors, bool]: The result of the test.

@@ -154,7 +154,7 @@ def load_and_sanitize_phylogeny(
         )
 
         LOGGER.info("Sanitized TREE as NEWICK would be persisted to:")
-        LOGGER.info(f"\t{cleaned_tree_file_path.relative_to(Path.cwd())}")
+        LOGGER.info(f"\t{cleaned_tree_file_path}")
 
         Phylo.write(
             sanitized_tree,
@@ -167,7 +167,7 @@ def load_and_sanitize_phylogeny(
         )
 
         LOGGER.info("Sanitized TREE as JSON would be persisted to:")
-        LOGGER.info(f"\t{cleaned_json_file_path.relative_to(Path.cwd())}")
+        LOGGER.info(f"\t{cleaned_json_file_path}")
 
         with cleaned_json_file_path.open("w+") as f:
             dump(sanitized_tree.to_dict(), f, indent=4, default=str)

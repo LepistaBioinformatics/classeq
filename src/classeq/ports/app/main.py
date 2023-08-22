@@ -7,7 +7,6 @@ from uuid import UUID
 import clean_base.exceptions as c_exc
 from clean_base.either import Either, right
 from PySide2 import QtCore, QtGui
-from PySide2.QtCore import QRect
 from PySide2.QtWidgets import (
     QAbstractItemView,
     QApplication,
@@ -52,7 +51,7 @@ class TreeEditor(QMainWindow):
         super(TreeEditor, self).__init__(parent)
 
         self.setWindowTitle("Classeq Tree Editor")
-        self.setGeometry(QRect(200, 200, 800, 600))
+        self.setGeometry(QtCore.QRect(200, 200, 800, 600))
         self.setMinimumHeight(150)
 
         self.__main = QWidget(self)
