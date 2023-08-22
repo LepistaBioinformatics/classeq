@@ -138,7 +138,6 @@ class TreeEditor(QMainWindow):
         name_items: list[QTreeWidgetItem] = []
         names_field_index = 0
         ids_field_index = 4
-        children: list[QTreeWidgetItem] = []
 
         def recursive_find_in_children(
             items: list[QTreeWidgetItem],
@@ -158,9 +157,23 @@ class TreeEditor(QMainWindow):
 
             """
 
+            children: list[QTreeWidgetItem] = []
+
             for item in items:
+                if (
+                    item.text(field_index).__str__().lower().find(text.lower())
+                    > -1
+                ):
+                    children.append(item)
+
                 for child in [item.child(i) for i in range(item.childCount())]:
-                    if child.text(field_index).lower().find(text.lower()) != -1:
+                    if (
+                        child.text(field_index)
+                        .__str__()
+                        .lower()
+                        .find(text.lower())
+                        > -1
+                    ):
                         children.append(child)
 
                     if child.childCount() > 0:
@@ -169,7 +182,8 @@ class TreeEditor(QMainWindow):
                             text,
                             field_index,
                         )
-                yield children
+
+            yield children
 
         for item in [
             *recursive_find_in_children(
@@ -193,10 +207,11 @@ class TreeEditor(QMainWindow):
         ]:
             name_items.extend(item)
 
-        self.__nodes_tree_widget.scrollToItem(
-            name_items[0],
-            QAbstractItemView.PositionAtCenter,
-        )
+        if len(name_items) > 0:
+            self.__nodes_tree_widget.scrollToItem(
+                name_items[0],
+                QAbstractItemView.PositionAtCenter,
+            )
 
         for item in set(name_items):
             self.__nodes_tree_widget.setItemSelected(item, True)
