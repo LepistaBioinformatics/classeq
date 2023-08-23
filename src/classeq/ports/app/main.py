@@ -6,7 +6,7 @@ from uuid import UUID
 
 import clean_base.exceptions as c_exc
 from clean_base.either import Either, right
-from PySide2 import QtCore, QtGui
+from PySide2 import QtCore
 from PySide2.QtWidgets import (
     QAbstractItemView,
     QApplication,
@@ -290,6 +290,8 @@ class TreeEditor(QMainWindow):
         self.__tree = tree
         self.__nodes_tree_widget.clear()
 
+        LOGGER.info("Building tree widget")
+
         def build_root_clade(
             clade: ExtendedBioPythonClade,
             parent: QTreeWidgetItem,
@@ -320,18 +322,14 @@ class TreeEditor(QMainWindow):
 
                 button.setFocusPolicy(QtCore.Qt.NoFocus)
 
-                button.mouseDoubleClickEvent = (
-                    lambda event: self.__annotate_node(
-                        clade_id=clade._id,
-                        current_value=clade.name,
-                        event=event,
-                    )
-                )
-
-                button.keyPressEvent = lambda event: self.__annotate_node(
+                button.mouseDoubleClickEvent = lambda _: self.__annotate_node(
                     clade_id=clade._id,
                     current_value=clade.name,
-                    event=event,
+                )
+
+                button.keyPressEvent = lambda _: self.__annotate_node(
+                    clade_id=clade._id,
+                    current_value=clade.name,
                 )
 
                 parent.treeWidget().setItemWidget(parent, 0, button)
@@ -406,15 +404,24 @@ class TreeEditor(QMainWindow):
             ):
                 item = QTreeWidgetItem(parent)
                 child_item = build_root_clade(clade=child, parent=item)
-                build_recursive_children(child, child_item)
+
+                if child.clades.__len__() > 0:
+                    build_recursive_children(child, child_item)
 
             return
 
         root_item = QTreeWidgetItem(self.__nodes_tree_widget)
         root_node = self.__tree.root
+
+        LOGGER.info("\tBuilding tree root")
+
         root_item = build_root_clade(clade=root_node, parent=root_item)
 
+        LOGGER.info("\tBuilding tree children")
+
         build_recursive_children(root_node, root_item)
+
+        LOGGER.info("\tBuilding done")
 
         return
 
@@ -422,7 +429,6 @@ class TreeEditor(QMainWindow):
         self,
         clade_id: UUID,
         current_value: str | None,
-        event: QtGui.QMouseEvent,
     ) -> None:
         text, ok = QInputDialog.getText(
             self,
@@ -433,19 +439,25 @@ class TreeEditor(QMainWindow):
         )
 
         if ok:
+            LOGGER.info("Updating node name")
             self.__tree.set_clade_name(  # type: ignore
                 clade_id=clade_id,
                 name=(text if text != "" and text is not None else None),
             )
 
+            LOGGER.info("Persisting tree")
             if self.__tree is not None:
+                LOGGER.info("\tSaving tree")
                 with self.__tree_file_path.open("w") as f:
                     dump(self.__tree.to_dict(), f, indent=4, default=str)  # type: ignore
 
+                LOGGER.info("\tReloading tree")
                 with self.__tree_file_path.open("r") as f:
                     self.__set_tree_widget_content(
                         tree=ExtendedBioPythonTree.from_dict(content=load(f))
                     )
+
+            LOGGER.info("Persisting Finished")
 
             item = self.__nodes_tree_widget.findItems(
                 clade_id.__str__(), QtCore.Qt.MatchRecursive, 4
@@ -456,6 +468,8 @@ class TreeEditor(QMainWindow):
                 item,
                 QAbstractItemView.PositionAtCenter,
             )
+
+            LOGGER.info("Done")
 
         return
 

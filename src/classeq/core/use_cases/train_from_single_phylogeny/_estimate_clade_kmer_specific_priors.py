@@ -10,7 +10,7 @@ from classeq.core.domain.dtos.kmer_inverse_index import (
 from classeq.settings import LOGGER
 
 
-def estimate_clade_kmer_specific_priors(
+def estimate_kmer_specific_priors_of_clade(
     kmer_indices: KmersInverseIndices,
     sequence_codes: list[int],
     corpus_size: int,
@@ -36,19 +36,19 @@ def estimate_clade_kmer_specific_priors(
         target_indices: set[KmerIndex] = set()
 
         for index in kmer_indices.indices:
-            for code in sequence_codes:
-                if index.contains(code):
-                    target_indices.add(index)
-                    continue
+            if set(index.records).isdisjoint(sequence_codes):
+                continue
 
-        for kmer_index in iter(target_indices):
-            n = [i for i in kmer_index.records if i in sequence_codes]
+            target_indices.add(index)
 
-            if len(n) == 0:
+        for index in iter(target_indices):
+            n = len(set(index.records).intersection(sequence_codes))
+
+            if n == 0:
                 raise
 
-            prior = (len(n) + 0.5) / (corpus_size + 1)
-            kmers_priors_for_clade[kmer_index.kmer] = round(prior, 8)
+            prior = (n + 0.5) / (corpus_size + 1)
+            kmers_priors_for_clade[index.kmer] = prior
 
         return right(kmers_priors_for_clade)
 

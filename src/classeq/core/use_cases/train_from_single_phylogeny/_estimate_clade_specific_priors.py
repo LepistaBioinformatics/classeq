@@ -117,9 +117,9 @@ def estimate_clade_specific_priors(
             root=root,
             outgroups=outgroup_nodes,
             ingroups=[
-                i
-                for i in references.linear_tree
-                if i.id not in [root.id, *[o.id for o in outgroup_nodes]]
+                ingroup
+                for ingroup in references.linear_tree
+                if ingroup.id not in [root.id, *[o.id for o in outgroup_nodes]]
             ],
             kmer_indices=references.msa.kmers_indices,
             min_clade_size=min_clade_size,

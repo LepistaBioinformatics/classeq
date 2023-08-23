@@ -1,4 +1,3 @@
-from copy import deepcopy
 from typing import Any
 
 import clean_base.exceptions as c_exc
@@ -132,7 +131,7 @@ def perform_adherence_test_of_child_clades(
                 if ingroup.joint_probability < sister.joint_probability:
                     contrasting_clades.add(
                         CladeAdherenceResult(
-                            clade=deepcopy(clade),
+                            clade=clade,
                             ingroup_adherence_test=ingroup,
                             sister_adherence_test=sister,
                         )
@@ -141,7 +140,7 @@ def perform_adherence_test_of_child_clades(
                 if ingroup.match_kmers > sister.match_kmers:
                     contrasting_clades.add(
                         CladeAdherenceResult(
-                            clade=deepcopy(clade),
+                            clade=clade,
                             ingroup_adherence_test=ingroup,
                             sister_adherence_test=sister,
                         )

@@ -5,6 +5,7 @@ import clean_base.exceptions as c_exc
 from clean_base.either import Either, right
 
 from classeq.core.domain.dtos.kmer_inverse_index import KmersInverseIndices
+from classeq.core.domain.dtos.ordered_tuple import OrderedTuple
 from classeq.core.domain.dtos.priors import NoiseGroupLabeledPriors
 from classeq.settings import LOGGER
 
@@ -20,7 +21,7 @@ def bootstrap_priors(
     bootstrap_replicates: int,
     sample_size: int,
     noise_group_priors: dict[str, float],
-    noise_group_labels: set[str],
+    noise_group_labels: set[int],
     **kwargs: Any,
 ) -> Either[c_exc.MappedErrors, tuple[list[float], list[int]]]:
     """Calculate bootstrap for adherence test.
@@ -55,7 +56,7 @@ def bootstrap_priors(
             )
 
             noise_group = NoiseGroupLabeledPriors(
-                labels=noise_group_labels,
+                labels=OrderedTuple(noise_group_labels),
                 priors={item[0]: item[1] for item in priors_sample},
             )
 

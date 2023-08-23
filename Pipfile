@@ -9,6 +9,7 @@ attrs = "*"
 clean-base = "*"
 pyside2 = "*"
 pyqt5 = "*"
+maturin = "*"
 
 [dev-packages]
 black = "*"

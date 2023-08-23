@@ -1,10 +1,8 @@
-from __future__ import annotations
-
 from collections import defaultdict
 from hashlib import md5
 from itertools import islice
 from pathlib import Path
-from typing import Any, DefaultDict, Iterator, Self
+from typing import Any, Iterator, Self
 
 import clean_base.exceptions as c_exc
 from attrs import define, field, frozen
@@ -12,12 +10,8 @@ from Bio import SeqIO
 from clean_base.either import Either, right
 
 from classeq.core.domain.dtos.msa_source_format import MsaSourceFormatEnum
+from classeq.core.domain.dtos.ordered_tuple import OrderedTuple
 from classeq.settings import LOGGER
-
-
-class OrderedKmerRecords(tuple[int, ...]):
-    def __new__(cls, values: tuple[int, ...] | list[int] | set[int]) -> Self:
-        return super(OrderedKmerRecords, cls).__new__(cls, tuple(sorted(values)))  # type: ignore
 
 
 @define(kw_only=True)
@@ -27,7 +21,7 @@ class KmerIndex:
     # ? ------------------------------------------------------------------------
 
     kmer: str = field()
-    records: OrderedKmerRecords = field()
+    records: OrderedTuple = field()
 
     # ? ------------------------------------------------------------------------
     # ? Life cycle hook methods
@@ -67,7 +61,7 @@ class KmerIndex:
                 logger=LOGGER,
             )()
 
-        return right(cls(kmer=kmer, records=OrderedKmerRecords(records)))
+        return right(cls(kmer=kmer, records=OrderedTuple(records)))
 
     # ? ------------------------------------------------------------------------
     # ? Public instance methods
@@ -102,7 +96,7 @@ class KmersInverseIndices:
     # ? ------------------------------------------------------------------------
 
     indices: tuple[KmerIndex, ...] = field(default=tuple())
-    hashes: tuple[int, ...] = field()
+    hashes: OrderedTuple = field()
 
     # ? ------------------------------------------------------------------------
     # ? Public class methods
@@ -133,10 +127,16 @@ class KmersInverseIndices:
 
             kmer_indices.append(kmer_index_either.value)
 
+        if (hashes := content.get("hashes")) is None:
+            return c_exc.DadaTransferObjectError(
+                "Invalid content detected on parse `hashes` from JSON dump",
+                logger=LOGGER,
+            )()
+
         return right(
             cls(
                 indices=tuple(kmer_indices),
-                hashes=tuple(sorted(content.get("hashes"))),  # type: ignore
+                hashes=OrderedTuple(hashes),
             )
         )
 
@@ -150,7 +150,7 @@ class KmersInverseIndices:
         source_file_path: Path,
         format: MsaSourceFormatEnum,
         k_size: int,
-        headers_map: DefaultDict[str, int],
+        headers_map: defaultdict[str, int],
     ) -> Either[c_exc.MappedErrors, Self]:
         try:
             if not source_file_path.is_file():
@@ -158,7 +158,7 @@ class KmersInverseIndices:
                     f"Invalid path: {source_file_path}"
                 )()
 
-            kmer_indices: DefaultDict[str, set[int]] = defaultdict(set)
+            kmer_indices: defaultdict[str, set[int]] = defaultdict(set)
 
             for record in SeqIO.parse(
                 handle=source_file_path,
@@ -173,9 +173,7 @@ class KmersInverseIndices:
                         )
                     ]
                 ):
-                    header_index = headers_map.get(record.id)
-
-                    if header_index is None:
+                    if (header_index := headers_map.get(record.id)) is None:
                         return c_exc.DadaTransferObjectError(
                             "Unexpected unmatch between kmer indices and "
                             + f"MSA sequence headers: {record.id}",
@@ -190,7 +188,7 @@ class KmersInverseIndices:
                     [
                         KmerIndex(
                             kmer=kmer,
-                            records=OrderedKmerRecords(codes),
+                            records=OrderedTuple(codes),
                         )
                         for kmer, codes in kmer_indices.items()
                     ],
@@ -201,7 +199,7 @@ class KmersInverseIndices:
             return right(
                 cls(
                     indices=indices,
-                    hashes=tuple(i.__hash__() for i in indices),
+                    hashes=OrderedTuple([i.__hash__() for i in indices]),
                 )
             )
 

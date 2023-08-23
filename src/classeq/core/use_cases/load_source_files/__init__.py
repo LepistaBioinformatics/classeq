@@ -12,7 +12,7 @@ from classeq.core.domain.dtos.msa import MsaSource, MsaSourceFormatEnum
 from classeq.core.domain.dtos.reference_set import ReferenceSet
 from classeq.core.domain.dtos.tree import ClasseqTree
 from classeq.core.domain.dtos.tree_source_format import TreeSourceFormatEnum
-from classeq.settings import DEFAULT_KMER_SIZE, LOGGER
+from classeq.settings import LOGGER
 
 from ._load_and_sanitize_phylogeny import load_and_sanitize_phylogeny
 from ._load_and_sanitize_sequences import load_and_sanitize_sequences
@@ -24,8 +24,8 @@ def load_source_files(
     tree_file_path: Path,
     tree_format: TreeSourceFormatEnum,
     outgroups: list[str],
+    k_size: int,
     output_directory: Path | None = None,
-    k_size: int = DEFAULT_KMER_SIZE,
     support_value_cutoff: int = 99,
 ) -> Either[c_exc.MappedErrors, ReferenceSet]:
     try:
@@ -123,6 +123,7 @@ def load_source_files(
         LOGGER.info("Building output")
 
         references = ReferenceSet(
+            kmer_size=k_size,
             tree=tree,
             msa=msa,
             labels_map=labels_map,
@@ -148,7 +149,7 @@ def load_source_files(
             )
         )
 
-        LOGGER.info("Load output file would be persisted to:")
+        LOGGER.info("Output file persisted to:")
         LOGGER.info(f"\t{train_output_file_path}")
 
         with gzip.open(
@@ -161,6 +162,7 @@ def load_source_files(
             dump(
                 asdict(
                     ReferenceSet(
+                        kmer_size=k_size,
                         tree=tree_artifact,
                         msa=references.msa,
                         labels_map=references.labels_map,

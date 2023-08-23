@@ -1,4 +1,4 @@
-from copy import copy, deepcopy
+from copy import copy
 from typing import Any
 
 import clean_base.exceptions as c_exc
@@ -8,7 +8,7 @@ from classeq.core.domain.dtos.clade import ClasseqClade
 from classeq.core.domain.dtos.kmer_inverse_index import KmersInverseIndices
 from classeq.core.domain.dtos.priors import PriorGroup, TreePriors
 from classeq.core.domain.dtos.reference_set import ReferenceSet
-from classeq.settings import DEFAULT_KMER_SIZE, LOGGER
+from classeq.settings import LOGGER
 
 from .._calculate_clade_adherence_with_bootstrap._dtos import (
     AdherenceResult,
@@ -29,7 +29,6 @@ def perform_single_sequence_phylogenetic_adherence_test(
     target_sequence: str,
     reference_set: ReferenceSet,
     tree_priors: TreePriors,
-    k_size: int = DEFAULT_KMER_SIZE,
     max_iterations: int = 1000,
     **kwargs: Any,
 ) -> Either[
@@ -106,7 +105,7 @@ def perform_single_sequence_phylogenetic_adherence_test(
             kmer
             for kmer in KmersInverseIndices.generate_kmers(
                 dna_sequence=target_sequence.upper(),
-                k_size=k_size,
+                k_size=reference_set.kmer_size,
             )
         }
 
@@ -181,30 +180,35 @@ def perform_single_sequence_phylogenetic_adherence_test(
         joint_probability: AdherenceResult
         status = CladeAdherenceResultStatus.NEXT_ITERATION
         local_max_iterations = copy(max_iterations)
-        response_clades: list[ClasseqClade] = deepcopy(ingroup_clades)
+        response_clades: list[ClasseqClade] = ingroup_clades
         current_iteration: int = 0
 
         final_response: ClasseqClade | AdherenceTestResultGroup = (
             AdherenceTestResultGroup.OUTGROUP
         )
 
-        clade_path: list[ClasseqClade] = list()
+        clade_path: list[CladeAdherenceResult] = list()
 
         while (
             response_clades
             and status == CladeAdherenceResultStatus.NEXT_ITERATION
         ):
-            clade = response_clades.pop(0)
-            clade_path.append(clade)
             current_iteration += 1
+            # clade = response_clades.pop(0)
+            # clade_path.append(clade)
 
-            if (children := clade.children) is None:
-                continue
+            if len(response_clades) == 1:
+                clade = response_clades.pop(0)
+                if (children := clade.children) is None:
+                    continue
+            else:
+                children = response_clades
+                response_clades = list()
 
             children = [i for i in children if i.is_internal()]
 
             if len(children) == 0:
-                final_response = clade
+                # final_response = clade
                 break
 
             if (
@@ -229,17 +233,28 @@ def perform_single_sequence_phylogenetic_adherence_test(
             LOGGER.debug("")
             LOGGER.debug(f"\tStatus: {status}")
 
+            if response_children is not None:
+                clade_path.append(response_children)
+
+            # ------------------------------------------------------------------
+            # Break the search if the adherence test is inconclusive due to
+            # absence of priors to perform comparisons.
+            # ------------------------------------------------------------------
+            if status == CladeAdherenceResultStatus.MAX_RESOLUTION_REACHED:
+                # final_response = clade
+                break
+
             # ------------------------------------------------------------------
             # Break the search if the adherence test is inconclusive due to
             # absence of priors to perform comparisons.
             # ------------------------------------------------------------------
             if joint_probability.status == AdherenceStatus.NOT_ENOUGH_PRIORS:
                 LOGGER.warning(
-                    f"Unable to classify clade `{clade}`. Not enough "
+                    f"Unable to classify clade `{'clade'}`. Not enough "
                     + "priors evidences to run comparisons."
                 )
 
-                status = CladeAdherenceResultStatus.CONCLUSIVE_OUTGROUP
+                status = CladeAdherenceResultStatus.INCONCLUSIVE
                 break
 
             # ------------------------------------------------------------------
@@ -254,8 +269,7 @@ def perform_single_sequence_phylogenetic_adherence_test(
                 > joint_probability.match_kmers
             ):
                 LOGGER.debug(
-                    "The processed sequence does not differs from "
-                    + f"outgroup: {clade}"
+                    "The processed sequence does not differs from outgroup"
                 )
 
                 status = CladeAdherenceResultStatus.CONCLUSIVE_OUTGROUP
@@ -280,7 +294,7 @@ def perform_single_sequence_phylogenetic_adherence_test(
             # be broken.
             # ------------------------------------------------------------------
             else:
-                final_response = clade
+                # final_response = clade
                 break
 
             # ------------------------------------------------------------------

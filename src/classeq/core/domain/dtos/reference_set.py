@@ -1,6 +1,6 @@
 from collections import defaultdict
 from copy import deepcopy
-from typing import Any, DefaultDict, Self
+from typing import Any, Self
 from uuid import UUID
 
 import clean_base.exceptions as c_exc
@@ -23,9 +23,10 @@ class ReferenceSet:
     # ? Class attributes
     # ? ------------------------------------------------------------------------
 
+    kmer_size: int = field()
     tree: ClasseqTree = field()
     msa: MsaSource = field()
-    labels_map: DefaultDict[str, int] = field()
+    labels_map: defaultdict[str, int] = field()
     linear_tree: tuple[ClasseqClade, ...] | None = field(default=None)
 
     # ? ------------------------------------------------------------------------
@@ -38,6 +39,7 @@ class ReferenceSet:
         content: dict[str, Any],
     ) -> Either[c_exc.MappedErrors, Self]:
         for key in [
+            "kmer_size",
             "tree",
             "msa",
             "labels_map",
@@ -75,6 +77,7 @@ class ReferenceSet:
 
         return right(
             cls(
+                kmer_size=content.pop("kmer_size"),
                 tree=tree_either.value,
                 msa=msa_either.value,
                 labels_map=defaultdict(int, content.pop("labels_map")),  # type: ignore

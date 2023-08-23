@@ -1,26 +1,25 @@
 from uuid import UUID
 
 import clean_base.exceptions as c_exc
+from Bio.Phylo.BaseTree import Tree
 from clean_base.either import Either, right
 
 from classeq.core.domain.dtos.clade import ClasseqClade
 from classeq.core.domain.dtos.kmer_inverse_index import KmersInverseIndices
+from classeq.core.domain.dtos.ordered_tuple import OrderedTuple
 from classeq.core.domain.dtos.priors import (
     IngroupCladePriors,
     IngroupLabeledPriors,
-    LabeledPriors,
     OutgroupCladePriors,
     OutgroupLabeledPriors,
-    PriorGroup,
     SisterGroupLabeledPriors,
     TreePriors,
 )
-from Bio.Phylo.BaseTree import Tree
 from classeq.core.domain.dtos.tree import ClasseqTree
 from classeq.settings import LOGGER
 
 from ._estimate_clade_kmer_specific_priors import (
-    estimate_clade_kmer_specific_priors,
+    estimate_kmer_specific_priors_of_clade,
 )
 from ._get_terminal_nodes import get_terminal_nodes
 
@@ -66,6 +65,8 @@ def calculate_recursive_priors(
         #
         # ? --------------------------------------------------------------------
 
+        LOGGER.info("Calculating outgroup priors")
+
         outgroup_labels: list[int] = []
         outgroups_parents = {o.parent for o in outgroups}
 
@@ -97,22 +98,24 @@ def calculate_recursive_priors(
                 logger=LOGGER,
             )()
 
-        outgroup_priors_either = estimate_clade_kmer_specific_priors(
-            kmer_indices=kmer_indices,
-            sequence_codes=[i.name for i in outgroups],
-            corpus_size=(1 + len(outgroups) + len(ingroups)),
-        )
-
-        if outgroup_priors_either.is_left:
+        if (
+            outgroup_priors_either := estimate_kmer_specific_priors_of_clade(
+                kmer_indices=kmer_indices,
+                sequence_codes=[i.name for i in outgroups],
+                corpus_size=(1 + len(outgroups) + len(ingroups)),
+            )
+        ).is_left:
             return outgroup_priors_either
 
         outgroup_priors = OutgroupCladePriors(
             parent=outgroup_parent,
-            priors=OutgroupLabeledPriors(
-                labels=tuple(sorted(outgroup_labels)),
+            labeled_priors=OutgroupLabeledPriors(
+                labels=OrderedTuple(outgroup_labels),
                 priors=outgroup_priors_either.value,
             ),
         )
+
+        LOGGER.info("Outgroup priors calculated")
 
         # ? --------------------------------------------------------------------
         # ? Calculate ingroups clades priors
@@ -134,9 +137,13 @@ def calculate_recursive_priors(
         ingroups_priors: list[IngroupCladePriors] = []
 
         for clade in [i for i in ingroups if i.is_internal()]:
+            LOGGER.info(f"Calculating priors for clade: {clade}")
+
             # ? ----------------------------------------------------------------
-            # ? Extract ingroup terminals
+            # ? Collect group labels
             # ? ----------------------------------------------------------------
+
+            LOGGER.debug("\tCollecting group labels")
 
             ingroup: list[ClasseqClade] = get_terminal_nodes(
                 target_nodes=[i for i in ingroups if i.parent == clade.id],
@@ -145,83 +152,101 @@ def calculate_recursive_priors(
 
             if len(ingroup) < min_clade_size:
                 LOGGER.warning(
-                    "Ingroup clade ineligible for training due to not having "
+                    "Ingroup clade ineligible for training due do not having "
                     + f"the minimum number of terminals ({min_clade_size}): "
                     + f"{clade.id}"
                 )
 
                 continue
 
-            # ? ----------------------------------------------------------------
-            # ? Extract sister group terminals
-            # ? ----------------------------------------------------------------
+            ingroup_labels: list[int] = [i.name for i in ingroup]
+
+            ingroup_ids = [i.id for i in ingroup]
 
             sister_group: list[ClasseqClade] = [
                 terminal
                 for terminal in get_terminal_nodes(
+                    reference_nodes=ingroups,
                     target_nodes=[
                         i for i in ingroups if i.parent == clade.parent
                     ],
-                    reference_nodes=ingroups,
                 )
-                if terminal.id not in [i.id for i in ingroup]
+                if terminal.id not in ingroup_ids
             ]
 
             if len(sister_group) < min_clade_size:
                 LOGGER.warning(
-                    "Sister group clade ineligible for training due to not "
+                    "Sister group clade ineligible for training due do not "
                     + "reaches the minimum number of terminals "
                     + f"({min_clade_size}): {clade.id}"
                 )
 
                 continue
 
+            sister_group_labels: list[int] = [i.name for i in sister_group]
+
+            LOGGER.debug("\tCollection finished")
+
             # ? ----------------------------------------------------------------
-            # ? Estimate group specific priors
+            # ? Calculate corpus size of the current clade
             # ? ----------------------------------------------------------------
 
-            priors_values: list[LabeledPriors] = []
+            corpus_size = 1 + len(ingroup) + len(sister_group)
 
-            for receiver, group in [
-                (IngroupLabeledPriors, ingroup),
-                (SisterGroupLabeledPriors, sister_group),
-            ]:
-                group_labels: list[int] = [i.name for i in group]
+            LOGGER.debug(f"\tCorpus size: {corpus_size}")
 
-                group_priors_either = estimate_clade_kmer_specific_priors(
+            # ? ----------------------------------------------------------------
+            # ? Estimate specific priors
+            # ? ----------------------------------------------------------------
+
+            LOGGER.debug("\tEstimating kmer specific priors")
+
+            LOGGER.debug("\t\tEstimating ingroup")
+
+            if (
+                ingroup_priors_either := estimate_kmer_specific_priors_of_clade(
                     kmer_indices=kmer_indices,
-                    sequence_codes=group_labels,
-                    # corpus_size=(1 + len(outgroups) + len(ingroups)),
-                    corpus_size=(1 + len(ingroup) + len(sister_group)),
+                    sequence_codes=ingroup_labels,
+                    corpus_size=corpus_size,
                 )
+            ).is_left:
+                return ingroup_priors_either
 
-                if group_priors_either.is_left:
-                    return group_priors_either
-
-                priors_values.append(
-                    receiver(
-                        labels=tuple(sorted(group_labels)),
-                        priors=group_priors_either.value,
-                    )
-                )
-
-            ingroup_priors = next(
-                i for i in priors_values if i.group == PriorGroup.INGROUP
+            ingroup_specific_priors = IngroupLabeledPriors(
+                labels=OrderedTuple(ingroup_labels),
+                priors=ingroup_priors_either.value,
             )
 
-            sister_priors = next(
-                i for i in priors_values if i.group == PriorGroup.SISTER
+            LOGGER.debug("\t\tEstimating sister ingroup")
+
+            if (
+                sister_group_priors_either := estimate_kmer_specific_priors_of_clade(
+                    kmer_indices=kmer_indices,
+                    sequence_codes=sister_group_labels,
+                    corpus_size=corpus_size,
+                )
+            ).is_left:
+                return sister_group_priors_either
+
+            sister_group_specific_priors = SisterGroupLabeledPriors(
+                labels=OrderedTuple(sister_group_labels),
+                priors=sister_group_priors_either.value,
             )
+
+            LOGGER.debug("\tEstimation finished")
 
             ingroups_priors.append(
                 IngroupCladePriors(
                     parent=clade.id,
-                    priors=(
-                        ingroup_priors,
-                        sister_priors,
+                    labeled_priors=(
+                        ingroup_specific_priors,
+                        sister_group_specific_priors,
                     ),
                 )
             )
+
+        LOGGER.info("Ingroup priors calculated")
+        LOGGER.info(f"\t{len(ingroups_priors)} clades eligible for predictions")
 
         # ? --------------------------------------------------------------------
         # ? Return a positive response

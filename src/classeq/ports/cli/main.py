@@ -21,7 +21,7 @@ from classeq.core.use_cases.predict_taxonomies_recursively._calculate_clade_adhe
 from classeq.core.use_cases.train_from_single_phylogeny import (
     train_from_single_phylogeny,
 )
-from classeq.settings import LOGGER
+from classeq.settings import DEFAULT_KMER_SIZE, LOGGER
 
 # ? ----------------------------------------------------------------------------
 # ? Initialize the CLI groups
@@ -122,6 +122,15 @@ def pipe_cmd() -> None:
     ),
 )
 @click.option(
+    "-k",
+    "--kmer-size",
+    required=False,
+    type=click.INT,
+    default=DEFAULT_KMER_SIZE,
+    show_default=True,
+    help="The kmer size.",
+)
+@click.option(
     "-og",
     "--outgroups",
     type=click.STRING,
@@ -152,6 +161,7 @@ def parse_source_files_cmd(
     fasta_file_path: str,
     tree_file_path: str,
     support_value_cutoff: int,
+    kmer_size: int,
     output_directory: str | None = None,
     outgroups: tuple[str, ...] | None = None,
     outgroups_file: click.Path | None = None,
@@ -185,6 +195,7 @@ def parse_source_files_cmd(
                     else None
                 ),
                 support_value_cutoff=support_value_cutoff,
+                k_size=kmer_size,
             )
         ).is_left:
             LOGGER.error(response.value.msg)

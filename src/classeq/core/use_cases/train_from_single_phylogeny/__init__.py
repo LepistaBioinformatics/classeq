@@ -3,7 +3,7 @@ from json import dump
 
 import clean_base.exceptions as c_exc
 from attrs import asdict
-from clean_base.either import Either, left, right
+from clean_base.either import Either, right
 
 from classeq.core.domain.dtos.priors import TreePriors
 from classeq.core.domain.dtos.reference_set import ReferenceSet
@@ -22,24 +22,22 @@ def train_from_single_phylogeny(
         # ? --------------------------------------------------------------------
 
         if not isinstance(references, ReferenceSet):
-            return left(
-                c_exc.UseCaseError(
-                    f"Argument `references` should be a `{ReferenceSet}` instance.",
-                    exp=True,
-                    logger=LOGGER,
-                )
-            )
+            return c_exc.UseCaseError(
+                f"Argument `references` should be a `{ReferenceSet}` instance.",
+                exp=True,
+                logger=LOGGER,
+            )()
 
         # ? --------------------------------------------------------------------
         # ? Recursively train for clades
         # ? --------------------------------------------------------------------
 
-        train_response_either = estimate_clade_specific_priors(
-            references=references,
-            min_clade_size=min_clade_size,
-        )
-
-        if train_response_either.is_left:
+        if (
+            train_response_either := estimate_clade_specific_priors(
+                references=references,
+                min_clade_size=min_clade_size,
+            )
+        ).is_left:
             return train_response_either
 
         train_response: TreePriors = train_response_either.value
@@ -81,4 +79,4 @@ def train_from_single_phylogeny(
         return right(True)
 
     except Exception as exc:
-        return left(c_exc.UseCaseError(exc, logger=LOGGER))
+        return c_exc.UseCaseError(exc, logger=LOGGER)()

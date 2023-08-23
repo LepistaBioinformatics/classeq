@@ -1,6 +1,7 @@
+from collections import defaultdict
 from pathlib import Path
 from re import search
-from typing import Any, DefaultDict, Self
+from typing import Any, Self
 
 import clean_base.exceptions as c_exc
 from attr import define, field
@@ -10,11 +11,7 @@ from clean_base.either import Either, right
 
 from classeq.core.domain.dtos.kmer_inverse_index import KmersInverseIndices
 from classeq.core.domain.dtos.msa_source_format import MsaSourceFormatEnum
-from classeq.settings import (
-    BASES,
-    LOGGER,
-    TEMP_INPUT_FILE_SUFFIX,
-)
+from classeq.settings import BASES, LOGGER, TEMP_INPUT_FILE_SUFFIX
 
 
 @define(kw_only=True)
@@ -112,7 +109,6 @@ class MsaSource:
                         )
 
                     sequence_headers.append(record.id)
-
                     sanitized_sequence = cls.__sanitize_sequence(record)
                     out.write(f">{record.id}\n{sanitized_sequence}\n")
 
@@ -133,18 +129,18 @@ class MsaSource:
 
     def initialize_kmer_indices(
         self,
-        headers_map: DefaultDict[str, int],
+        headers_map: defaultdict[str, int],
         k_size: int,
     ) -> Either[c_exc.MappedErrors, bool]:
         try:
-            indices_either = KmersInverseIndices.new(
-                source_file_path=self.source_file_path,
-                format=self.file_format,
-                k_size=k_size,
-                headers_map=headers_map,
-            )
-
-            if indices_either.is_left:
+            if (
+                indices_either := KmersInverseIndices.new(
+                    source_file_path=self.source_file_path,
+                    format=self.file_format,
+                    k_size=k_size,
+                    headers_map=headers_map,
+                )
+            ).is_left:
                 return c_exc.DadaTransferObjectError(
                     "Unexpected error on generate kmer indices.",
                     prev=indices_either.value,
