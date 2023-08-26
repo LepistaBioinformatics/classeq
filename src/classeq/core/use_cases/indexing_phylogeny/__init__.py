@@ -9,10 +9,10 @@ from classeq.core.domain.dtos.priors import TreePriors
 from classeq.core.domain.dtos.reference_set import ReferenceSet
 from classeq.settings import LOGGER, MINIMUM_CLADE_SIZE
 
-from ._estimate_clade_specific_priors import estimate_clade_specific_priors
+from ._fetch_clade_specific_kmers import fetch_clade_specific_kmers
 
 
-def train_from_single_phylogeny(
+def indexing_phylogeny(
     references: ReferenceSet,
     min_clade_size: int = MINIMUM_CLADE_SIZE,
 ) -> Either[c_exc.MappedErrors, bool]:
@@ -33,7 +33,7 @@ def train_from_single_phylogeny(
         # ? --------------------------------------------------------------------
 
         if (
-            train_response_either := estimate_clade_specific_priors(
+            train_response_either := fetch_clade_specific_kmers(
                 references=references,
                 min_clade_size=min_clade_size,
             )

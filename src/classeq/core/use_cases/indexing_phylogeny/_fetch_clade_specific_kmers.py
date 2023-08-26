@@ -5,10 +5,10 @@ from classeq.core.domain.dtos.priors import TreePriors
 from classeq.core.domain.dtos.reference_set import ReferenceSet
 from classeq.settings import LOGGER
 
-from ._calculate_recursive_priors import calculate_recursive_priors
+from ._recursively_fetch_kmers import recursively_fetch_kmers
 
 
-def estimate_clade_specific_priors(
+def fetch_clade_specific_kmers(
     references: ReferenceSet,
     min_clade_size: int,
 ) -> Either[c_exc.MappedErrors, TreePriors]:
@@ -112,7 +112,7 @@ def estimate_clade_specific_priors(
         # ? Recursive calculate probabilities
         # ? --------------------------------------------------------------------
 
-        return calculate_recursive_priors(
+        return recursively_fetch_kmers(
             reference_tree=references.tree,
             root=root,
             outgroups=outgroup_nodes,

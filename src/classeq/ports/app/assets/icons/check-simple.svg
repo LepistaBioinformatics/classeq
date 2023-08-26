@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+
+<svg
+   width="800px"
+   height="800px"
+   viewBox="0 0 24 24"
+   fill="none"
+   version="1.1"
+   id="svg6"
+   sodipodi:docname="check-simple.svg"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   inkscape:export-filename="/home/sgelias/thirdparty-projects/classeq/src/classeq/ports/app/assets/icons/check-simple-16x16.png"
+   inkscape:export-xdpi="1.92"
+   inkscape:export-ydpi="1.92"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs10" />
+  <sodipodi:namedview
+     id="namedview8"
+     pagecolor="#505050"
+     bordercolor="#ffffff"
+     borderopacity="1"
+     inkscape:pageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="1"
+     showgrid="false"
+     inkscape:zoom="0.805"
+     inkscape:cx="400"
+     inkscape:cy="400"
+     inkscape:window-width="2560"
+     inkscape:window-height="1043"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg6" />
+  <path
+     opacity="0.5"
+     d="M12 22C7.28595 22 4.92893 22 3.46447 20.5355C2 19.0711 2 16.714 2 12C2 7.28595 2 4.92893 3.46447 3.46447C4.92893 2 7.28595 2 12 2C16.714 2 19.0711 2 20.5355 3.46447C22 4.92893 22 7.28595 22 12C22 16.714 22 19.0711 20.5355 20.5355C19.0711 22 16.714 22 12 22Z"
+     fill="#1C274C"
+     id="path2"
+     style="fill:#008000;opacity:1" />
+  <path
+     d="m 18.917779,6.3603436 c 0.511906,0.5283497 0.511906,1.3849943 0,1.9132899 l -8.738597,9.0195935 c -0.5119068,0.528367 -1.341724,0.528367 -1.8536834,0 L 4.83006,13.68539 c -0.5118894,-0.528368 -0.5118894,-1.384869 0,-1.913237 0.5118895,-0.528368 1.3418465,-0.528368 1.8537359,0 l 2.5685706,2.651039 7.8117815,-8.0628484 c 0.511906,-0.5283498 1.341724,-0.5283498 1.853631,0 z"
+     fill="#1C274C"
+     id="path4"
+     style="fill:#ffffff;stroke-width:1.7756" />
+</svg>

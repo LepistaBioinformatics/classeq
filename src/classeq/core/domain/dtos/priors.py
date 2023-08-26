@@ -1,4 +1,3 @@
-from collections import defaultdict
 from enum import Enum
 from typing import Any, Self
 from uuid import UUID
@@ -6,8 +5,8 @@ from uuid import UUID
 import clean_base.exceptions as c_exc
 from attrs import field, frozen
 from clean_base.either import Either, left, right
-from classeq.core.domain.dtos.ordered_tuple import OrderedTuple
 
+from classeq.core.domain.dtos.ordered_tuple import OrderedTuple
 from classeq.settings import LOGGER
 
 
@@ -22,13 +21,14 @@ class PriorGroup(Enum):
 
 
 @frozen(kw_only=True)
-class LabeledPriors:
+class CladePriors:
     # ? ------------------------------------------------------------------------
     # ? Class attributes
     # ? ------------------------------------------------------------------------
 
     labels: OrderedTuple = field()
-    priors: defaultdict[str, float] = field()
+    # priors: defaultdict[str, float] = field()
+    kmers: OrderedTuple = field()
     group: PriorGroup = field()
 
     # ? ------------------------------------------------------------------------
@@ -38,7 +38,8 @@ class LabeledPriors:
     def to_dict(self) -> dict[str, Any]:
         return {
             "labels": self.labels,
-            "priors": self.priors,
+            # "priors": self.priors,
+            "kmers": self.kmers,
             "group": self.group.value,
         }
 
@@ -53,13 +54,14 @@ class LabeledPriors:
     ) -> Either[c_exc.MappedErrors, Self]:
         for key in [
             "labels",
-            "priors",
+            # "priors",
+            "kmers",
             "group",
         ]:
             if key not in content:
                 return left(
                     c_exc.DadaTransferObjectError(
-                        f"Invalid content detected on parse `{LabeledPriors}`. "
+                        f"Invalid content detected on parse `{CladePriors}`. "
                         f"{key}` key is empty.",
                         logger=LOGGER,
                     )
@@ -68,7 +70,7 @@ class LabeledPriors:
         if (labels := content.get("labels")) is None:
             return left(
                 c_exc.DadaTransferObjectError(
-                    f"Invalid content detected on parse `{LabeledPriors}`. "
+                    f"Invalid content detected on parse `{CladePriors}`. "
                     f"{key}` key is empty.",
                     logger=LOGGER,
                 )
@@ -77,29 +79,30 @@ class LabeledPriors:
         return right(
             cls(
                 labels=OrderedTuple([int(i) for i in labels]),
-                priors=defaultdict(float, content.get("priors")),  # type: ignore
+                # priors=defaultdict(float, content.get("priors")),  # type: ignore
+                kmers=OrderedTuple(content.get("kmers")),  # type: ignore
                 group=PriorGroup(content.get("group").lower()),  # type: ignore
             )
         )
 
 
 @frozen(kw_only=True)
-class OutgroupLabeledPriors(LabeledPriors):
+class OutgroupLabeledPriors(CladePriors):
     group: PriorGroup = field(default=PriorGroup.OUTGROUP)
 
 
 @frozen(kw_only=True)
-class IngroupLabeledPriors(LabeledPriors):
+class IngroupLabeledPriors(CladePriors):
     group: PriorGroup = field(default=PriorGroup.INGROUP)
 
 
 @frozen(kw_only=True)
-class SisterGroupLabeledPriors(LabeledPriors):
+class SisterGroupLabeledPriors(CladePriors):
     group: PriorGroup = field(default=PriorGroup.SISTER)
 
 
 @frozen(kw_only=True)
-class NoiseGroupLabeledPriors(LabeledPriors):
+class NoiseGroupLabeledPriors(CladePriors):
     group: PriorGroup = field(default=PriorGroup.NOISE)
 
 
@@ -117,7 +120,7 @@ class OutgroupCladePriors:
 
     # The field include the priors of all kmers shared among members of the
     # target clade.
-    labeled_priors: OutgroupLabeledPriors = field()
+    clade_priors: OutgroupLabeledPriors = field()
 
     # ? ------------------------------------------------------------------------
     # ? Public instance methods
@@ -126,7 +129,7 @@ class OutgroupCladePriors:
     def to_dict(self) -> dict[str, Any]:
         return {
             "parent": self.parent.__str__(),
-            "labeled_priors": self.labeled_priors.to_dict(),
+            "clade_priors": self.clade_priors.to_dict(),
         }
 
     # ? ------------------------------------------------------------------------
@@ -140,7 +143,7 @@ class OutgroupCladePriors:
     ) -> Either[c_exc.MappedErrors, Self]:
         for key in [
             "parent",
-            "labeled_priors",
+            "clade_priors",
         ]:
             if key not in content:
                 return left(
@@ -152,7 +155,7 @@ class OutgroupCladePriors:
                 )
 
         priors_either = OutgroupLabeledPriors.from_dict(
-            content=content.get("labeled_priors")  # type: ignore
+            content=content.get("clade_priors")  # type: ignore
         )
 
         if priors_either.is_left:
@@ -161,7 +164,7 @@ class OutgroupCladePriors:
         return right(
             cls(
                 parent=UUID(content.get("parent")),
-                labeled_priors=priors_either.value,
+                clade_priors=priors_either.value,
             )
         )
 
@@ -180,7 +183,7 @@ class IngroupCladePriors:
 
     # Priors of specific groups, being in order: ingroup, sister, and random
     # groups, respectively.
-    labeled_priors: tuple[
+    clade_priors: tuple[
         IngroupLabeledPriors,
         SisterGroupLabeledPriors,
     ] = field()
@@ -192,7 +195,7 @@ class IngroupCladePriors:
     def to_dict(self) -> dict[str, Any]:
         return {
             "parent": self.parent.__str__(),
-            "priors": [i.to_dict() for i in self.labeled_priors],
+            "priors": [i.to_dict() for i in self.clade_priors],
         }
 
     # ? ------------------------------------------------------------------------
@@ -206,7 +209,7 @@ class IngroupCladePriors:
     ) -> Either[c_exc.MappedErrors, Self]:
         for key in [
             "parent",
-            "labeled_priors",
+            "clade_priors",
         ]:
             if key not in content:
                 return left(
@@ -217,10 +220,10 @@ class IngroupCladePriors:
                     )
                 )
 
-        priors: list[LabeledPriors] = []
+        priors: list[CladePriors] = []
 
-        for prior in content.get("labeled_priors"):  # type: ignore
-            prior_either = LabeledPriors.from_dict(content=prior)
+        for prior in content.get("clade_priors"):  # type: ignore
+            prior_either = CladePriors.from_dict(content=prior)
 
             if prior_either.is_left:
                 return prior_either
@@ -233,14 +236,16 @@ class IngroupCladePriors:
         return right(
             cls(
                 parent=UUID(content.get("parent")),
-                labeled_priors=(
+                clade_priors=(
                     IngroupLabeledPriors(
                         labels=ingroup_prior.labels,
-                        priors=ingroup_prior.priors,
+                        # priors=ingroup_prior.priors,
+                        kmers=ingroup_prior.kmers,
                     ),
                     SisterGroupLabeledPriors(
                         labels=sister_prior.labels,
-                        priors=sister_prior.priors,
+                        # priors=sister_prior.priors,
+                        kmers=sister_prior.kmers,
                     ),
                 ),
             )

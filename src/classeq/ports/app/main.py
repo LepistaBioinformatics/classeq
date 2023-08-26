@@ -1,3 +1,4 @@
+import re
 import sys
 from json import dump, load
 from pathlib import Path
@@ -6,7 +7,7 @@ from uuid import UUID
 
 import clean_base.exceptions as c_exc
 from clean_base.either import Either, right
-from PySide2 import QtCore
+from PySide2 import QtCore, QtGui
 from PySide2.QtWidgets import (
     QAbstractItemView,
     QApplication,
@@ -16,6 +17,9 @@ from PySide2.QtWidgets import (
     QMainWindow,
     QMenu,
     QPushButton,
+    QSplitter,
+    QTableWidget,
+    QTableWidgetItem,
     QTreeWidget,
     QTreeWidgetItem,
     QVBoxLayout,
@@ -25,6 +29,10 @@ from PySide2.QtWidgets import (
 from classeq.core.domain.dtos.biopython_wrappers import (
     ExtendedBioPythonClade,
     ExtendedBioPythonTree,
+    ExtraTaxonomicRanks,
+    MajorTaxonomicRanks,
+    MinorTaxonomicRanks,
+    try_to_reach_rank_enum,
 )
 from classeq.core.domain.dtos.tree_source_format import TreeSourceFormatEnum
 from classeq.ports.app.settings import STYLE_SHEET_DARK
@@ -37,7 +45,13 @@ class TreeEditor(QMainWindow):
     # ? ------------------------------------------------------------------------
 
     __tree: ExtendedBioPythonTree | None = None
+    __clade: ExtendedBioPythonClade | None = None
     __tree_file_path: Path
+    __tree_field_names: int = 0
+    __tree_field_status: int = 1
+    __tree_field_taxid: int = 3
+    __tree_field_related_rank: int = 4
+    __tree_field_ids: int = 7
 
     # ? ------------------------------------------------------------------------
     # ? LIFE CYCLE HOOKS
@@ -54,10 +68,10 @@ class TreeEditor(QMainWindow):
         self.setGeometry(QtCore.QRect(200, 200, 800, 600))
         self.setMinimumHeight(150)
 
-        self.__main = QWidget(self)
-        self.setCentralWidget(self.__main)
+        central_item = QWidget(self)
+        self.setCentralWidget(central_item)
 
-        self.__add_widgets()
+        self.__add_widgets(parent=central_item)
         self.__build_main_menu(self)
 
         self.__tree_file_path = tree_file_path
@@ -70,73 +84,151 @@ class TreeEditor(QMainWindow):
             raise Exception(load_tree_either.value.msg)
 
     # ? ------------------------------------------------------------------------
+    # ? SUPER METHODS REPLACEMENT
+    # ? ------------------------------------------------------------------------
+
+    def closeEvent(self, event: Any) -> None:
+        """Override the close event to save the tree before closing the
+        application.
+
+        """
+
+        LOGGER.info("Closing application")
+        event.accept()
+
+    # ? ------------------------------------------------------------------------
     # ? PRIVATE STATIC METHODS
     # ? ------------------------------------------------------------------------
 
-    def __add_widgets(self) -> None:
+    def __add_widgets(self, parent: Any) -> None:
+        """Add the widgets to the main window."""
+
         # ? --------------------------------------------------------------------
         # ? Main layout
         #
         # Here the phylogeny is presented.
         #
         # ? --------------------------------------------------------------------
-        primary_hbox = QVBoxLayout(self.__main)
+        layout = QVBoxLayout(parent)
+        splitter = QSplitter(parent)
 
         # ? --------------------------------------------------------------------
-        # ? Filter box
+        # ? Right panel = Details + Annotations
         # ? --------------------------------------------------------------------
 
-        self.__search_field = QLineEdit()
-        self.__search_field.setFocusPolicy(QtCore.Qt.StrongFocus)
-        self.__search_field.setObjectName("search_field")
-        self.__search_field.setStyleSheet("font-size: 16px; height: 50px;")
-        self.__search_field.setPlaceholderText("Search for a node")
+        left_splitter = QSplitter(splitter)
+        left_splitter.setOrientation(QtCore.Qt.Vertical)
 
-        self.__search_field.textChanged.connect(
+        left_widget = QWidget(left_splitter)
+        left_layout = QVBoxLayout(left_widget)
+        print(left_layout)
+        # left_splitter.addWidget(left_widget)
+
+        table_fields = [
+            "Node Name",
+            "Clade Support",
+            "Taxid",
+            "Related Rank",
+            "Outgroup",
+            "Terminal",
+            "Identifier",
+            "Children",
+        ]
+
+        table_view = self.__table_view = QTableWidget(
+            len(table_fields), 1, left_widget
+        )
+
+        table_view.setHorizontalHeaderLabels(["Values"])
+        table_view.setVerticalHeaderLabels(table_fields)
+        table_view.horizontalHeader().setStretchLastSection(True)
+        table_view.verticalHeader().setStretchLastSection(True)
+        table_view.setFixedHeight(280)
+        table_view.resizeColumnsToContents()
+
+        line_edit = QLineEdit(left_widget)
+
+        left_splitter.addWidget(self.__table_view)
+        left_splitter.addWidget(line_edit)
+
+        # ? --------------------------------------------------------------------
+        # ? Left panel = Filter box + Tree box
+        # ? --------------------------------------------------------------------
+
+        right_widget = QWidget(splitter)
+        right_layout = QVBoxLayout(right_widget)
+        splitter.addWidget(right_widget)
+
+        search_field = self.__search_field = QLineEdit(right_widget)
+        search_field.setFocusPolicy(QtCore.Qt.StrongFocus)
+        search_field.setObjectName("search_field")
+        search_field.setStyleSheet("font-size: 16px; height: 50px;")
+        search_field.setPlaceholderText("Search for a node")
+        search_field.textChanged.connect(
             lambda text: self.__on_text_changed(text)
         )
 
-        primary_hbox.addWidget(self.__search_field)
-
-        # ? --------------------------------------------------------------------
-        # ? Internal nodes box
-        # ? --------------------------------------------------------------------
-        inner_tree_items = self.__nodes_tree_widget = QTreeWidget()
-        inner_tree_items.setHeaderItem(
+        tree_widget = self.__tree_widget = QTreeWidget(right_widget)
+        tree_widget.setHeaderItem(
             QTreeWidgetItem(
                 [
                     "Name",
+                    " ",
                     "Support",
+                    "Taxid",
+                    "Related Rank",
                     "Outgroup",
                     "Terminal",
                     "Identifier",
-                    "",
                 ]
             )
         )
 
-        inner_tree_items.setColumnCount(6)
-        inner_tree_items.setColumnWidth(0, 700)
-        inner_tree_items.setColumnWidth(1, 80)
-        inner_tree_items.setColumnWidth(2, 80)
-        inner_tree_items.setColumnWidth(3, 80)
-        inner_tree_items.setColumnWidth(4, 300)
-        inner_tree_items.setColumnWidth(5, 50)
-        inner_tree_items.setSelectionMode(QAbstractItemView.ExtendedSelection)
-        inner_tree_items.setSortingEnabled(True)
-        primary_hbox.addWidget(inner_tree_items)
+        tree_widget.header().swapSections(0, 1)
+        tree_widget.setColumnCount(8)
+        tree_widget.setColumnWidth(0, 700)
+        tree_widget.setColumnWidth(1, 10)
+        tree_widget.setColumnWidth(2, 80)
+        tree_widget.setColumnWidth(3, 80)
+        tree_widget.setColumnWidth(4, 110)
+        tree_widget.setColumnWidth(5, 80)
+        tree_widget.setColumnWidth(6, 80)
+        tree_widget.setColumnWidth(7, 300)
+        tree_widget.setSelectionMode(QAbstractItemView.ExtendedSelection)
+        tree_widget.setSortingEnabled(True)
+        tree_widget.itemClicked.connect(self.__on_item_clicked)
+
+        right_layout.addWidget(self.__search_field)
+        right_layout.addWidget(self.__tree_widget)
+
+        # ? --------------------------------------------------------------------
+        # ? Update splitter layout
+        # ? --------------------------------------------------------------------
+
+        splitter.setStretchFactor(0, 2)
+        splitter.setStretchFactor(1, 5)
+        layout.addWidget(splitter)
 
         return
 
+    @QtCore.Slot(QTreeWidgetItem, int)
+    def __on_item_clicked(self, item: QTreeWidgetItem, _: int) -> None:
+        if self.__tree is None:
+            return
+
+        self.__clade = self.__tree.find_clade_by_id(
+            id=UUID(item.text(self.__tree_field_ids))
+        )
+
+        self.__set_table_data()
+
     def __on_text_changed(self, text: str) -> None:
-        self.__nodes_tree_widget.clearSelection()
+        self.__tree_widget.clearSelection()
 
         if text == "" or text is None or text.__len__() < 3:
             return
 
         name_items: list[QTreeWidgetItem] = []
-        names_field_index = 0
-        ids_field_index = 4
 
         def recursive_find_in_children(
             items: list[QTreeWidgetItem],
@@ -186,34 +278,34 @@ class TreeEditor(QMainWindow):
 
         for item in [
             *recursive_find_in_children(
-                items=self.__nodes_tree_widget.findItems(
+                items=self.__tree_widget.findItems(
                     None,
                     QtCore.Qt.MatchRecursive,
-                    names_field_index,
+                    self.__tree_field_names,
                 ),
                 text=text,
-                field_index=names_field_index,
+                field_index=self.__tree_field_names,
             ),
             *recursive_find_in_children(
-                items=self.__nodes_tree_widget.findItems(
+                items=self.__tree_widget.findItems(
                     None,
                     QtCore.Qt.MatchContains,
-                    ids_field_index,
+                    self.__tree_field_ids,
                 ),
                 text=text,
-                field_index=ids_field_index,
+                field_index=self.__tree_field_ids,
             ),
         ]:
             name_items.extend(item)
 
         if len(name_items) > 0:
-            self.__nodes_tree_widget.scrollToItem(
+            self.__tree_widget.scrollToItem(
                 name_items[0],
                 QAbstractItemView.PositionAtCenter,
             )
 
         for item in set(name_items):
-            self.__nodes_tree_widget.setItemSelected(item, True)
+            self.__tree_widget.setItemSelected(item, True)
 
     def __build_main_menu(self, parent: Any) -> None:
         self.menubar = self.menuBar()
@@ -282,13 +374,34 @@ class TreeEditor(QMainWindow):
 
         return right(True)
 
+    @staticmethod
+    def __check_status(
+        clade: ExtendedBioPythonClade,
+    ) -> QtGui.QIcon | None:
+        """Check if the clade is valid.
+
+        Args:
+            clade (ExtendedBioPythonClade): The clade to check.
+
+        Returns:
+            QtGui.QIcon | None: The icon to show.
+
+        """
+
+        if clade.is_terminal():
+            return None
+
+        if clade.name is None:
+            return QtGui.QIcon("assets:/icons/warning-16x16.png")
+        return QtGui.QIcon("assets:/icons/check-simple-16x16.png")
+
     def __set_tree_widget_content(
         self,
         tree: ExtendedBioPythonTree,
     ) -> None:
         root_node: ExtendedBioPythonClade
         self.__tree = tree
-        self.__nodes_tree_widget.clear()
+        self.__tree_widget.clear()
 
         LOGGER.info("Building tree widget")
 
@@ -308,38 +421,94 @@ class TreeEditor(QMainWindow):
             """
 
             parent.setExpanded(True)
+            faded_color = QtGui.QColor("#808080")
 
             if clade.is_terminal():
-                parent.setText(0, clade.name or "Unnamed clade")
+                parent.setTextColor(self.__tree_field_names, faded_color)
+
             else:
-                button = QPushButton()
-                button.setText(clade.name or "Click to update")
+                # ? ------------------------------------------------------------
+                # ? Annotate name
+                # ? ------------------------------------------------------------
 
-                if clade.name is not None and clade.name != "":
-                    button.setStyleSheet(
-                        "QPushButton {background-color: #4CAF50;}"
+                name_button = QPushButton()
+                name_button.setFocusPolicy(QtCore.Qt.NoFocus)
+                name_button.setCursor(
+                    QtGui.QCursor(QtCore.Qt.PointingHandCursor)
+                )
+
+                name_button.mouseDoubleClickEvent = (
+                    lambda _: self.__annotate_clade_name(
+                        clade=clade,
+                        current_value=clade.name,
                     )
-
-                button.setFocusPolicy(QtCore.Qt.NoFocus)
-
-                button.mouseDoubleClickEvent = lambda _: self.__annotate_node(
-                    clade_id=clade._id,
-                    current_value=clade.name,
                 )
 
-                button.keyPressEvent = lambda _: self.__annotate_node(
-                    clade_id=clade._id,
-                    current_value=clade.name,
+                parent.treeWidget().setItemWidget(
+                    parent, self.__tree_field_names, name_button
                 )
 
-                parent.treeWidget().setItemWidget(parent, 0, button)
+                # ? ------------------------------------------------------------
+                # ? Annotate taxid
+                # ? ------------------------------------------------------------
+
+                taxid_button = QPushButton()
+                taxid_button.setFocusPolicy(QtCore.Qt.NoFocus)
+                taxid_button.setCursor(
+                    QtGui.QCursor(QtCore.Qt.PointingHandCursor)
+                )
+
+                taxid_button.mouseDoubleClickEvent = (
+                    lambda _: self.__annotate_clade_taxid(
+                        clade=clade,
+                        current_value=clade._taxid.__str__(),
+                    )
+                )
+
+                parent.treeWidget().setItemWidget(
+                    parent, self.__tree_field_taxid, taxid_button
+                )
+
+                # ? ------------------------------------------------------------
+                # ? Annotate name
+                # ? ------------------------------------------------------------
+
+                rank_button = QPushButton()
+                rank_button.setFocusPolicy(QtCore.Qt.NoFocus)
+                rank_button.setCursor(
+                    QtGui.QCursor(QtCore.Qt.PointingHandCursor)
+                )
+
+                rank_button.mouseDoubleClickEvent = (
+                    lambda _: self.__annotate_clade_rank(
+                        clade=clade,
+                        current_value=clade._related_rank,
+                    )
+                )
+
+                parent.treeWidget().setItemWidget(
+                    parent, self.__tree_field_related_rank, rank_button
+                )
 
             for index, element in enumerate(
                 [
                     (
                         "Clade Name or ID",
                         parent.setText,
-                        ("" if clade.name is None else clade.name),
+                        (
+                            clade.name.__str__()
+                            if clade.name is not None
+                            else None
+                        ),
+                    ),
+                    (
+                        "The clade general status",
+                        (
+                            parent.setText
+                            if self.__check_status(clade) is None
+                            else parent.setIcon
+                        ),
+                        self.__check_status(clade),
                     ),
                     (
                         "Clade Support",
@@ -347,6 +516,20 @@ class TreeEditor(QMainWindow):
                         (
                             clade.confidence.__str__()
                             if clade.confidence
+                            else ""
+                        ),
+                    ),
+                    (
+                        "Clade Related Taxid",
+                        parent.setText,
+                        (clade._taxid.__str__() if clade._taxid else ""),
+                    ),
+                    (
+                        "Clade Taxonomic Rank",
+                        parent.setText,
+                        (
+                            clade._related_rank.name
+                            if clade._related_rank
                             else ""
                         ),
                     ),
@@ -371,16 +554,13 @@ class TreeEditor(QMainWindow):
                     (
                         "The node unique identifier",
                         parent.setText,
-                        (
-                            clade._id.__str__()
-                            if not clade.is_terminal()
-                            else ""
-                        ),
+                        clade._id.__str__(),
                     ),
                 ]
             ):
                 tip, action, value = element
                 action(index, value)
+                parent.setTextColor(index, faded_color)
                 parent.setToolTip(index, tip)
 
             return parent
@@ -410,7 +590,7 @@ class TreeEditor(QMainWindow):
 
             return
 
-        root_item = QTreeWidgetItem(self.__nodes_tree_widget)
+        root_item = QTreeWidgetItem(self.__tree_widget)
         root_node = self.__tree.root
 
         LOGGER.info("\tBuilding tree root")
@@ -421,15 +601,50 @@ class TreeEditor(QMainWindow):
 
         build_recursive_children(root_node, root_item)
 
+        LOGGER.info("\tSetting up tree detail view")
+
+        self.__set_table_data(root_node)
+
         LOGGER.info("\tBuilding done")
 
         return
 
-    def __annotate_node(
+    def __set_table_data(
         self,
-        clade_id: UUID,
+        clade: ExtendedBioPythonClade | None = None,
+    ) -> None:
+        if clade is None:
+            if self.__clade is None:
+                return
+            clade = self.__clade
+
+        for index, data in enumerate(
+            [
+                (clade.name.__str__() if clade.name else ""),
+                (clade.confidence.__str__() if clade.confidence else ""),
+                (clade._taxid.__str__() if clade._taxid else ""),
+                (clade._related_rank.name if clade._related_rank else ""),
+                (clade._is_outgroup.__str__() or ""),
+                (clade.is_terminal().__str__() if clade.is_terminal() else ""),
+                (clade._id.__str__() or ""),
+                (
+                    clade.clades.__len__().__str__()
+                    if not clade.is_terminal()
+                    else ""
+                ),
+            ]
+        ):
+            self.__table_view.setItem(index, 0, QTableWidgetItem(data))
+            item = self.__table_view.item(index, 0)
+            item.setFlags(QtCore.Qt.ItemIsEnabled)
+
+    def __annotate_clade_name(
+        self,
+        clade: ExtendedBioPythonClade,
         current_value: str | None,
     ) -> None:
+        clade_id: UUID = clade._id
+
         text, ok = QInputDialog.getText(
             self,
             "Annotate Node",
@@ -439,10 +654,16 @@ class TreeEditor(QMainWindow):
         )
 
         if ok:
+            slug_text = re.sub(r"[^a-zA-Z0-9\s_]", "", text).replace(" ", "_")
+
             LOGGER.info("Updating node name")
             self.__tree.set_clade_name(  # type: ignore
-                clade_id=clade_id,
-                name=(text if text != "" and text is not None else None),
+                id=clade_id,
+                name=(
+                    slug_text
+                    if slug_text != "" and slug_text is not None
+                    else None
+                ),
             )
 
             LOGGER.info("Persisting tree")
@@ -451,27 +672,132 @@ class TreeEditor(QMainWindow):
                 with self.__tree_file_path.open("w") as f:
                     dump(self.__tree.to_dict(), f, indent=4, default=str)  # type: ignore
 
-                LOGGER.info("\tReloading tree")
-                with self.__tree_file_path.open("r") as f:
-                    self.__set_tree_widget_content(
-                        tree=ExtendedBioPythonTree.from_dict(content=load(f))
-                    )
-
             LOGGER.info("Persisting Finished")
 
-            item = self.__nodes_tree_widget.findItems(
-                clade_id.__str__(), QtCore.Qt.MatchRecursive, 4
-            )[0]
-
-            self.__nodes_tree_widget.setItemSelected(item, True)
-            self.__nodes_tree_widget.scrollToItem(
-                item,
-                QAbstractItemView.PositionAtCenter,
+            self.__finish_annotation(
+                clade=clade,
+                column=self.__tree_field_names,
+                text=slug_text,
             )
 
             LOGGER.info("Done")
 
         return
+
+    def __annotate_clade_taxid(
+        self,
+        clade: ExtendedBioPythonClade,
+        current_value: str | None,
+    ) -> None:
+        clade_id: UUID = clade._id
+
+        text, ok = QInputDialog.getText(
+            self,
+            "Annotate Node",
+            "Enter node name:",
+            QLineEdit.Normal,
+            current_value or "",
+        )
+
+        if ok:
+            try:
+                slug_text = int(text)
+            except ValueError:
+                slug_text = None
+
+            LOGGER.info("Updating node name")
+            self.__tree.set_clade_taxid(  # type: ignore
+                id=clade_id,
+                taxid=(slug_text if slug_text is not None else None),
+            )
+
+            LOGGER.info("Persisting tree")
+            if self.__tree is not None:
+                LOGGER.info("\tSaving tree")
+                with self.__tree_file_path.open("w") as f:
+                    dump(self.__tree.to_dict(), f, indent=4, default=str)  # type: ignore
+
+            LOGGER.info("Persisting Finished")
+
+            self.__finish_annotation(
+                clade=clade,
+                column=self.__tree_field_taxid,
+                text=slug_text,
+            )
+
+            LOGGER.info("Done")
+
+        return
+
+    def __annotate_clade_rank(
+        self,
+        clade: ExtendedBioPythonClade,
+        current_value: str | None,
+    ) -> None:
+        clade_id: UUID = clade._id
+
+        text, ok = QInputDialog.getItem(
+            self,
+            "Annotate Node",
+            "Enter node name:",
+            [
+                ExtraTaxonomicRanks.NO_RANK.value,
+                *[rank.value for rank in MajorTaxonomicRanks],
+                *[rank.value for rank in MinorTaxonomicRanks],
+                *[rank.value for rank in ExtraTaxonomicRanks],
+            ],
+        )
+
+        if ok:
+            rank = try_to_reach_rank_enum(text)
+
+            LOGGER.info("Updating node name")
+            self.__tree.set_clade_rank(  # type: ignore
+                id=clade_id,
+                rank=rank,
+            )
+
+            LOGGER.info("Persisting tree")
+            if self.__tree is not None:
+                LOGGER.info("\tSaving tree")
+                with self.__tree_file_path.open("w") as f:
+                    dump(self.__tree.to_dict(), f, indent=4, default=str)  # type: ignore
+
+            LOGGER.info("Persisting Finished")
+
+            self.__finish_annotation(
+                clade=clade,
+                column=self.__tree_field_related_rank,
+                text=rank.name,
+            )
+
+            LOGGER.info("Done")
+
+        return
+
+    def __finish_annotation(
+        self,
+        clade: ExtendedBioPythonClade,
+        column: int,
+        text: str | int | None,
+    ) -> None:
+        item = self.__tree_widget.findItems(
+            clade._id.__str__(),
+            QtCore.Qt.MatchRecursive,
+            self.__tree_field_ids,
+        )[0]
+
+        item.setText(column, text.__str__())
+        item.setIcon(self.__tree_field_status, self.__check_status(clade))
+
+        self.__tree_widget.clearSelection()
+        self.__tree_widget.setItemSelected(item, True)
+        self.__tree_widget.scrollToItem(
+            item,
+            QAbstractItemView.PositionAtCenter,
+        )
+
+        self.__set_table_data(clade=clade)
 
 
 def main(phylo_json_tree: Path) -> None:

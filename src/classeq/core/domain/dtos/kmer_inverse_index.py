@@ -2,11 +2,12 @@ from collections import defaultdict
 from hashlib import md5
 from itertools import islice
 from pathlib import Path
-from typing import Any, Iterator, Self
+from typing import Any, Generator, Iterator, Self
 
 import clean_base.exceptions as c_exc
 from attrs import define, field, frozen
 from Bio import SeqIO
+from Bio.Seq import Seq
 from clean_base.either import Either, right
 
 from classeq.core.domain.dtos.msa_source_format import MsaSourceFormatEnum
@@ -164,14 +165,9 @@ class KmersInverseIndices:
                 handle=source_file_path,
                 format=format.value,
             ):
-                for kmer in set(
-                    [
-                        kmer
-                        for kmer in cls.generate_kmers(
-                            dna_sequence=record.seq,
-                            k_size=k_size,
-                        )
-                    ]
+                for kmer in cls.generate_double_strand_kmers(
+                    dna_sequence=record.seq,
+                    k_size=k_size,
                 ):
                     if (header_index := headers_map.get(record.id)) is None:
                         return c_exc.DadaTransferObjectError(
@@ -236,11 +232,41 @@ class KmersInverseIndices:
         return index
 
     # ? ------------------------------------------------------------------------
-    # ? Public static methods
+    # ? Public class methods
+    # ? ------------------------------------------------------------------------
+
+    @classmethod
+    def generate_double_strand_kmers(
+        cls,
+        dna_sequence: Seq,
+        k_size: int,
+    ) -> Generator[str, None, None]:
+        for kmer in set(
+            [
+                *[
+                    kmer
+                    for kmer in cls.__generate_kmers(
+                        dna_sequence=dna_sequence,
+                        k_size=k_size,
+                    )
+                ],
+                *[
+                    kmer
+                    for kmer in cls.__generate_kmers(
+                        dna_sequence=dna_sequence.reverse_complement(),
+                        k_size=k_size,
+                    )
+                ],
+            ]
+        ):
+            yield kmer
+
+    # ? ------------------------------------------------------------------------
+    # ? Private static methods
     # ? ------------------------------------------------------------------------
 
     @staticmethod
-    def generate_kmers(
+    def __generate_kmers(
         dna_sequence: str,
         k_size: int,
     ) -> Iterator[str]:

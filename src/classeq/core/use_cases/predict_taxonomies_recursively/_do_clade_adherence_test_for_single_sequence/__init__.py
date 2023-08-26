@@ -5,25 +5,20 @@ from clean_base.either import Either, right
 
 from classeq.core.domain.dtos.kmer_inverse_index import KmersInverseIndices
 from classeq.core.domain.dtos.priors import (
+    CladePriors,
     IngroupCladePriors,
-    LabeledPriors,
     OutgroupCladePriors,
     PriorGroup,
 )
 from classeq.settings import LOGGER
 
-from .._calculate_clade_adherence_with_bootstrap import (
-    AdherenceResult,
-    AdherenceTestStrategy,
-    calculate_clade_adherence_test,
-)
+from ._dtos import AdherenceResult, AdherenceStatus
 
 
 def do_clade_adherence_test_for_single_sequence(
     query_kmers: set[str],
     clade_priors: IngroupCladePriors | OutgroupCladePriors,
     kmer_indices: KmersInverseIndices,
-    adherence_strategy: AdherenceTestStrategy = AdherenceTestStrategy(None),
 ) -> Either[c_exc.MappedErrors, dict[PriorGroup, AdherenceResult]]:
     """Calculate the probability of a sequence belongs to a clade.
 
@@ -49,6 +44,38 @@ def do_clade_adherence_test_for_single_sequence(
             not a list.
 
     """
+
+    def measure_intersection(
+        clade_priors: CladePriors,
+    ) -> AdherenceResult:
+        """Measure the intersection of the query kmers and the priors.
+
+        Attempts to avoid change the `query_kmers` variable which is inherited
+        from the parent function context.
+
+        Args:
+            clade_priors (LabeledPriors): The labeled priors.
+
+        Returns:
+            AdherenceResult: The adherence result.
+
+        """
+
+        prior_keys = clade_priors.kmers
+        match_kmers = query_kmers.intersection(set(prior_keys)).__len__()
+        status = AdherenceStatus.UNDEFINED
+
+        if match_kmers == 0:
+            status = AdherenceStatus.NOT_ENOUGH_PRIORS
+        else:
+            status = AdherenceStatus.SUCCESS
+
+        return AdherenceResult(
+            match_kmers=match_kmers,
+            query_kmers_size=len(query_kmers),
+            subject_kmers_size=len(prior_keys),
+            status=status,
+        )
 
     try:
         seed(987_654_321)
@@ -85,7 +112,7 @@ def do_clade_adherence_test_for_single_sequence(
         # ? Calculate joint probability units
         # ? --------------------------------------------------------------------
 
-        group: LabeledPriors
+        labeled_prior: CladePriors
         clade_adherence_stats: dict[PriorGroup, float] = {}
 
         # ? --------------------------------------------------------------------
@@ -93,19 +120,16 @@ def do_clade_adherence_test_for_single_sequence(
         # ? --------------------------------------------------------------------
 
         if isinstance(clade_priors, OutgroupCladePriors):
-            if (
-                adherence_either := calculate_clade_adherence_test(
-                    labeled_priors=clade_priors.labeled_priors,
-                    query_kmers=query_kmers,
-                    kmer_indices=kmer_indices,
-                    total_length=len(clade_priors.labeled_priors.labels),
-                    adherence_strategy=adherence_strategy,
-                )
-            ).is_left:
-                return adherence_either
+            adherence_result = measure_intersection(
+                clade_priors=clade_priors.clade_priors
+            )
+
+            LOGGER.debug(
+                f"\t\t{clade_priors.clade_priors.group}: {adherence_result}"
+            )
 
             clade_adherence_stats.update(
-                {clade_priors.labeled_priors.group: adherence_either.value}
+                {clade_priors.clade_priors.group: adherence_result}
             )
 
         # ? --------------------------------------------------------------------
@@ -113,23 +137,16 @@ def do_clade_adherence_test_for_single_sequence(
         # ? --------------------------------------------------------------------
 
         if isinstance(clade_priors, IngroupCladePriors):
-            for group in clade_priors.labeled_priors:
-                if (
-                    adherence_either := calculate_clade_adherence_test(
-                        labeled_priors=group,
-                        query_kmers=query_kmers,
-                        kmer_indices=kmer_indices,
-                        total_length=len(group.labels),
-                        adherence_strategy=adherence_strategy,
-                    )
-                ).is_left:
-                    return adherence_either
+            for labeled_prior in clade_priors.clade_priors:
+                adherence_result = measure_intersection(
+                    clade_priors=labeled_prior
+                )
 
-                adherence = adherence_either.value
+                LOGGER.debug(f"\t\t{labeled_prior.group}: {adherence_result}")
 
-                LOGGER.debug(f"\t\t{group.group}: {adherence}")
-
-                clade_adherence_stats.update({group.group: adherence})
+                clade_adherence_stats.update(
+                    {labeled_prior.group: adherence_result}
+                )
 
         # ? --------------------------------------------------------------------
         # ? Return a positive response

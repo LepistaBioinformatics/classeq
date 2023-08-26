@@ -18,13 +18,10 @@ from classeq.core.domain.dtos.priors import (
 from classeq.core.domain.dtos.tree import ClasseqTree
 from classeq.settings import LOGGER
 
-from ._estimate_clade_kmer_specific_priors import (
-    estimate_kmer_specific_priors_of_clade,
-)
 from ._get_terminal_nodes import get_terminal_nodes
 
 
-def calculate_recursive_priors(
+def recursively_fetch_kmers(
     reference_tree: ClasseqTree,
     root: ClasseqClade,
     outgroups: list[ClasseqClade],
@@ -55,6 +52,40 @@ def calculate_recursive_priors(
         c_exc.UseCaseError: If the outgroups are not valid.
 
     """
+
+    def fetch_kmers_indices(
+        kmer_indices: KmersInverseIndices,
+        sequence_codes: list[int],
+    ) -> Either[c_exc.MappedErrors, set[str]]:
+        """Fetch kmer indices for a given set of sequence codes.
+
+        Args:
+            kmer_indices (KmersInverseIndices): Kmer indices of the MSA.
+            sequence_codes (list[int]): Sequence codes to be used as filter.
+
+        Returns:
+            Either[c_exc.MappedErrors, set[str]]: Either a set of kmer indices
+                or a `classeq.core.domain.utils.exceptions.MappedErrors`
+                instance.
+
+        Raises:
+            c_exc.UseCaseError: If any error occurred.
+
+        """
+
+        try:
+            return right(
+                OrderedTuple(
+                    {
+                        index.kmer
+                        for index in kmer_indices.indices
+                        if not set(index.records).isdisjoint(sequence_codes)
+                    }
+                )
+            )
+
+        except Exception as exc:
+            raise c_exc.UseCaseError(exc, logger=LOGGER)()
 
     try:
         # ? --------------------------------------------------------------------
@@ -99,19 +130,28 @@ def calculate_recursive_priors(
             )()
 
         if (
+            outgroup_kmers_either := fetch_kmers_indices(
+                kmer_indices=kmer_indices,
+                sequence_codes=[i.name for i in outgroups],
+            )
+        ).is_left:
+            return outgroup_kmers_either
+
+        """ if (
             outgroup_priors_either := estimate_kmer_specific_priors_of_clade(
                 kmer_indices=kmer_indices,
                 sequence_codes=[i.name for i in outgroups],
                 corpus_size=(1 + len(outgroups) + len(ingroups)),
             )
         ).is_left:
-            return outgroup_priors_either
+            return outgroup_priors_either """
 
         outgroup_priors = OutgroupCladePriors(
             parent=outgroup_parent,
-            labeled_priors=OutgroupLabeledPriors(
+            clade_priors=OutgroupLabeledPriors(
                 labels=OrderedTuple(outgroup_labels),
-                priors=outgroup_priors_either.value,
+                # priors=outgroup_priors_either.value,
+                kmers=outgroup_kmers_either.value,
             ),
         )
 
@@ -151,7 +191,7 @@ def calculate_recursive_priors(
             )
 
             if len(ingroup) < min_clade_size:
-                LOGGER.warning(
+                LOGGER.debug(
                     "Ingroup clade ineligible for training due do not having "
                     + f"the minimum number of terminals ({min_clade_size}): "
                     + f"{clade.id}"
@@ -175,7 +215,7 @@ def calculate_recursive_priors(
             ]
 
             if len(sister_group) < min_clade_size:
-                LOGGER.warning(
+                LOGGER.debug(
                     "Sister group clade ineligible for training due do not "
                     + "reaches the minimum number of terminals "
                     + f"({min_clade_size}): {clade.id}"
@@ -191,9 +231,9 @@ def calculate_recursive_priors(
             # ? Calculate corpus size of the current clade
             # ? ----------------------------------------------------------------
 
-            corpus_size = 1 + len(ingroup) + len(sister_group)
+            """ corpus_size = 1 + len(ingroup) + len(sister_group)
 
-            LOGGER.debug(f"\tCorpus size: {corpus_size}")
+            LOGGER.debug(f"\tCorpus size: {corpus_size}") """
 
             # ? ----------------------------------------------------------------
             # ? Estimate specific priors
@@ -204,33 +244,51 @@ def calculate_recursive_priors(
             LOGGER.debug("\t\tEstimating ingroup")
 
             if (
+                ingroup_priors_either := fetch_kmers_indices(
+                    kmer_indices=kmer_indices,
+                    sequence_codes=ingroup_labels,
+                )
+            ).is_left:
+                return ingroup_priors_either
+
+            """ if (
                 ingroup_priors_either := estimate_kmer_specific_priors_of_clade(
                     kmer_indices=kmer_indices,
                     sequence_codes=ingroup_labels,
                     corpus_size=corpus_size,
                 )
             ).is_left:
-                return ingroup_priors_either
+                return ingroup_priors_either """
 
             ingroup_specific_priors = IngroupLabeledPriors(
                 labels=OrderedTuple(ingroup_labels),
-                priors=ingroup_priors_either.value,
+                # priors=ingroup_priors_either.value,
+                kmers=ingroup_priors_either.value,
             )
 
             LOGGER.debug("\t\tEstimating sister ingroup")
 
             if (
+                sister_group_priors_either := fetch_kmers_indices(
+                    kmer_indices=kmer_indices,
+                    sequence_codes=sister_group_labels,
+                )
+            ).is_left:
+                return sister_group_priors_either
+
+            """ if (
                 sister_group_priors_either := estimate_kmer_specific_priors_of_clade(
                     kmer_indices=kmer_indices,
                     sequence_codes=sister_group_labels,
                     corpus_size=corpus_size,
                 )
             ).is_left:
-                return sister_group_priors_either
+                return sister_group_priors_either """
 
             sister_group_specific_priors = SisterGroupLabeledPriors(
                 labels=OrderedTuple(sister_group_labels),
-                priors=sister_group_priors_either.value,
+                # priors=sister_group_priors_either.value,
+                kmers=sister_group_priors_either.value,
             )
 
             LOGGER.debug("\tEstimation finished")
@@ -238,7 +296,7 @@ def calculate_recursive_priors(
             ingroups_priors.append(
                 IngroupCladePriors(
                     parent=clade.id,
-                    labeled_priors=(
+                    clade_priors=(
                         ingroup_specific_priors,
                         sister_group_specific_priors,
                     ),

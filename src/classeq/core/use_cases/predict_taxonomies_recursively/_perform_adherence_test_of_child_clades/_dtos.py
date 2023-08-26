@@ -5,7 +5,7 @@ from attrs import define, field
 
 from classeq.core.domain.dtos.clade import ClasseqClade
 
-from .._calculate_clade_adherence_with_bootstrap._dtos import AdherenceResult
+from .._do_clade_adherence_test_for_single_sequence._dtos import AdherenceResult
 
 
 class CladeAdherenceResultStatus(Enum):

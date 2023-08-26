@@ -8,13 +8,10 @@ from classeq.core.domain.dtos.kmer_inverse_index import KmersInverseIndices
 from classeq.core.domain.dtos.priors import PriorGroup, TreePriors
 from classeq.settings import LOGGER
 
-from .._calculate_clade_adherence_with_bootstrap._dtos import (
-    AdherenceResult,
-    AdherenceTestStrategy,
-)
 from .._do_clade_adherence_test_for_single_sequence import (
     do_clade_adherence_test_for_single_sequence,
 )
+from .._do_clade_adherence_test_for_single_sequence._dtos import AdherenceResult
 from ._dtos import CladeAdherenceResult, CladeAdherenceResultStatus
 
 
@@ -83,11 +80,7 @@ def perform_adherence_test_of_child_clades(
         # ? --------------------------------------------------------------------
 
         contrasting_clades: set[CladeAdherenceResult] = set()
-        sister_joint_probabilities: list[AdherenceResult] = []
-
-        adherence_strategy: AdherenceTestStrategy = kwargs.get(
-            "adherence_strategy", AdherenceTestStrategy(None)
-        )
+        sister_adherence_tests: list[AdherenceResult] = []
 
         for clade in clades:
             LOGGER.debug("")
@@ -98,7 +91,7 @@ def perform_adherence_test_of_child_clades(
                     i for i in tree_priors.ingroups if i.parent == clade.id
                 )
             except StopIteration:
-                LOGGER.warning(f"Ignore child: {clade}")
+                LOGGER.debug(f"Ignore child with by small clade size: {clade}")
                 continue
 
             if (
@@ -127,26 +120,16 @@ def perform_adherence_test_of_child_clades(
                     logger=LOGGER,
                 )()
 
-            if adherence_strategy == AdherenceTestStrategy.JOINT_PROBABILITY:
-                if ingroup.joint_probability < sister.joint_probability:
-                    contrasting_clades.add(
-                        CladeAdherenceResult(
-                            clade=clade,
-                            ingroup_adherence_test=ingroup,
-                            sister_adherence_test=sister,
-                        )
+            if ingroup.match_kmers > sister.match_kmers:
+                contrasting_clades.add(
+                    CladeAdherenceResult(
+                        clade=clade,
+                        ingroup_adherence_test=ingroup,
+                        sister_adherence_test=sister,
                     )
-            else:
-                if ingroup.match_kmers > sister.match_kmers:
-                    contrasting_clades.add(
-                        CladeAdherenceResult(
-                            clade=clade,
-                            ingroup_adherence_test=ingroup,
-                            sister_adherence_test=sister,
-                        )
-                    )
+                )
 
-            sister_joint_probabilities.append(sister)
+            sister_adherence_tests.append(sister)
 
         # ? --------------------------------------------------------------------
         # ? Return a positive response
@@ -156,11 +139,11 @@ def perform_adherence_test_of_child_clades(
             return right(
                 (
                     (
-                        min(
-                            sister_joint_probabilities,
-                            key=lambda i: i.joint_probability,
+                        max(
+                            sister_adherence_tests,
+                            key=lambda i: i.match_kmers,
                         )
-                        if len(sister_joint_probabilities) > 0
+                        if len(sister_adherence_tests) > 0
                         else None
                     ),
                     None,
@@ -199,7 +182,8 @@ def perform_adherence_test_of_child_clades(
                 (
                     sorted(
                         contrasting_clades,
-                        key=lambda i: i.ingroup_adherence_test.joint_probability,
+                        key=lambda i: i.ingroup_adherence_test.match_kmers,
+                        reverse=True,
                     )[0].ingroup_adherence_test,
                     None,
                     CladeAdherenceResultStatus.INCONCLUSIVE,

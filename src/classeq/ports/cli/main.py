@@ -11,15 +11,10 @@ from classeq.core.domain.dtos.msa_source_format import MsaSourceFormatEnum
 from classeq.core.domain.dtos.priors import TreePriors
 from classeq.core.domain.dtos.reference_set import ReferenceSet
 from classeq.core.domain.dtos.tree_source_format import TreeSourceFormatEnum
+from classeq.core.use_cases.indexing_phylogeny import indexing_phylogeny
 from classeq.core.use_cases.load_source_files import load_source_files
 from classeq.core.use_cases.predict_taxonomies_recursively import (
     predict_for_multiple_fasta_file,
-)
-from classeq.core.use_cases.predict_taxonomies_recursively._calculate_clade_adherence_with_bootstrap._dtos import (
-    AdherenceTestStrategy,
-)
-from classeq.core.use_cases.train_from_single_phylogeny import (
-    train_from_single_phylogeny,
 )
 from classeq.settings import DEFAULT_KMER_SIZE, LOGGER
 
@@ -67,10 +62,10 @@ def pipe_cmd() -> None:
 
 
 @std_cmd.command(
-    "load",
+    "indexing",
     help=(
-        "Parse a FASTA file and TREE phylogeny into a JSON file. Run "
-        + "'classeq std parse --help' for more information."
+        "Parse a FASTA file and TREE phylogeny and calculate priors of the "
+        + "individual phylogeny."
     ),
 )
 @click.option(
@@ -202,6 +197,11 @@ def parse_source_files_cmd(
             click.echo("Error: Something went wrong.")
             exit(1)
 
+        if (response := indexing_phylogeny(references=response.value)).is_left:
+            LOGGER.error(response.value.msg)
+            click.echo("Error: Something went wrong.")
+            exit(1)
+
     except Exception as exc:
         click.echo(f"Error: {exc}")
         exit(1)
@@ -266,7 +266,7 @@ def calculate_priors_cmd(
             exit(1)
 
         if (
-            response := train_from_single_phylogeny(
+            response := indexing_phylogeny(
                 references=reference_set_either.value
             )
         ).is_left:
@@ -338,34 +338,11 @@ def calculate_priors_cmd(
     ),
     help="The path to the annotated phylogeny in PHYLO-JSON format.",
 )
-@click.option(
-    "--adherence-strategy",
-    required=False,
-    show_default=True,
-    default=AdherenceTestStrategy(None).value,
-    type=click.Choice(
-        [
-            AdherenceTestStrategy.JOINT_PROBABILITY.value,
-            AdherenceTestStrategy.KMERS_INTERSECTION.value,
-        ],
-        case_sensitive=False,
-    ),
-    help="The adherence test strategy.",
-)
-@click.option(
-    "--calculate-bootstrap",
-    is_flag=True,
-    show_default=True,
-    default=False,
-    help="Calculate bootstrap probability of clades if True.",
-)
 def infer_identity_cmd(
     fasta_file_path: str,
     references_path: str,
     priors_path: str,
-    adherence_strategy: str,
     annotated_phylojson_path: str | None = None,
-    calculate_bootstrap: bool = False,
     output_file_path: str | None = None,
 ) -> None:
     """Try to infer identity of multi FASTA sequences."""
@@ -415,13 +392,11 @@ def infer_identity_cmd(
                 fasta_format=MsaSourceFormatEnum.FASTA,
                 tree_priors=tree_priors_either.value,
                 reference_set=reference_set_either.value,
-                adherence_strategy=AdherenceTestStrategy(adherence_strategy),
                 annotated_phylojson_path=(
                     Path(annotated_phylojson_path)
                     if annotated_phylojson_path is not None
                     else None
                 ),
-                calculate_bootstrap=calculate_bootstrap,
                 output_file_path=(
                     Path(output_file_path)
                     if output_file_path is not None

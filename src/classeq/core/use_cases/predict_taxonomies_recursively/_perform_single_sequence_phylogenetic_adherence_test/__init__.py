@@ -1,6 +1,7 @@
 from copy import copy
 from typing import Any
 
+from Bio.Seq import Seq
 import clean_base.exceptions as c_exc
 from clean_base.either import Either, right
 
@@ -10,7 +11,7 @@ from classeq.core.domain.dtos.priors import PriorGroup, TreePriors
 from classeq.core.domain.dtos.reference_set import ReferenceSet
 from classeq.settings import LOGGER
 
-from .._calculate_clade_adherence_with_bootstrap._dtos import (
+from .._do_clade_adherence_test_for_single_sequence._dtos import (
     AdherenceResult,
     AdherenceStatus,
 )
@@ -103,8 +104,8 @@ def perform_single_sequence_phylogenetic_adherence_test(
 
         query_kmers: set[str] = {
             kmer
-            for kmer in KmersInverseIndices.generate_kmers(
-                dna_sequence=target_sequence.upper(),
+            for kmer in KmersInverseIndices.generate_double_strand_kmers(
+                dna_sequence=Seq(target_sequence.upper()),
                 k_size=reference_set.kmer_size,
             )
         }
@@ -194,8 +195,6 @@ def perform_single_sequence_phylogenetic_adherence_test(
             and status == CladeAdherenceResultStatus.NEXT_ITERATION
         ):
             current_iteration += 1
-            # clade = response_clades.pop(0)
-            # clade_path.append(clade)
 
             if len(response_clades) == 1:
                 clade = response_clades.pop(0)
@@ -208,7 +207,6 @@ def perform_single_sequence_phylogenetic_adherence_test(
             children = [i for i in children if i.is_internal()]
 
             if len(children) == 0:
-                # final_response = clade
                 break
 
             if (
@@ -241,7 +239,6 @@ def perform_single_sequence_phylogenetic_adherence_test(
             # absence of priors to perform comparisons.
             # ------------------------------------------------------------------
             if status == CladeAdherenceResultStatus.MAX_RESOLUTION_REACHED:
-                # final_response = clade
                 break
 
             # ------------------------------------------------------------------
@@ -294,7 +291,6 @@ def perform_single_sequence_phylogenetic_adherence_test(
             # be broken.
             # ------------------------------------------------------------------
             else:
-                # final_response = clade
                 break
 
             # ------------------------------------------------------------------

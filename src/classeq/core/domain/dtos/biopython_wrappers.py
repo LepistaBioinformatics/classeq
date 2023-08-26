@@ -1,4 +1,5 @@
 from copy import deepcopy
+from enum import Enum
 from typing import Any, Self
 from uuid import UUID, uuid4
 
@@ -32,6 +33,81 @@ class ExtendedBioPythonElement:
     __str__ = __repr__  # type: ignore
 
 
+class MajorTaxonomicRanks(Enum):
+    KINGDOM = "kingdom"
+    PHYLUM = "phylum"
+    CLASS = "class"
+    ORDER = "order"
+    FAMILY = "family"
+    GENUS = "genus"
+    SPECIES = "species"
+
+
+class MinorTaxonomicRanks(Enum):
+    SUB_KINGDOM = "subkingdom"
+    SUB_PHYLUM = "subphylum"
+    INFRA_CLASS = "infraclass"
+    SUB_CLASS = "subclass"
+    SUB_ORDER = "suborder"
+    INFRA_ORDER = "infraorder"
+    SUB_FAMILY = "subfamily"
+    SUB_GENUS = "subgenus"
+    SUB_SPECIES = "subspecies"
+
+
+class ExtraTaxonomicRanks(Enum):
+    NO_RANK = "no-rank"
+    BIOTYPE = "biotype"
+    CLADE = "clade"
+    COHORT = "cohort"
+    SUB_COHORT = "subcohort"
+    FORMA = "forma"
+    FORMA_SPECIALIS = "forma-specialis"
+    GENOTYPE = "genotype"
+    ISOLATE = "isolate"
+    MORPH = "morph"
+    PARV_ORDER = "parvorder"
+    PATHO_GROUP = "pathogroup"
+    SECTION = "section"
+    SERIES = "series"
+    SERO_GROUP = "serogroup"
+    SEROTYPE = "serotype"
+    SPECIES_GROUP = "species-group"
+    SPECIES_SUBGROUP = "species-subgroup"
+    STRAIN = "strain"
+    SUB_SECTION = "subsection"
+    SUB_TRIBE = "subtribe"
+    SUB_VARIETY = "subvariety"
+    SUPER_CLASS = "superclass"
+    SUPER_FAMILY = "superfamily"
+    SUPER_KINGDOM = "superkingdom"
+    SUPER_ORDER = "superorder"
+    SUPER_PHYLUM = "superphylum"
+    TRIBE = "tribe"
+    VARIETAS = "varietas"
+
+
+def try_to_reach_rank_enum(
+    rank: str,
+) -> MajorTaxonomicRanks | MinorTaxonomicRanks | ExtraTaxonomicRanks | None:
+    try:
+        return MajorTaxonomicRanks(rank)
+    except ValueError:
+        pass
+
+    try:
+        return MinorTaxonomicRanks(rank)
+    except ValueError:
+        pass
+
+    try:
+        return ExtraTaxonomicRanks(rank)
+    except ValueError:
+        pass
+
+    return None
+
+
 class ExtendedBioPythonClade(ExtendedBioPythonElement, Clade):
     # ? ------------------------------------------------------------------------
     # ? Class attributes
@@ -39,6 +115,10 @@ class ExtendedBioPythonClade(ExtendedBioPythonElement, Clade):
 
     _id: UUID
     _is_outgroup: bool
+    _taxid: int | None = None
+    _related_rank: MajorTaxonomicRanks | MinorTaxonomicRanks | ExtraTaxonomicRanks | None = (
+        None
+    )
 
     # ? ------------------------------------------------------------------------
     # ? Life cycle hook methods
@@ -48,12 +128,19 @@ class ExtendedBioPythonClade(ExtendedBioPythonElement, Clade):
         self,
         id: UUID | None = None,
         is_outgroup: bool | None = None,
+        taxid: int | None = None,
+        related_rank: MajorTaxonomicRanks
+        | MinorTaxonomicRanks
+        | ExtraTaxonomicRanks
+        | None = None,
         *args: Any,
         **kwargs: Any,
     ) -> None:
         super().__init__(*args, **kwargs)
         self._id = id or uuid4()
         self._is_outgroup = is_outgroup or False
+        self._taxid = taxid or None
+        self._related_rank = related_rank or None
 
     # ? ------------------------------------------------------------------------
     # ? Public instance methods
@@ -68,6 +155,12 @@ class ExtendedBioPythonClade(ExtendedBioPythonElement, Clade):
             "confidence": self.confidence,
             "color": self.color,
             "width": self.width,
+            "taxid": self._taxid,
+            "related_rank": (
+                self._related_rank.value
+                if self._related_rank is not None
+                else None
+            ),
             "clades": [clade.to_dict() for clade in self.clades],
         }
 
@@ -88,6 +181,12 @@ class ExtendedBioPythonClade(ExtendedBioPythonElement, Clade):
             confidence=content.get("confidence"),
             color=content.get("color"),
             width=content.get("width"),
+            taxid=content.get("taxid"),
+            related_rank=(
+                try_to_reach_rank_enum(related_rank)
+                if (related_rank := content.get("related_rank")) is not None
+                else None
+            ),
             clades=[
                 cls.from_dict(clade) for clade in content.get("clades", [])
             ],
@@ -167,11 +266,43 @@ class ExtendedBioPythonTree(Tree):
     # ? Public instance methods
     # ? ------------------------------------------------------------------------
 
-    def set_clade_name(self, clade_id: UUID, name: str) -> None:
-        for clade in [
-            clade for clade in self.find_clades() if clade._id == clade_id
-        ]:
+    def set_clade_name(
+        self,
+        id: UUID,
+        name: str,
+    ) -> None:
+        for clade in [clade for clade in self.find_clades() if clade._id == id]:
             setattr(clade, "name", name)
+
+    def set_clade_taxid(
+        self,
+        id: UUID,
+        taxid: int,
+    ) -> None:
+        for clade in [clade for clade in self.find_clades() if clade._id == id]:
+            setattr(clade, "_taxid", taxid)
+
+    def set_clade_rank(
+        self,
+        id: UUID,
+        rank: MajorTaxonomicRanks
+        | MinorTaxonomicRanks
+        | ExtraTaxonomicRanks
+        | None = None,
+    ) -> None:
+        for clade in [clade for clade in self.find_clades() if clade._id == id]:
+            setattr(clade, "_related_rank", rank)
+
+    def find_clade_by_id(
+        self,
+        id: UUID,
+    ) -> None:
+        try:
+            return next(
+                clade for clade in self.find_clades() if clade._id == id
+            )
+        except StopIteration:
+            return None
 
     # ? ------------------------------------------------------------------------
     # ? Public class methods
