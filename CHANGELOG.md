@@ -1,3 +1,9 @@
+## v0.4.2 (2023-08-26)
+
+### Fix
+
+- remove unused commands from cli port
+
 ## v0.4.1 (2023-08-26)
 
 ### Fix
