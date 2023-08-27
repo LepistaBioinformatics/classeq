@@ -34,34 +34,12 @@ def classeq_cmd() -> None:
     pass
 
 
-@classeq_cmd.group(
-    "std",
-    help=(
-        "Run standalone steps of the pipeline. Run 'classeq std --help' for "
-        + "more information."
-    ),
-)
-def std_cmd() -> None:
-    pass
-
-
-@classeq_cmd.group(
-    "pipe",
-    help=(
-        "Run the complete pipeline pipeline. Run 'classeq pipe --help' for "
-        + "more information."
-    ),
-)
-def pipe_cmd() -> None:
-    pass
-
-
 # ? ----------------------------------------------------------------------------
 # ? Initialize the CLI sub-commands
 # ? ----------------------------------------------------------------------------
 
 
-@std_cmd.command(
+@classeq_cmd.command(
     "indexing",
     help=(
         "Parse a FASTA file and TREE phylogeny and calculate priors of the "
@@ -217,69 +195,7 @@ def __load_outgroups_from_file(file: Path) -> list[str]:
     return list({outgroup.strip() for outgroup in outgroups})
 
 
-@std_cmd.command(
-    "train",
-    help="Calculate priors of the individual phylogeny clades.",
-)
-@click.option(
-    "-r",
-    "--references",
-    required=True,
-    type=click.Path(
-        resolve_path=True,
-        readable=True,
-        exists=True,
-        dir_okay=True,
-    ),
-    help="The path to the reference file set calculated during data loading.",
-)
-def calculate_priors_cmd(
-    references: str,
-    **_: Any,
-) -> None:
-    """Calculate priors of the individual phylogeny clades."""
-
-    LOGGER.debug(" ".join(argv))
-
-    try:
-        references_path = Path(references)
-
-        if not references_path.is_file():
-            click.echo(
-                "Error: You must provide a valid path for the reference priors."
-            )
-
-            exit(1)
-
-        with gzip.open(references_path, "r") as fin:
-            json_bytes = fin.read()
-
-        json_str = json_bytes.decode("utf-8")
-
-        if (
-            reference_set_either := ReferenceSet.from_dict(
-                content=loads(json_str)
-            )
-        ).is_left:
-            LOGGER.error(reference_set_either.value.msg)
-            click.echo("Error: Something went wrong.")
-            exit(1)
-
-        if (
-            response := indexing_phylogeny(
-                references=reference_set_either.value
-            )
-        ).is_left:
-            LOGGER.error(response.value.msg)
-            click.echo("Error: Something went wrong.")
-            exit(1)
-
-    except Exception as exc:
-        click.echo(f"Error: {exc}")
-        exit(1)
-
-
-@std_cmd.command(
+@classeq_cmd.command(
     "predict",
     help="Try to infer identity of multi FASTA sequences.",
 )
