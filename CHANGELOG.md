@@ -1,3 +1,17 @@
+## v0.4.0 (2023-08-26)
+
+### Feat
+
+- upgrade enums to use ordered-tuple as tuple manager default and update prediction use-cases to better performance
+
+### Fix
+
+- remove unused code of joint probability calculate
+
+### Refactor
+
+- remove joint probability strategy from application
+
 ## v0.3.6 (2023-08-22)
 
 ### Fix
