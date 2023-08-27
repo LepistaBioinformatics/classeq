@@ -121,8 +121,6 @@ class TreeEditor(QMainWindow):
 
         left_widget = QWidget(left_splitter)
         left_layout = QVBoxLayout(left_widget)
-        print(left_layout)
-        # left_splitter.addWidget(left_widget)
 
         table_fields = [
             "Node Name",
@@ -135,21 +133,17 @@ class TreeEditor(QMainWindow):
             "Children",
         ]
 
-        table_view = self.__table_view = QTableWidget(
-            len(table_fields), 1, left_widget
-        )
+        table_view = self.__table_view = QTableWidget(len(table_fields), 1)
 
         table_view.setHorizontalHeaderLabels(["Values"])
         table_view.setVerticalHeaderLabels(table_fields)
         table_view.horizontalHeader().setStretchLastSection(True)
         table_view.verticalHeader().setStretchLastSection(True)
         table_view.setFixedHeight(280)
-        table_view.resizeColumnsToContents()
 
-        line_edit = QLineEdit(left_widget)
-
-        left_splitter.addWidget(self.__table_view)
-        left_splitter.addWidget(line_edit)
+        left_layout.addWidget(table_view)
+        left_layout.addStretch()
+        left_splitter.setStretchFactor(1, 1)
 
         # ? --------------------------------------------------------------------
         # ? Left panel = Filter box + Tree box
