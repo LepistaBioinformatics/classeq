@@ -4,7 +4,7 @@ from uuid import UUID
 
 import clean_base.exceptions as c_exc
 from attrs import field, frozen
-from clean_base.either import Either, left, right
+from clean_base.either import Either, right
 
 from classeq.core.domain.dtos.ordered_tuple import OrderedTuple
 from classeq.settings import LOGGER
@@ -14,7 +14,6 @@ class PriorGroup(Enum):
     OUTGROUP = "outgroup"
     INGROUP = "ingroup"
     SISTER = "sister"
-    NOISE = "noise"
 
     def __str__(self) -> str:
         return self.name
@@ -27,7 +26,6 @@ class CladePriors:
     # ? ------------------------------------------------------------------------
 
     labels: OrderedTuple = field()
-    # priors: defaultdict[str, float] = field()
     kmers: OrderedTuple = field()
     group: PriorGroup = field()
 
@@ -38,7 +36,6 @@ class CladePriors:
     def to_dict(self) -> dict[str, Any]:
         return {
             "labels": self.labels,
-            # "priors": self.priors,
             "kmers": self.kmers,
             "group": self.group.value,
         }
@@ -52,36 +49,40 @@ class CladePriors:
         cls,
         content: dict[str, Any],
     ) -> Either[c_exc.MappedErrors, Self]:
-        for key in [
-            "labels",
-            # "priors",
-            "kmers",
-            "group",
-        ]:
+        for key in ["labels", "kmers", "group"]:
             if key not in content:
-                return left(
-                    c_exc.DadaTransferObjectError(
-                        f"Invalid content detected on parse `{CladePriors}`. "
-                        f"{key}` key is empty.",
-                        logger=LOGGER,
-                    )
-                )
-
-        if (labels := content.get("labels")) is None:
-            return left(
-                c_exc.DadaTransferObjectError(
+                return c_exc.DadaTransferObjectError(
                     f"Invalid content detected on parse `{CladePriors}`. "
                     f"{key}` key is empty.",
                     logger=LOGGER,
-                )
-            )
+                )()
+
+        if (labels := content.get("labels")) is None:
+            return c_exc.DadaTransferObjectError(
+                f"Invalid content detected on parse `{CladePriors}`. "
+                f"{key}` key is empty.",
+                logger=LOGGER,
+            )()
+
+        if (kmers := content.get("kmers")) is None:
+            return c_exc.DadaTransferObjectError(
+                f"Invalid content detected on parse `{CladePriors}`. "
+                f"{key}` key is empty.",
+                logger=LOGGER,
+            )()
+
+        if (group := content.get("group")) is None:
+            return c_exc.DadaTransferObjectError(
+                f"Invalid content detected on parse `{CladePriors}`. "
+                f"{key}` key is empty.",
+                logger=LOGGER,
+            )()
 
         return right(
             cls(
                 labels=OrderedTuple([int(i) for i in labels]),
-                # priors=defaultdict(float, content.get("priors")),  # type: ignore
-                kmers=OrderedTuple(content.get("kmers")),  # type: ignore
-                group=PriorGroup(content.get("group").lower()),  # type: ignore
+                kmers=OrderedTuple(kmers),
+                group=PriorGroup(group.lower()),
             )
         )
 
@@ -92,22 +93,17 @@ class OutgroupLabeledPriors(CladePriors):
 
 
 @frozen(kw_only=True)
-class IngroupLabeledPriors(CladePriors):
+class IngroupCladePriors(CladePriors):
     group: PriorGroup = field(default=PriorGroup.INGROUP)
 
 
 @frozen(kw_only=True)
-class SisterGroupLabeledPriors(CladePriors):
+class SisterCladePriors(CladePriors):
     group: PriorGroup = field(default=PriorGroup.SISTER)
 
 
 @frozen(kw_only=True)
-class NoiseGroupLabeledPriors(CladePriors):
-    group: PriorGroup = field(default=PriorGroup.NOISE)
-
-
-@frozen(kw_only=True)
-class OutgroupCladePriors:
+class OutgroupPriors:
     """These object stores priors of a single clade."""
 
     # ? ------------------------------------------------------------------------
@@ -146,13 +142,11 @@ class OutgroupCladePriors:
             "clade_priors",
         ]:
             if key not in content:
-                return left(
-                    c_exc.DadaTransferObjectError(
-                        f"Invalid content detected on parse `{OutgroupCladePriors}`. "
-                        f"{key}` key is empty.",
-                        logger=LOGGER,
-                    )
-                )
+                return c_exc.DadaTransferObjectError(
+                    f"Invalid content detected on parse `{OutgroupPriors}`. "
+                    f"{key}` key is empty.",
+                    logger=LOGGER,
+                )()
 
         priors_either = OutgroupLabeledPriors.from_dict(
             content=content.get("clade_priors")  # type: ignore
@@ -170,7 +164,7 @@ class OutgroupCladePriors:
 
 
 @frozen(kw_only=True)
-class IngroupCladePriors:
+class IngroupPriors:
     """These object stores priors of a single clade."""
 
     # ? ------------------------------------------------------------------------
@@ -184,8 +178,8 @@ class IngroupCladePriors:
     # Priors of specific groups, being in order: ingroup, sister, and random
     # groups, respectively.
     clade_priors: tuple[
-        IngroupLabeledPriors,
-        SisterGroupLabeledPriors,
+        IngroupCladePriors,
+        SisterCladePriors,
     ] = field()
 
     # ? ------------------------------------------------------------------------
@@ -212,13 +206,11 @@ class IngroupCladePriors:
             "clade_priors",
         ]:
             if key not in content:
-                return left(
-                    c_exc.DadaTransferObjectError(
-                        f"Invalid content detected on parse `{IngroupCladePriors}`."
-                        f" {key}` key is empty.",
-                        logger=LOGGER,
-                    )
-                )
+                return c_exc.DadaTransferObjectError(
+                    f"Invalid content detected on parse `{IngroupPriors}`."
+                    f" {key}` key is empty.",
+                    logger=LOGGER,
+                )()
 
         priors: list[CladePriors] = []
 
@@ -237,14 +229,12 @@ class IngroupCladePriors:
             cls(
                 parent=UUID(content.get("parent")),
                 clade_priors=(
-                    IngroupLabeledPriors(
+                    IngroupCladePriors(
                         labels=ingroup_prior.labels,
-                        # priors=ingroup_prior.priors,
                         kmers=ingroup_prior.kmers,
                     ),
-                    SisterGroupLabeledPriors(
+                    SisterCladePriors(
                         labels=sister_prior.labels,
-                        # priors=sister_prior.priors,
                         kmers=sister_prior.kmers,
                     ),
                 ),
@@ -262,8 +252,8 @@ class TreePriors:
     # ? Class attributes
     # ? ------------------------------------------------------------------------
 
-    outgroup: OutgroupCladePriors = field()
-    ingroups: list[IngroupCladePriors] = field(default=[])
+    outgroup: OutgroupPriors = field()
+    ingroups: list[IngroupPriors] = field(default=[])
 
     # ? ------------------------------------------------------------------------
     # ? Public instance methods
@@ -289,24 +279,22 @@ class TreePriors:
             "ingroups",
         ]:
             if key not in content:
-                return left(
-                    c_exc.DadaTransferObjectError(
-                        f"Invalid content detected on parse `{TreePriors}`. "
-                        f"{key}` key is empty.",
-                        logger=LOGGER,
-                    )
-                )
+                return c_exc.DadaTransferObjectError(
+                    f"Invalid content detected on parse `{TreePriors}`. "
+                    f"{key}` key is empty.",
+                    logger=LOGGER,
+                )()
 
-        outgroup_either = OutgroupCladePriors.from_dict(
+        outgroup_either = OutgroupPriors.from_dict(
             content=content.get("outgroup")  # type: ignore
         )
 
         if outgroup_either.is_left:
             return outgroup_either
 
-        ingroups: list[IngroupCladePriors] = []
+        ingroups: list[IngroupPriors] = []
         for item in content.get("ingroups"):  # type: ignore
-            parsed_item = IngroupCladePriors.from_dict(content=item)
+            parsed_item = IngroupPriors.from_dict(content=item)
 
             if parsed_item.is_left:
                 return parsed_item

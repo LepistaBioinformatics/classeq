@@ -17,7 +17,6 @@ class AdherenceResult:
     query_kmers_size: int = field()
     subject_kmers_size: int = field()
     status: AdherenceStatus = field(default=AdherenceStatus.UNDEFINED)
-    adherence_p_value: float = field(default=-999)
 
     def __str__(self) -> str:
         return (
@@ -25,6 +24,5 @@ class AdherenceResult:
             + f"match_kmers={self.match_kmers}, "
             + f"q={self.query_kmers_size}, "
             + f"s={self.subject_kmers_size}, "
-            + f"status={self.status.name}, "
-            + "adherence_p_value=%0.6f )" % self.adherence_p_value
+            + f"status={self.status.name} )"
         )

@@ -1,8 +1,8 @@
 from copy import copy
 from typing import Any
 
-from Bio.Seq import Seq
 import clean_base.exceptions as c_exc
+from Bio.Seq import Seq
 from clean_base.either import Either, right
 
 from classeq.core.domain.dtos.clade import ClasseqClade
@@ -11,19 +11,18 @@ from classeq.core.domain.dtos.priors import PriorGroup, TreePriors
 from classeq.core.domain.dtos.reference_set import ReferenceSet
 from classeq.settings import LOGGER
 
+from .._do_clade_adherence_test_for_single_sequence import (
+    do_clade_adherence_test_for_single_sequence,
+)
 from .._do_clade_adherence_test_for_single_sequence._dtos import (
     AdherenceResult,
     AdherenceStatus,
-)
-from .._do_clade_adherence_test_for_single_sequence import (
-    do_clade_adherence_test_for_single_sequence,
 )
 from .._perform_adherence_test_of_child_clades import (
     CladeAdherenceResult,
     CladeAdherenceResultStatus,
     perform_adherence_test_of_child_clades,
 )
-from ._dtos import AdherenceTestResultGroup
 
 
 def perform_single_sequence_phylogenetic_adherence_test(
@@ -34,11 +33,7 @@ def perform_single_sequence_phylogenetic_adherence_test(
     **kwargs: Any,
 ) -> Either[
     c_exc.MappedErrors,
-    tuple[
-        ClasseqClade | AdherenceTestResultGroup,
-        list[ClasseqClade],
-        CladeAdherenceResultStatus,
-    ],
+    tuple[list[ClasseqClade], CladeAdherenceResultStatus],
 ]:
     """Perform phylogenetic adherence test.
 
@@ -184,10 +179,6 @@ def perform_single_sequence_phylogenetic_adherence_test(
         response_clades: list[ClasseqClade] = ingroup_clades
         current_iteration: int = 0
 
-        final_response: ClasseqClade | AdherenceTestResultGroup = (
-            AdherenceTestResultGroup.OUTGROUP
-        )
-
         clade_path: list[CladeAdherenceResult] = list()
 
         while (
@@ -309,7 +300,7 @@ def perform_single_sequence_phylogenetic_adherence_test(
         # ? Return a positive response
         # ? --------------------------------------------------------------------
 
-        return right((final_response, clade_path, status))
+        return right((clade_path, status))
 
     except Exception as exc:
         return c_exc.UseCaseError(exc, logger=LOGGER)()

@@ -8,11 +8,11 @@ from classeq.core.domain.dtos.clade import ClasseqClade
 from classeq.core.domain.dtos.kmer_inverse_index import KmersInverseIndices
 from classeq.core.domain.dtos.ordered_tuple import OrderedTuple
 from classeq.core.domain.dtos.priors import (
+    IngroupPriors,
     IngroupCladePriors,
-    IngroupLabeledPriors,
-    OutgroupCladePriors,
+    OutgroupPriors,
     OutgroupLabeledPriors,
-    SisterGroupLabeledPriors,
+    SisterCladePriors,
     TreePriors,
 )
 from classeq.core.domain.dtos.tree import ClasseqTree
@@ -137,20 +137,10 @@ def recursively_fetch_kmers(
         ).is_left:
             return outgroup_kmers_either
 
-        """ if (
-            outgroup_priors_either := estimate_kmer_specific_priors_of_clade(
-                kmer_indices=kmer_indices,
-                sequence_codes=[i.name for i in outgroups],
-                corpus_size=(1 + len(outgroups) + len(ingroups)),
-            )
-        ).is_left:
-            return outgroup_priors_either """
-
-        outgroup_priors = OutgroupCladePriors(
+        outgroup_priors = OutgroupPriors(
             parent=outgroup_parent,
             clade_priors=OutgroupLabeledPriors(
                 labels=OrderedTuple(outgroup_labels),
-                # priors=outgroup_priors_either.value,
                 kmers=outgroup_kmers_either.value,
             ),
         )
@@ -174,7 +164,7 @@ def recursively_fetch_kmers(
         #
         # ? --------------------------------------------------------------------
 
-        ingroups_priors: list[IngroupCladePriors] = []
+        ingroups_priors: list[IngroupPriors] = []
 
         for clade in [i for i in ingroups if i.is_internal()]:
             LOGGER.info(f"Calculating priors for clade: {clade}")
@@ -228,14 +218,6 @@ def recursively_fetch_kmers(
             LOGGER.debug("\tCollection finished")
 
             # ? ----------------------------------------------------------------
-            # ? Calculate corpus size of the current clade
-            # ? ----------------------------------------------------------------
-
-            """ corpus_size = 1 + len(ingroup) + len(sister_group)
-
-            LOGGER.debug(f"\tCorpus size: {corpus_size}") """
-
-            # ? ----------------------------------------------------------------
             # ? Estimate specific priors
             # ? ----------------------------------------------------------------
 
@@ -251,18 +233,8 @@ def recursively_fetch_kmers(
             ).is_left:
                 return ingroup_priors_either
 
-            """ if (
-                ingroup_priors_either := estimate_kmer_specific_priors_of_clade(
-                    kmer_indices=kmer_indices,
-                    sequence_codes=ingroup_labels,
-                    corpus_size=corpus_size,
-                )
-            ).is_left:
-                return ingroup_priors_either """
-
-            ingroup_specific_priors = IngroupLabeledPriors(
+            ingroup_specific_priors = IngroupCladePriors(
                 labels=OrderedTuple(ingroup_labels),
-                # priors=ingroup_priors_either.value,
                 kmers=ingroup_priors_either.value,
             )
 
@@ -276,25 +248,15 @@ def recursively_fetch_kmers(
             ).is_left:
                 return sister_group_priors_either
 
-            """ if (
-                sister_group_priors_either := estimate_kmer_specific_priors_of_clade(
-                    kmer_indices=kmer_indices,
-                    sequence_codes=sister_group_labels,
-                    corpus_size=corpus_size,
-                )
-            ).is_left:
-                return sister_group_priors_either """
-
-            sister_group_specific_priors = SisterGroupLabeledPriors(
+            sister_group_specific_priors = SisterCladePriors(
                 labels=OrderedTuple(sister_group_labels),
-                # priors=sister_group_priors_either.value,
                 kmers=sister_group_priors_either.value,
             )
 
             LOGGER.debug("\tEstimation finished")
 
             ingroups_priors.append(
-                IngroupCladePriors(
+                IngroupPriors(
                     parent=clade.id,
                     clade_priors=(
                         ingroup_specific_priors,

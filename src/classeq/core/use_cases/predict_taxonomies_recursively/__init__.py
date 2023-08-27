@@ -73,7 +73,6 @@ def predict_for_multiple_fasta_file(
                 return adherence_test_response_either
 
             (
-                adherence_final_response,
                 adherence_test_path,
                 status,
             ) = adherence_test_response_either.value
@@ -83,8 +82,6 @@ def predict_for_multiple_fasta_file(
                 adherence_test_path=adherence_test_path,
             )
 
-            LOGGER.debug("")
-            LOGGER.debug(f"Adherence Terminal: {adherence_final_response}")
             LOGGER.debug("")
             LOGGER.debug(f"Adherence Test Path: {resolved_path_names}")
             LOGGER.debug("")
