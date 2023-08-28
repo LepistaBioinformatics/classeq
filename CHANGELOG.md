@@ -1,3 +1,9 @@
+## v0.5.0 (2023-08-27)
+
+### Feat
+
+- upgrade project to work with tar balls as input instead to use individual gz files
+
 ## v0.4.2 (2023-08-26)
 
 ### Fix
