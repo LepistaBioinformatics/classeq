@@ -12,6 +12,7 @@ from clean_base.either import Either, right
 
 from classeq.core.domain.dtos.msa_source_format import MsaSourceFormatEnum
 from classeq.core.domain.dtos.ordered_tuple import OrderedTuple
+from classeq.core.domain.dtos.strand import StrandEnum
 from classeq.settings import LOGGER
 
 
@@ -129,6 +130,7 @@ class KmersInverseIndices:
         format: MsaSourceFormatEnum,
         k_size: int,
         headers_map: defaultdict[str, int],
+        strand: StrandEnum,
     ) -> Either[c_exc.MappedErrors, Self]:
         try:
             if not source_file_path.is_file():
@@ -142,9 +144,10 @@ class KmersInverseIndices:
                 handle=source_file_path,
                 format=format.value,
             ):
-                for kmer in cls.generate_double_strand_kmers(
+                for kmer in cls.generate_kmers(
                     dna_sequence=record.seq,
                     k_size=k_size,
+                    strand=strand,
                 ):
                     if (header_index := headers_map.get(record.id)) is None:
                         return c_exc.DadaTransferObjectError(
@@ -177,30 +180,25 @@ class KmersInverseIndices:
             return c_exc.CreationError(exc, logger=LOGGER)()
 
     @classmethod
-    def generate_double_strand_kmers(
+    def generate_kmers(
         cls,
         dna_sequence: Seq,
         k_size: int,
+        strand: StrandEnum,
     ) -> Generator[str, None, None]:
-        for kmer in set(
-            [
-                *[
-                    kmer
-                    for kmer in cls.__generate_kmers(
-                        dna_sequence=dna_sequence,
-                        k_size=k_size,
-                    )
-                ],
-                *[
-                    kmer
-                    for kmer in cls.__generate_kmers(
-                        dna_sequence=dna_sequence.reverse_complement(),
-                        k_size=k_size,
-                    )
-                ],
-            ]
-        ):
-            yield kmer
+        if strand in [StrandEnum.PLUS, StrandEnum.BOTH]:
+            for kmer in cls.__generate_kmers(
+                dna_sequence=dna_sequence,
+                k_size=k_size,
+            ):
+                yield kmer
+
+        if strand in [StrandEnum.MINUS, StrandEnum.BOTH]:
+            for kmer in cls.__generate_kmers(
+                dna_sequence=dna_sequence.reverse_complement(),
+                k_size=k_size,
+            ):
+                yield kmer
 
     # ? ------------------------------------------------------------------------
     # ? Private static methods

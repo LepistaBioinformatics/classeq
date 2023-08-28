@@ -34,6 +34,31 @@ def predict_for_multiple_fasta_file(
     output_file_path: Path | None = None,
     **kwargs: Any,
 ) -> Either[c_exc.MappedErrors, Literal[True]]:
+    """Predict taxonomies for multiple sequences in a FASTA file and save the
+    output as JSON and TSV.
+
+    Args:
+        fasta_path (Path): Path to the FASTA file.
+        tree_priors (TreePriors): Tree priors.
+        reference_set (ReferenceSet): Reference set.
+        fasta_format (MsaSourceFormatEnum, optional): Format of the FASTA file.
+            Defaults to MsaSourceFormatEnum.FASTA.
+        annotated_phylojson_path (Path, optional): Path to the annotated
+            phylojson file. Defaults to None.
+        output_file_path (Path, optional): Path to the output file. Defaults to
+            None.
+        run_parallel (bool, optional): Whether to run the predictions in
+            parallel. Defaults to True.
+
+    returns:
+        Either[c_exc.MappedErrors, Literal[True]]: Either a mapped error or
+            True.
+
+    raises:
+        c_exc.UseCaseError: If an error occurs.
+
+    """
+
     try:
         # ? --------------------------------------------------------------------
         # ? Resolve tree annotations
@@ -207,34 +232,6 @@ def predict_for_multiple_fasta_file(
                     )
 
             f.write("\n".join(response_lines))
-
-            """ f.write(
-                "\n".join(
-                    [
-                        "\t".join(
-                            [
-                                k,
-                                v.get("status").value,  # type: ignore
-                                *[
-                                    *[
-                                        z
-                                        for y, z in i.to_dict(
-                                            omit_children=True
-                                        ).items()
-                                        if y in prediction_output_fields
-                                    ],
-                                    index + 1,
-                                    i.to_dict(omit_children=True)
-                                    for index, i in enumerate(
-                                        v.get("phylogeny_path")  # type: ignore
-                                    )
-                                ],
-                            ]
-                        )
-                        for k, v in response.items()
-                    ]
-                )
-            ) """
 
         return right(True)
 

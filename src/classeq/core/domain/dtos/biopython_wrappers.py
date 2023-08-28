@@ -1,7 +1,7 @@
 from copy import deepcopy
 from enum import Enum
 from typing import Any, Self
-from uuid import UUID, uuid4
+from uuid import NAMESPACE_DNS, UUID, uuid3
 
 from Bio.Phylo.BaseTree import Clade, Tree
 
@@ -137,7 +137,17 @@ class ExtendedBioPythonClade(ExtendedBioPythonElement, Clade):
         **kwargs: Any,
     ) -> None:
         super().__init__(*args, **kwargs)
-        self._id = id or uuid4()
+
+        self._id = id or uuid3(
+            NAMESPACE_DNS,
+            (
+                (self.name or "")
+                + (self.branch_length or 0).__str__()
+                + (self.confidence or 0).__str__()
+                + "".join([str(i) for i in self.clades] or [])
+            ),
+        )
+
         self._is_outgroup = is_outgroup or False
         self._taxid = taxid or None
         self._related_rank = related_rank or None

@@ -10,6 +10,7 @@ from clean_base.either import Either, right
 
 from classeq.core.domain.dtos.msa import MsaSource, MsaSourceFormatEnum
 from classeq.core.domain.dtos.reference_set import ReferenceSet
+from classeq.core.domain.dtos.strand import StrandEnum
 from classeq.core.domain.dtos.tree import ClasseqTree
 from classeq.core.domain.dtos.tree_source_format import TreeSourceFormatEnum
 from classeq.settings import (
@@ -29,6 +30,7 @@ def load_source_files(
     tree_format: TreeSourceFormatEnum,
     outgroups: list[str],
     k_size: int,
+    strand: StrandEnum,
     output_directory: Path | None = None,
     support_value_cutoff: int = 99,
 ) -> Either[c_exc.MappedErrors, tuple[Path, ReferenceSet]]:
@@ -133,6 +135,7 @@ def load_source_files(
                 headers_map=labels_map,
                 k_size=k_size,
                 source_file_path=sanitized_msa_path,
+                strand=strand,
             )
         ).is_left:
             return init_either
@@ -147,6 +150,7 @@ def load_source_files(
 
         references = ReferenceSet(
             kmer_size=k_size,
+            strand=strand,
             tree=classeq_tree,
             msa=msa,
             labels_map=labels_map,

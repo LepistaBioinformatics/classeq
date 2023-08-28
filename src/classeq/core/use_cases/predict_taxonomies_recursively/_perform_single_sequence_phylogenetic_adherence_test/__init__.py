@@ -99,9 +99,10 @@ def perform_single_sequence_phylogenetic_adherence_test(
 
         query_kmers: set[str] = {
             kmer
-            for kmer in KmersInverseIndices.generate_double_strand_kmers(
+            for kmer in KmersInverseIndices.generate_kmers(
                 dna_sequence=Seq(target_sequence.upper()),
                 k_size=reference_set.kmer_size,
+                strand=reference_set.strand,
             )
         }
 

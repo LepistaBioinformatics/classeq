@@ -10,6 +10,7 @@ from clean_base.either import Either, right
 
 from classeq.core.domain.dtos.kmer_inverse_index import KmersInverseIndices
 from classeq.core.domain.dtos.msa_source_format import MsaSourceFormatEnum
+from classeq.core.domain.dtos.strand import StrandEnum
 from classeq.settings import BASES, LOGGER
 
 
@@ -83,6 +84,7 @@ class MsaSource:
         source_file_path: Path,
         headers_map: defaultdict[str, int],
         k_size: int,
+        strand: StrandEnum,
     ) -> Either[c_exc.MappedErrors, bool]:
         try:
             if (
@@ -91,6 +93,7 @@ class MsaSource:
                     format=self.file_format,
                     k_size=k_size,
                     headers_map=headers_map,
+                    strand=strand,
                 )
             ).is_left:
                 return c_exc.DadaTransferObjectError(

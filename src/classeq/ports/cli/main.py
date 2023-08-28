@@ -12,6 +12,7 @@ from classeq.__version__ import version
 from classeq.core.domain.dtos.msa_source_format import MsaSourceFormatEnum
 from classeq.core.domain.dtos.priors import TreePriors
 from classeq.core.domain.dtos.reference_set import ReferenceSet
+from classeq.core.domain.dtos.strand import StrandEnum
 from classeq.core.domain.dtos.tree_source_format import TreeSourceFormatEnum
 from classeq.core.use_cases.indexing_phylogeny import indexing_phylogeny
 from classeq.core.use_cases.load_source_files import load_source_files
@@ -112,6 +113,15 @@ def classeq_cmd() -> None:
     help="The kmer size.",
 )
 @click.option(
+    "-s",
+    "--strand",
+    required=False,
+    type=click.Choice([s.value for s in StrandEnum]),
+    default=StrandEnum(None).value,
+    show_default=True,
+    help="The DNA strand direction to include in analysis.",
+)
+@click.option(
     "-og",
     "--outgroups",
     type=click.STRING,
@@ -146,6 +156,7 @@ def parse_source_files_cmd(
     output_directory: str | None = None,
     outgroups: tuple[str, ...] | None = None,
     outgroups_file: click.Path | None = None,
+    strand: str | None = None,
     **_: Any,
 ) -> None:
     """Parse a FASTA file and TREE phylogeny into a JSON file."""
@@ -177,6 +188,9 @@ def parse_source_files_cmd(
                 ),
                 support_value_cutoff=support_value_cutoff,
                 k_size=kmer_size,
+                strand=(
+                    StrandEnum(None) if strand is None else StrandEnum(strand)
+                ),
             )
         ).is_left:
             LOGGER.error(response.value.msg)

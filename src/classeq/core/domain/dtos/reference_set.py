@@ -13,6 +13,7 @@ from classeq.core.domain.dtos.biopython_wrappers import (
 )
 from classeq.core.domain.dtos.clade import ClasseqClade, NodeType
 from classeq.core.domain.dtos.msa import MsaSource
+from classeq.core.domain.dtos.strand import StrandEnum
 from classeq.core.domain.dtos.tree import ClasseqTree
 from classeq.settings import LOGGER
 
@@ -27,6 +28,7 @@ class ReferenceSet:
     tree: ClasseqTree = field()
     msa: MsaSource = field()
     labels_map: defaultdict[str, int] = field()
+    strand: StrandEnum = field(default=StrandEnum(None))
     linear_tree: tuple[ClasseqClade, ...] | None = field(default=None)
 
     # ? ------------------------------------------------------------------------
@@ -44,6 +46,7 @@ class ReferenceSet:
             "msa",
             "labels_map",
             "linear_tree",
+            "strand",
         ]:
             if key not in content:
                 return c_exc.DadaTransferObjectError(
@@ -81,6 +84,7 @@ class ReferenceSet:
                 tree=tree_either.value,
                 msa=msa_either.value,
                 labels_map=defaultdict(int, content.pop("labels_map")),  # type: ignore
+                strand=StrandEnum(content.pop("strand")),
                 linear_tree=(
                     linear_tree if linear_tree is None else tuple(linear_tree)
                 ),
@@ -94,6 +98,7 @@ class ReferenceSet:
     def to_dict(self) -> dict[str, Any]:
         return {
             "kmer_size": self.kmer_size,
+            "strand": self.strand.value,
             "tree": self.tree.to_dict(),
             "msa": self.msa.to_dict(),
             "labels_map": self.labels_map,
