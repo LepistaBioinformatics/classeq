@@ -1,3 +1,9 @@
+## v0.6.1 (2023-08-28)
+
+### Fix
+
+- fix use-case that extends hierarchical tree over the original size
+
 ## v0.6.0 (2023-08-28)
 
 ### Feat
