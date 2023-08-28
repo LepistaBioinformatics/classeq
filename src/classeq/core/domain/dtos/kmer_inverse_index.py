@@ -2,18 +2,20 @@ from collections import defaultdict
 from hashlib import md5
 from itertools import islice
 from pathlib import Path
+from re import search
 from typing import Any, Generator, Iterator, Self
 
 import clean_base.exceptions as c_exc
 from attrs import define, field, frozen
 from Bio import SeqIO
 from Bio.Seq import Seq
+from Bio.SeqRecord import SeqRecord
 from clean_base.either import Either, right
 
 from classeq.core.domain.dtos.msa_source_format import MsaSourceFormatEnum
 from classeq.core.domain.dtos.ordered_tuple import OrderedTuple
 from classeq.core.domain.dtos.strand import StrandEnum
-from classeq.settings import LOGGER
+from classeq.settings import BASES, LOGGER
 
 
 @define(kw_only=True)
@@ -145,7 +147,7 @@ class KmersInverseIndices:
                 format=format.value,
             ):
                 for kmer in cls.generate_kmers(
-                    dna_sequence=record.seq,
+                    dna_sequence=cls.sanitize_sequence(record, True),
                     k_size=k_size,
                     strand=strand,
                 ):
@@ -199,6 +201,33 @@ class KmersInverseIndices:
                 k_size=k_size,
             ):
                 yield kmer
+
+    # ? ------------------------------------------------------------------------
+    # ? Public static methods
+    # ? ------------------------------------------------------------------------
+
+    @staticmethod
+    def check_sequence_sanity(sequence: SeqRecord) -> bool:
+        return search(f"[^{''.join(BASES)}]", str(sequence.seq).upper()) is None
+
+    @staticmethod
+    def sanitize_sequence(
+        sequence: SeqRecord,
+        as_seq: bool = False,
+    ) -> str:
+        seq = "".join(
+            [
+                letter
+                for letter in Seq(
+                    sequence.seq.replace("-", "").replace("?", "")
+                ).upper()
+                if letter in BASES
+            ]
+        )
+
+        if as_seq is True:
+            return Seq(seq)
+        return seq
 
     # ? ------------------------------------------------------------------------
     # ? Private static methods

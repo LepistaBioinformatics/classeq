@@ -749,7 +749,11 @@ class TreeEditor(QMainWindow):
             "Annotate Node",
             "Enter node name:",
             items,
-            items.index(current_value.value if current_value else ""),
+            (
+                items.index(current_value.value)
+                if current_value is not None
+                else 0
+            ),
         )
 
         if ok:

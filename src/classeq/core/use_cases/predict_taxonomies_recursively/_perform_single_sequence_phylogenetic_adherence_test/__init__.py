@@ -8,7 +8,7 @@ from clean_base.either import Either, right
 from classeq.core.domain.dtos.clade import ClasseqClade
 from classeq.core.domain.dtos.kmer_inverse_index import KmersInverseIndices
 from classeq.core.domain.dtos.priors import PriorGroup, TreePriors
-from classeq.core.domain.dtos.reference_set import ReferenceSet
+from classeq.core.domain.dtos.strand import StrandEnum
 from classeq.settings import LOGGER
 
 from .._do_clade_adherence_test_for_single_sequence import (
@@ -27,8 +27,11 @@ from .._perform_adherence_test_of_child_clades import (
 
 def perform_single_sequence_phylogenetic_adherence_test(
     target_sequence: str,
-    reference_set: ReferenceSet,
+    kmers_indices: KmersInverseIndices,
     tree_priors: TreePriors,
+    kmer_size: int,
+    tree: ClasseqClade,
+    strand: StrandEnum,
     max_iterations: int = 1000,
     **kwargs: Any,
 ) -> Either[
@@ -44,10 +47,12 @@ def perform_single_sequence_phylogenetic_adherence_test(
         the test is conclusive or inconclusive.
 
     Args:
-        target_sequence (str): The sequence to be tested.
-        reference_set (ReferenceSet): The reference set.
+        target_sequence (str): The target sequence.
+        kmers_indices (KmersInverseIndices): The kmer indices.
         tree_priors (TreePriors): The tree priors.
-        k_size (int, optional): The kmer size. Defaults to DEFAULT_KMER_SIZE.
+        kmer_size (int): The kmer size.
+        tree (ClasseqClade): The tree.
+        strand (StrandEnum): The strand.
         max_iterations (int, optional): The maximum number of iterations.
             Defaults to 1000.
 
@@ -72,13 +77,6 @@ def perform_single_sequence_phylogenetic_adherence_test(
                 logger=LOGGER,
             )()
 
-        if not isinstance(reference_set, ReferenceSet):
-            return c_exc.UseCaseError(
-                "Unexpected error. The `reference_set` argument should be a "
-                + f"ReferenceSet. Received {type(reference_set)}.",
-                logger=LOGGER,
-            )()
-
         if not isinstance(tree_priors, TreePriors):
             return c_exc.UseCaseError(
                 "Unexpected error. The `tree_priors` argument should be a "
@@ -93,6 +91,13 @@ def perform_single_sequence_phylogenetic_adherence_test(
                 logger=LOGGER,
             )()
 
+        if tree.is_root() is False:
+            return c_exc.UseCaseError(
+                "Unexpected error. Retrieved tree using "
+                + "`get_hierarchical_tree` is not a rooted tree.",
+                logger=LOGGER,
+            )()
+
         # ? --------------------------------------------------------------------
         # ? Get sequence kmers
         # ? --------------------------------------------------------------------
@@ -101,26 +106,10 @@ def perform_single_sequence_phylogenetic_adherence_test(
             kmer
             for kmer in KmersInverseIndices.generate_kmers(
                 dna_sequence=Seq(target_sequence.upper()),
-                k_size=reference_set.kmer_size,
-                strand=reference_set.strand,
+                k_size=kmer_size,
+                strand=strand,
             )
         }
-
-        # ? --------------------------------------------------------------------
-        # ? Collect hierarchical tree
-        # ? --------------------------------------------------------------------
-
-        if (tree_either := reference_set.get_hierarchical_tree()).is_left:
-            return tree_either
-
-        tree: ClasseqClade = tree_either.value
-
-        if tree.is_root() is False:
-            return c_exc.UseCaseError(
-                "Unexpected error. Retrieved tree using "
-                + "`get_hierarchical_tree` is not a rooted tree.",
-                logger=LOGGER,
-            )()
 
         # ? --------------------------------------------------------------------
         # ? Perform adherence test for outgroup
@@ -133,7 +122,7 @@ def perform_single_sequence_phylogenetic_adherence_test(
             binding_either := do_clade_adherence_test_for_single_sequence(
                 query_kmers=query_kmers,
                 clade_priors=tree_priors.outgroup,
-                kmer_indices=reference_set.msa.kmers_indices,
+                kmer_indices=kmers_indices,
                 **kwargs,
             )
         ).is_left:
@@ -202,7 +191,7 @@ def perform_single_sequence_phylogenetic_adherence_test(
                     query_kmers=query_kmers,
                     clades=children,
                     tree_priors=tree_priors,
-                    kmer_indices=reference_set.msa.kmers_indices,
+                    kmer_indices=kmers_indices,
                     **kwargs,
                 )
             ).is_left:

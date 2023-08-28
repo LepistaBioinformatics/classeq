@@ -1,17 +1,15 @@
 from collections import defaultdict
 from pathlib import Path
-from re import search
 from typing import Any, Self
 
 import clean_base.exceptions as c_exc
 from attr import define, field
-from Bio.SeqRecord import SeqRecord
 from clean_base.either import Either, right
 
 from classeq.core.domain.dtos.kmer_inverse_index import KmersInverseIndices
 from classeq.core.domain.dtos.msa_source_format import MsaSourceFormatEnum
 from classeq.core.domain.dtos.strand import StrandEnum
-from classeq.settings import BASES, LOGGER
+from classeq.settings import LOGGER
 
 
 @define(kw_only=True)
@@ -108,17 +106,3 @@ class MsaSource:
 
         except Exception as exc:
             return c_exc.CreationError(exc, logger=LOGGER)()
-
-    # ? ------------------------------------------------------------------------
-    # ? Public static methods
-    # ? ------------------------------------------------------------------------
-
-    @staticmethod
-    def check_sequence_sanity(sequence: SeqRecord) -> bool:
-        return search(f"[^{''.join(BASES)}]", str(sequence.seq).upper()) is None
-
-    @staticmethod
-    def sanitize_sequence(sequence: SeqRecord) -> str:
-        return "".join(
-            [letter for letter in str(sequence.seq).upper() if letter in BASES]
-        )

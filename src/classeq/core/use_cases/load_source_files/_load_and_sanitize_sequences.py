@@ -2,8 +2,8 @@ from pathlib import Path
 
 import clean_base.exceptions as c_exc
 from Bio import SeqIO
-from Bio.Seq import Seq
 from clean_base.either import Either, left, right
+from classeq.core.domain.dtos.kmer_inverse_index import KmersInverseIndices
 
 from classeq.core.domain.dtos.msa import MsaSource, MsaSourceFormatEnum
 from classeq.settings import BASES, LOGGER, TEMP_INPUT_FILE_SUFFIX
@@ -41,9 +41,8 @@ def load_and_sanitize_sequences(
                 handle=source_file_path,
                 format=format.value,
             ):
-                record.seq = Seq(record.seq.replace("-", "").replace("?", ""))
-
-                if MsaSource.check_sequence_sanity(record) is False:
+                record.seq = KmersInverseIndices.sanitize_sequence(record, True)
+                if KmersInverseIndices.check_sequence_sanity(record) is False:
                     LOGGER.warning(
                         f"Sequence `{record.id}` has invalid characters. "
                         + f"Only non redundant residuals ({', '.join(BASES)}) "
@@ -51,8 +50,7 @@ def load_and_sanitize_sequences(
                     )
 
                 sequence_headers.append(record.id)
-                sanitized_sequence = MsaSource.sanitize_sequence(record)
-                out.write(f">{record.id}\n{sanitized_sequence}\n")
+                out.write(f">{record.id}\n{record.seq}\n")
 
         return right(
             (

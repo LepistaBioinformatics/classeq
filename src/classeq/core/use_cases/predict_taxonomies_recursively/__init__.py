@@ -67,11 +67,13 @@ def predict_for_multiple_fasta_file(
         resolved_names: dict[UUID, ExtendedBioPythonClade] = dict()
         if annotated_phylojson_path is not None:
             with annotated_phylojson_path.open("r") as f:
-                tree = ExtendedBioPythonTree.from_dict(content=load(f))
+                annotated_tree = ExtendedBioPythonTree.from_dict(
+                    content=load(f)
+                )
 
                 resolved_names = {
                     node._id: node
-                    for node in tree.get_nonterminals()
+                    for node in annotated_tree.get_nonterminals()
                     if node.name is not None
                 }
 
@@ -85,6 +87,11 @@ def predict_for_multiple_fasta_file(
 
         response: defaultdict[str, dict[str, Any]] = defaultdict()
 
+        if (tree_either := reference_set.get_hierarchical_tree()).is_left:
+            return tree_either
+
+        hierarchical_tree: ClasseqClade = tree_either.value
+
         for record in records:
             LOGGER.debug("-" * 80)
             LOGGER.debug(f"Processing sequence: {record.id}")
@@ -93,7 +100,10 @@ def predict_for_multiple_fasta_file(
             if (
                 adherence_test_response_either := perform_single_sequence_phylogenetic_adherence_test(
                     target_sequence=str(record.seq),
-                    reference_set=reference_set,
+                    kmers_indices=reference_set.msa.kmers_indices,
+                    kmer_size=reference_set.kmer_size,
+                    tree=hierarchical_tree,
+                    strand=reference_set.strand,
                     tree_priors=tree_priors,
                     **kwargs,
                 )
@@ -209,7 +219,7 @@ def predict_for_multiple_fasta_file(
         phylogeny_path: list[ClasseqClade]
         with output_file_path_tsv.open("w+") as f:
             response_lines: list[str] = []
-            line_definition = "{query}\t{id}\t{status}\t{depth}\t{name}\t{taxid}\t{related_rank}"
+            line_definition = "{query}\t{id}\t{status}\t{depth}\t{name}\t{taxid}\t{related_rank}\t{support}\t{branches}"
 
             for sequence_name, prediction in response.items():
                 if (status := prediction.get("status")) is None:
@@ -228,6 +238,12 @@ def predict_for_multiple_fasta_file(
                             name=clade.name,
                             taxid=clade.taxid,
                             related_rank=clade.related_rank,
+                            support=clade.support,
+                            branches=(
+                                clade.children.__len__()
+                                if clade.children
+                                else None
+                            ),
                         )
                     )
 
