@@ -1,4 +1,6 @@
 import gzip
+import tarfile
+from io import BytesIO
 from json import loads
 from pathlib import Path
 from sys import argv
@@ -16,7 +18,13 @@ from classeq.core.use_cases.load_source_files import load_source_files
 from classeq.core.use_cases.predict_taxonomies_recursively import (
     predict_for_multiple_fasta_file,
 )
-from classeq.settings import DEFAULT_KMER_SIZE, LOGGER
+from classeq.settings import (
+    DEFAULT_CLASSEQ_OUTPUT_FILE_NAME,
+    DEFAULT_KMER_SIZE,
+    LOGGER,
+    REFERENCE_SET_OUTPUT_FILE_NAME,
+    TRAIN_SOURCE_OUTPUT_FILE_NAME,
+)
 
 # ? ----------------------------------------------------------------------------
 # ? Initialize the CLI groups
@@ -40,7 +48,7 @@ def classeq_cmd() -> None:
 
 
 @classeq_cmd.command(
-    "indexing",
+    "index",
     help=(
         "Parse a FASTA file and TREE phylogeny and calculate priors of the "
         + "individual phylogeny."
@@ -175,7 +183,17 @@ def parse_source_files_cmd(
             click.echo("Error: Something went wrong.")
             exit(1)
 
-        if (response := indexing_phylogeny(references=response.value)).is_left:
+        (
+            indexing_file_path,
+            reference_set,
+        ) = response.value
+
+        if (
+            response := indexing_phylogeny(
+                references=reference_set,
+                indexing_file_path=indexing_file_path,
+            )
+        ).is_left:
             LOGGER.error(response.value.msg)
             click.echo("Error: Something went wrong.")
             exit(1)
@@ -200,8 +218,8 @@ def __load_outgroups_from_file(file: Path) -> list[str]:
     help="Try to infer identity of multi FASTA sequences.",
 )
 @click.option(
-    "-f",
-    "--fasta-file-path",
+    "-q",
+    "--query-fasta-path",
     required=True,
     type=click.Path(
         resolve_path=True,
@@ -209,11 +227,11 @@ def __load_outgroups_from_file(file: Path) -> list[str]:
         exists=True,
         dir_okay=True,
     ),
-    help="The path to the FASTA file.",
+    help="The path to the query FASTA file.",
 )
 @click.option(
-    "-r",
-    "--references-path",
+    "-i",
+    "--classeq-indices",
     required=True,
     type=click.Path(
         resolve_path=True,
@@ -221,19 +239,7 @@ def __load_outgroups_from_file(file: Path) -> list[str]:
         exists=True,
         dir_okay=True,
     ),
-    help="The path to the reference file set calculated during data loading.",
-)
-@click.option(
-    "-p",
-    "--priors-path",
-    required=True,
-    type=click.Path(
-        resolve_path=True,
-        readable=True,
-        exists=True,
-        dir_okay=True,
-    ),
-    help="The path to the priors calculated in the `train` step.",
+    help=f"The path to the classeq index file ({DEFAULT_CLASSEQ_OUTPUT_FILE_NAME})",
 )
 @click.option(
     "-o",
@@ -255,9 +261,8 @@ def __load_outgroups_from_file(file: Path) -> list[str]:
     help="The path to the annotated phylogeny in PHYLO-JSON format.",
 )
 def infer_identity_cmd(
-    fasta_file_path: str,
-    references_path: str,
-    priors_path: str,
+    query_fasta_path: str,
+    classeq_indices: str,
     annotated_phylojson_path: str | None = None,
     output_file_path: str | None = None,
 ) -> None:
@@ -270,33 +275,71 @@ def infer_identity_cmd(
         # ? Load the reference set
         # ? --------------------------------------------------------------------
 
-        with gzip.open(references_path, "r") as fin:
-            json_bytes = fin.read()
-            json_str = json_bytes.decode("utf-8")
+        classeq_indices_path = Path(classeq_indices)
 
-        if (
-            reference_set_either := ReferenceSet.from_dict(
-                content=loads(json_str)
+        if classeq_indices_path.name != DEFAULT_CLASSEQ_OUTPUT_FILE_NAME:
+            raise Exception(
+                f"Invalid classeq indices file name: {classeq_indices_path.name}"
             )
-        ).is_left:
-            LOGGER.error(reference_set_either.value.msg)
-            click.echo("Error: Something went wrong.")
-            exit(1)
 
-        # ? --------------------------------------------------------------------
-        # ? Load the priors
-        # ? --------------------------------------------------------------------
+        with tarfile.open(classeq_indices_path) as tf:
+            # ? ----------------------------------------------------------------
+            # ? Load reference set
+            # ? ----------------------------------------------------------------
 
-        with gzip.open(priors_path, "r") as fin:
-            json_bytes = fin.read()
-            json_str = json_bytes.decode("utf-8")
+            if (
+                reference_set_content := tf.extractfile(
+                    member=REFERENCE_SET_OUTPUT_FILE_NAME
+                )
+            ) is None:
+                raise Exception(
+                    f"Reference set not found: {REFERENCE_SET_OUTPUT_FILE_NAME}"
+                )
 
-        if (
-            tree_priors_either := TreePriors.from_dict(content=loads(json_str))
-        ).is_left:
-            LOGGER.error(tree_priors_either.value.msg)
-            click.echo("Error: Something went wrong.")
-            exit(1)
+            with gzip.GzipFile(
+                fileobj=BytesIO(reference_set_content.read()),
+                mode="rb",
+            ) as fin:
+                json_bytes = fin.read()
+                json_str = json_bytes.decode("utf-8")
+
+            if (
+                reference_set_either := ReferenceSet.from_dict(
+                    content=loads(json_str)
+                )
+            ).is_left:
+                LOGGER.error(reference_set_either.value.msg)
+                click.echo("Error: Something went wrong.")
+                exit(1)
+
+            # ? ----------------------------------------------------------------
+            # ? Load indices
+            # ? ----------------------------------------------------------------
+
+            if (
+                indices_content := tf.extractfile(
+                    member=TRAIN_SOURCE_OUTPUT_FILE_NAME
+                )
+            ) is None:
+                raise Exception(
+                    f"Reference set not found: {TRAIN_SOURCE_OUTPUT_FILE_NAME}"
+                )
+
+            with gzip.GzipFile(
+                fileobj=BytesIO(indices_content.read()),
+                mode="rb",
+            ) as fin:
+                json_bytes = fin.read()
+                json_str = json_bytes.decode("utf-8")
+
+            if (
+                tree_priors_either := TreePriors.from_dict(
+                    content=loads(json_str)
+                )
+            ).is_left:
+                LOGGER.error(tree_priors_either.value.msg)
+                click.echo("Error: Something went wrong.")
+                exit(1)
 
         # ? --------------------------------------------------------------------
         # ? Predict the taxonomies
@@ -304,7 +347,7 @@ def infer_identity_cmd(
 
         if (
             response := predict_for_multiple_fasta_file(
-                fasta_path=Path(fasta_file_path),
+                fasta_path=Path(query_fasta_path),
                 fasta_format=MsaSourceFormatEnum.FASTA,
                 tree_priors=tree_priors_either.value,
                 reference_set=reference_set_either.value,

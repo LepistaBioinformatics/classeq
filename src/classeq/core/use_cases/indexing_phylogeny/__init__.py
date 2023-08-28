@@ -1,5 +1,8 @@
+import tarfile
+from tempfile import TemporaryDirectory
 import gzip
 from json import dump
+from pathlib import Path
 
 import clean_base.exceptions as c_exc
 from attrs import asdict
@@ -7,13 +10,18 @@ from clean_base.either import Either, right
 
 from classeq.core.domain.dtos.priors import TreePriors
 from classeq.core.domain.dtos.reference_set import ReferenceSet
-from classeq.settings import LOGGER, MINIMUM_CLADE_SIZE
+from classeq.settings import (
+    LOGGER,
+    MINIMUM_CLADE_SIZE,
+    TRAIN_SOURCE_OUTPUT_FILE_NAME,
+)
 
 from ._fetch_clade_specific_kmers import fetch_clade_specific_kmers
 
 
 def indexing_phylogeny(
     references: ReferenceSet,
+    indexing_file_path: Path,
     min_clade_size: int = MINIMUM_CLADE_SIZE,
 ) -> Either[c_exc.MappedErrors, bool]:
     try:
@@ -46,20 +54,16 @@ def indexing_phylogeny(
         # ? Persist results to file
         # ? --------------------------------------------------------------------
 
-        tree_source = references.tree.newick_file_path
-        train_output_file_path = tree_source.parent.joinpath(
-            ".".join(
-                [
-                    tree_source.stem,
-                    "train-source",
-                    "json",
-                    "gz",
-                ]
-            )
+        LOGGER.info("Output file:")
+        LOGGER.info(
+            f"\t{indexing_file_path.relative_to(indexing_file_path.parent)}"
         )
 
-        LOGGER.info("Train output file would be persisted to:")
-        LOGGER.info(f"\t{train_output_file_path}")
+        tmp_dir = TemporaryDirectory()
+
+        train_output_file_path = Path(tmp_dir.name).joinpath(
+            TRAIN_SOURCE_OUTPUT_FILE_NAME
+        )
 
         with gzip.open(
             train_output_file_path, "wt", encoding="utf-8"
@@ -71,6 +75,14 @@ def indexing_phylogeny(
                 default=str,
                 sort_keys=True,
             )
+
+        with tarfile.open(indexing_file_path, "a:") as tar:
+            tar.add(
+                train_output_file_path,
+                arcname=train_output_file_path.name,
+            )
+
+        tmp_dir.cleanup()
 
         # ? --------------------------------------------------------------------
         # ? Return a positive response

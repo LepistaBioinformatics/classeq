@@ -101,14 +101,6 @@ def recursively_fetch_kmers(
         outgroup_labels: list[int] = []
         outgroups_parents = {o.parent for o in outgroups}
 
-        if reference_tree.sanitized_tree is None:
-            if (
-                load_response := reference_tree.load_tree(
-                    outgroups=reference_tree.outgroups
-                )
-            ).is_left:
-                return load_response
-
         sanitized_tree: Tree = reference_tree.sanitized_tree  # type: ignore
 
         outgroup_clades = sanitized_tree.common_ancestor(

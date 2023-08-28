@@ -109,11 +109,7 @@ def perform_single_sequence_phylogenetic_adherence_test(
         # ? Collect hierarchical tree
         # ? --------------------------------------------------------------------
 
-        if (
-            tree_either := reference_set.get_hierarchical_tree(
-                force_reload_tree=True
-            )
-        ).is_left:
+        if (tree_either := reference_set.get_hierarchical_tree()).is_left:
             return tree_either
 
         tree: ClasseqClade = tree_either.value

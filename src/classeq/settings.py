@@ -97,3 +97,12 @@ MINIMUM_CLADE_SIZE = 3
 
 
 TEMP_INPUT_FILE_SUFFIX = "sanitized"
+
+
+DEFAULT_CLASSEQ_OUTPUT_FILE_NAME = "classeq.tar"
+
+
+REFERENCE_SET_OUTPUT_FILE_NAME = "reference-set.json.gz"
+
+
+TRAIN_SOURCE_OUTPUT_FILE_NAME = "train-source.json.gz"

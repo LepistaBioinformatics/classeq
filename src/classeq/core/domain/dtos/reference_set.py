@@ -91,17 +91,27 @@ class ReferenceSet:
     # ? Public instance methods
     # ? ------------------------------------------------------------------------
 
-    def get_hierarchical_tree(
-        self,
-        force_reload_tree: bool = False,
-    ) -> Either[c_exc.MappedErrors, ClasseqClade]:
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "kmer_size": self.kmer_size,
+            "tree": self.tree.to_dict(),
+            "msa": self.msa.to_dict(),
+            "labels_map": self.labels_map,
+            "linear_tree": (
+                [i.to_dict() for i in self.linear_tree]
+                if self.linear_tree is not None
+                else None
+            ),
+        }
+
+    def get_hierarchical_tree(self) -> Either[c_exc.MappedErrors, ClasseqClade]:
         try:
             # ? ----------------------------------------------------------------
             # ? Generate the linear tree
             # ? ----------------------------------------------------------------
 
-            if self.linear_tree is None or force_reload_tree is True:
-                linear_tree_either = self.build_linear_tree(force_reload_tree)
+            if self.linear_tree is None:
+                linear_tree_either = self.build_linear_tree()
 
                 if linear_tree_either.is_left:
                     return linear_tree_either
@@ -165,10 +175,7 @@ class ReferenceSet:
         except Exception as exc:
             return c_exc.DadaTransferObjectError(exc, logger=LOGGER)()
 
-    def build_linear_tree(
-        self,
-        force_reload_tree: bool = False,
-    ) -> Either[c_exc.MappedErrors, bool]:
+    def build_linear_tree(self) -> Either[c_exc.MappedErrors, bool]:
         """Convert the original Bio.Phylo.BaseTree.Tree to a linear version
         composed of a set of `CladeWrapper` elements.
         """
@@ -219,17 +226,6 @@ class ReferenceSet:
                     )
 
         try:
-            if self.tree.sanitized_tree is None or force_reload_tree is True:
-                if (
-                    tree_either := self.tree.parse_and_reroot_phylojson_tree(
-                        phylojson_file_path=self.tree.phylojson_file_path,
-                        outgroups=self.tree.outgroups,
-                    )
-                ).is_left:
-                    return tree_either
-
-                self.tree.sanitized_tree = tree_either.value
-
             tree: ExtendedBioPythonTree = deepcopy(self.tree.sanitized_tree)
             root: ExtendedBioPythonClade = deepcopy(tree.root)
 

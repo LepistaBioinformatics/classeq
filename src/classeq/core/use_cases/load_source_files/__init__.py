@@ -1,18 +1,22 @@
 import gzip
+import tarfile
 from collections import defaultdict
-from copy import deepcopy
 from json import dump
 from pathlib import Path
+from tempfile import TemporaryDirectory
 
 import clean_base.exceptions as c_exc
-from attrs import asdict
 from clean_base.either import Either, right
 
 from classeq.core.domain.dtos.msa import MsaSource, MsaSourceFormatEnum
 from classeq.core.domain.dtos.reference_set import ReferenceSet
 from classeq.core.domain.dtos.tree import ClasseqTree
 from classeq.core.domain.dtos.tree_source_format import TreeSourceFormatEnum
-from classeq.settings import LOGGER
+from classeq.settings import (
+    DEFAULT_CLASSEQ_OUTPUT_FILE_NAME,
+    LOGGER,
+    REFERENCE_SET_OUTPUT_FILE_NAME,
+)
 
 from ._load_and_sanitize_phylogeny import load_and_sanitize_phylogeny
 from ._load_and_sanitize_sequences import load_and_sanitize_sequences
@@ -27,7 +31,7 @@ def load_source_files(
     k_size: int,
     output_directory: Path | None = None,
     support_value_cutoff: int = 99,
-) -> Either[c_exc.MappedErrors, ReferenceSet]:
+) -> Either[c_exc.MappedErrors, tuple[Path, ReferenceSet]]:
     try:
         train_output_dir = (
             tree_file_path.parent
@@ -37,6 +41,10 @@ def load_source_files(
 
         if not train_output_dir.is_dir():
             train_output_dir.mkdir(parents=True)
+
+        train_output_dir_output_file = train_output_dir.joinpath(
+            DEFAULT_CLASSEQ_OUTPUT_FILE_NAME
+        )
 
         # ? --------------------------------------------------------------------
         # ? Load MSA
@@ -53,7 +61,13 @@ def load_source_files(
         ).is_left:
             return msa_either
 
-        msa: MsaSource = msa_either.value
+        msa: MsaSource
+        sanitized_msa_path: Path
+
+        (
+            sanitized_msa_path,
+            msa,
+        ) = msa_either.value
 
         # ? --------------------------------------------------------------------
         # ? Load Tree
@@ -72,7 +86,7 @@ def load_source_files(
         ).is_left:
             return tree_either
 
-        tree: ClasseqTree = tree_either.value
+        classeq_tree: ClasseqTree = tree_either.value
 
         # ? --------------------------------------------------------------------
         # ? Check content matches
@@ -82,8 +96,14 @@ def load_source_files(
 
         if not all(
             [
-                *[id in msa.sequence_headers for id in tree.tree_headers],
-                *[id in tree.tree_headers for id in msa.sequence_headers],
+                *[
+                    id in msa.sequence_headers
+                    for id in classeq_tree.tree_headers
+                ],
+                *[
+                    id in classeq_tree.tree_headers
+                    for id in msa.sequence_headers
+                ],
             ]
         ):
             return c_exc.UseCaseError(
@@ -100,7 +120,7 @@ def load_source_files(
 
         numeric_labels = sorted(labels_map.values())
         msa.sequence_headers = numeric_labels
-        tree.tree_headers = numeric_labels
+        classeq_tree.tree_headers = numeric_labels
 
         # ? --------------------------------------------------------------------
         # ? Initialize kmers
@@ -112,6 +132,7 @@ def load_source_files(
             init_either := msa.initialize_kmer_indices(
                 headers_map=labels_map,
                 k_size=k_size,
+                source_file_path=sanitized_msa_path,
             )
         ).is_left:
             return init_either
@@ -122,9 +143,11 @@ def load_source_files(
 
         LOGGER.info("Building output")
 
+        classeq_tree.update_tree_hash()
+
         references = ReferenceSet(
             kmer_size=k_size,
-            tree=tree,
+            tree=classeq_tree,
             msa=msa,
             labels_map=labels_map,
         )
@@ -132,54 +155,37 @@ def load_source_files(
         if (linear_tree_either := references.build_linear_tree()).is_left:
             return linear_tree_either
 
-        tree_source = references.tree.newick_file_path
-
         if not train_output_dir.exists():
             train_output_dir.mkdir(parents=True)
 
-        train_output_file_path = train_output_dir.joinpath(
-            ".".join(
-                [
-                    tree_source.stem,
-                    "reference-set",
-                    f"k{k_size}",
-                    "json",
-                    "gz",
-                ]
-            )
+        temp_dir = TemporaryDirectory()
+
+        train_output_file_path = Path(temp_dir.name).joinpath(
+            REFERENCE_SET_OUTPUT_FILE_NAME
         )
 
-        LOGGER.info("Output file persisted to:")
-        LOGGER.info(f"\t{train_output_file_path}")
-
-        with gzip.open(
-            train_output_file_path, "wt", encoding="utf-8"
-        ) as out_gz:
-            # ? Remove sanitized tree of the persistence artifact
-            tree_artifact = deepcopy(tree)
-            tree_artifact.sanitized_tree = None
-
+        with gzip.open(train_output_file_path, "wt", encoding="utf-8") as out:
             dump(
-                asdict(
-                    ReferenceSet(
-                        kmer_size=k_size,
-                        tree=tree_artifact,
-                        msa=references.msa,
-                        labels_map=references.labels_map,
-                        linear_tree=references.linear_tree,
-                    )
-                ),
-                out_gz,
+                references.to_dict(),
+                out,
                 indent=4,
                 default=str,
                 sort_keys=True,
             )
 
+        with tarfile.open(train_output_dir_output_file, "w:") as tar:
+            tar.add(
+                train_output_file_path,
+                arcname=train_output_file_path.name,
+            )
+
+        temp_dir.cleanup()
+
         # ? --------------------------------------------------------------------
         # ? Return a positive response
         # ? --------------------------------------------------------------------
 
-        return right(references)
+        return right((train_output_dir_output_file, references))
 
     except Exception as exc:
         return c_exc.UseCaseError(exc, logger=LOGGER)()

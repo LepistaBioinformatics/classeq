@@ -1,3 +1,4 @@
+from hashlib import md5
 from json import load
 from pathlib import Path
 from typing import Any, Self
@@ -20,12 +21,11 @@ class ClasseqTree:
     # ? Class attributes
     # ? ------------------------------------------------------------------------
 
-    newick_file_path: Path = field()
-    phylojson_file_path: Path = field()
     tree_headers: list[int] = field()
     outgroups: list[str] = field()
     tree_format: MsaSourceFormatEnum = field()
-    sanitized_tree: ExtendedBioPythonTree | None = field(default=None)
+    sanitized_tree: ExtendedBioPythonTree = field()
+    tree_hash: str | None = field(default=None)
 
     # ? ------------------------------------------------------------------------
     # ? Public class methods
@@ -37,12 +37,11 @@ class ClasseqTree:
         content: dict[str, Any],
     ) -> Either[c_exc.MappedErrors, Self]:
         for key in [
-            "newick_file_path",
-            "phylojson_file_path",
             "tree_headers",
             "outgroups",
             "tree_format",
             "sanitized_tree",
+            "tree_hash",
         ]:
             if key not in content:
                 return c_exc.DadaTransferObjectError(
@@ -51,55 +50,75 @@ class ClasseqTree:
                     logger=LOGGER,
                 )()
 
-        return right(
-            cls(
-                newick_file_path=Path(content.get("newick_file_path")),  # type: ignore
-                phylojson_file_path=Path(content.get("phylojson_file_path")),  # type: ignore
-                tree_headers=content.get("tree_headers"),  # type: ignore
-                outgroups=content.get("outgroups"),  # type: ignore
-                tree_format=eval(content.get("tree_format")),  # type: ignore
-                sanitized_tree=content.get("sanitized_tree"),  # type: ignore
-            )
+        if (sanitized_tree := content.get("sanitized_tree")) is None:
+            return c_exc.DadaTransferObjectError(
+                f"Invalid content detected on parse `{ClasseqTree}`. "
+                f"`sanitized_tree` key is empty.",
+                logger=LOGGER,
+            )()
+
+        tree = cls(
+            tree_headers=content.get("tree_headers"),  # type: ignore
+            outgroups=content.get("outgroups"),  # type: ignore
+            tree_format=eval(content.get("tree_format")),  # type: ignore
+            sanitized_tree=ExtendedBioPythonTree.from_dict(
+                content=sanitized_tree,
+            ),
         )
+
+        if (tree_hash := content.get("tree_hash")) is None:
+            return c_exc.DadaTransferObjectError(
+                f"Invalid content detected on parse `{ClasseqTree}`. "
+                f"`tree_hash` key is empty.",
+                logger=LOGGER,
+            )()
+
+        tree.update_tree_hash()
+
+        if tree.tree_hash != tree_hash:
+            return c_exc.DadaTransferObjectError(
+                f"Invalid content detected on parse `{ClasseqTree}`. "
+                f"`tree_hash` key is empty.",
+                logger=LOGGER,
+            )()
+
+        return right(tree)
 
     # ? ------------------------------------------------------------------------
     # ? Public instance methods
     # ? ------------------------------------------------------------------------
 
-    def load_tree(
-        self,
-        outgroups: list[str],
-    ) -> Either[c_exc.MappedErrors, bool]:
-        try:
-            if not self.newick_file_path.is_file():
-                return c_exc.DadaTransferObjectError(
-                    f"Invalid path: {self.newick_file_path}"
-                )()
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "tree_headers": self.tree_headers,
+            "outgroups": self.outgroups,
+            "tree_format": self.tree_format,
+            "sanitized_tree": self.sanitized_tree.to_dict(),
+            "tree_hash": self.tree_hash,
+        }
 
-            # ? ----------------------------------------------------------------
-            # ? Load phylogenetic tree
-            # ? ----------------------------------------------------------------
-
-            LOGGER.info("Loading phylogenetic tree")
-
-            if (
-                rooted_tree_either := self.parse_and_reroot_phylojson_tree(
-                    self.phylojson_file_path,
-                    outgroups,
+    def update_tree_hash(self) -> None:
+        self.tree_hash = md5(
+            str(
+                (
+                    self.tree_headers,
+                    self.outgroups,
+                    self.tree_format,
+                    "".join(
+                        [
+                            f"{clade._id}{clade.branch_length}{clade.confidence}"
+                            for clade in self.sanitized_tree.root.get_nonterminals()
+                        ]
+                    ),
+                    "".join(
+                        [
+                            f"{clade._id}{clade.branch_length}{clade.name}"
+                            for clade in self.sanitized_tree.root.get_terminals()
+                        ]
+                    ),
                 )
-            ).is_left:
-                return c_exc.UseCaseError(
-                    "Unexpected error on parse phylogenetic tree.",
-                    prev=rooted_tree_either.value,
-                    logger=LOGGER,
-                )()
-
-            self.sanitized_tree = rooted_tree_either.value
-
-            return right(True)
-
-        except Exception as exc:
-            return c_exc.UseCaseError(exc, logger=LOGGER)()
+            ).encode()
+        ).hexdigest()
 
     # ? ------------------------------------------------------------------------
     # ? Public static methods

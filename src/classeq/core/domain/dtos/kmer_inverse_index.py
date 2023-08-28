@@ -42,6 +42,16 @@ class KmerIndex:
         return int(md5(self.kmer.encode("utf-8")).hexdigest(), 16)
 
     # ? ------------------------------------------------------------------------
+    # ? Public instance methods
+    # ? ------------------------------------------------------------------------
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "kmer": self.kmer,
+            "records": self.records,
+        }
+
+    # ? ------------------------------------------------------------------------
     # ? Public class methods
     # ? ------------------------------------------------------------------------
 
@@ -64,31 +74,6 @@ class KmerIndex:
 
         return right(cls(kmer=kmer, records=OrderedTuple(records)))
 
-    # ? ------------------------------------------------------------------------
-    # ? Public instance methods
-    # ? ------------------------------------------------------------------------
-
-    def contains(
-        self,
-        target: int,
-    ) -> int | None:
-        first = 0
-        last = len(self.records) - 1
-        index: int | None = None
-
-        while (first <= last) and (index is None):
-            mid = (first + last) // 2
-
-            if self.records[mid] == target:
-                return mid
-            else:
-                if target < self.records[mid]:
-                    last = mid - 1
-                else:
-                    first = mid + 1
-
-        return index
-
 
 @frozen(kw_only=True)
 class KmersInverseIndices:
@@ -97,7 +82,15 @@ class KmersInverseIndices:
     # ? ------------------------------------------------------------------------
 
     indices: tuple[KmerIndex, ...] = field(default=tuple())
-    hashes: OrderedTuple = field()
+
+    # ? ------------------------------------------------------------------------
+    # ? Public instance methods
+    # ? ------------------------------------------------------------------------
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "indices": [i.to_dict() for i in self.indices],
+        }
 
     # ? ------------------------------------------------------------------------
     # ? Public class methods
@@ -110,7 +103,6 @@ class KmersInverseIndices:
     ) -> Either[c_exc.MappedErrors, Self]:
         for key in [
             "indices",
-            "hashes",
         ]:
             if key not in content:
                 return c_exc.DadaTransferObjectError(
@@ -128,22 +120,7 @@ class KmersInverseIndices:
 
             kmer_indices.append(kmer_index_either.value)
 
-        if (hashes := content.get("hashes")) is None:
-            return c_exc.DadaTransferObjectError(
-                "Invalid content detected on parse `hashes` from JSON dump",
-                logger=LOGGER,
-            )()
-
-        return right(
-            cls(
-                indices=tuple(kmer_indices),
-                hashes=OrderedTuple(hashes),
-            )
-        )
-
-    # ? ------------------------------------------------------------------------
-    # ? Public instance methods
-    # ? ------------------------------------------------------------------------
+        return right(cls(indices=tuple(kmer_indices)))
 
     @classmethod
     def new(
@@ -179,61 +156,25 @@ class KmersInverseIndices:
 
                     kmer_indices[kmer].add(header_index)
 
-            indices = tuple(
-                sorted(
-                    [
-                        KmerIndex(
-                            kmer=kmer,
-                            records=OrderedTuple(codes),
-                        )
-                        for kmer, codes in kmer_indices.items()
-                    ],
-                    key=lambda i: i.__hash__(),
-                )
-            )
-
             return right(
                 cls(
-                    indices=indices,
-                    hashes=OrderedTuple([i.__hash__() for i in indices]),
+                    indices=tuple(
+                        sorted(
+                            [
+                                KmerIndex(
+                                    kmer=kmer,
+                                    records=OrderedTuple(codes),
+                                )
+                                for kmer, codes in kmer_indices.items()
+                            ],
+                            key=lambda i: i.__hash__(),
+                        )
+                    )
                 )
             )
 
         except Exception as exc:
             return c_exc.CreationError(exc, logger=LOGGER)()
-
-    # ? ------------------------------------------------------------------------
-    # ? Public instance methods
-    # ? ------------------------------------------------------------------------
-
-    def index_of(
-        self,
-        kmer: str,
-    ) -> int | None:
-        # ? Initialize search params
-        first = 0
-        last = len(self.hashes) - 1
-        index: int | None = None
-
-        # ? Convert the kmer to a md5 representation
-        hashed_kmer = int(md5(kmer.encode("utf-8")).hexdigest(), 16)
-
-        while (first <= last) and (index is None):
-            mid = (first + last) // 2
-
-            if self.hashes[mid] == hashed_kmer:
-                return mid
-            else:
-                if hashed_kmer < self.hashes[mid]:
-                    last = mid - 1
-                else:
-                    first = mid + 1
-
-        return index
-
-    # ? ------------------------------------------------------------------------
-    # ? Public class methods
-    # ? ------------------------------------------------------------------------
 
     @classmethod
     def generate_double_strand_kmers(

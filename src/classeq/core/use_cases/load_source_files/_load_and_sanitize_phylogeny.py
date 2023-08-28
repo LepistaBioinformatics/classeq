@@ -154,7 +154,7 @@ def load_and_sanitize_phylogeny(
         )
 
         LOGGER.info("Sanitized TREE as NEWICK would be persisted to:")
-        LOGGER.info(f"\t{cleaned_tree_file_path}")
+        LOGGER.info(f"\t{cleaned_tree_file_path.relative_to(output_directory)}")
 
         Phylo.write(
             sanitized_tree,
@@ -167,7 +167,7 @@ def load_and_sanitize_phylogeny(
         )
 
         LOGGER.info("Sanitized TREE as JSON would be persisted to:")
-        LOGGER.info(f"\t{cleaned_json_file_path}")
+        LOGGER.info(f"\t{cleaned_json_file_path.relative_to(output_directory)}")
 
         with cleaned_json_file_path.open("w+") as f:
             dump(sanitized_tree.to_dict(), f, indent=4, default=str)
@@ -176,16 +176,16 @@ def load_and_sanitize_phylogeny(
         # ? Return a positive response
         # ? --------------------------------------------------------------------
 
-        return right(
-            ClasseqTree(
-                newick_file_path=cleaned_tree_file_path,
-                phylojson_file_path=cleaned_json_file_path,
-                tree_format=format,
-                tree_headers=[h.name for h in sanitized_tree.get_terminals()],
-                outgroups=outgroups,
-                sanitized_tree=sanitized_tree,
-            )
+        classeq_tree = ClasseqTree(
+            tree_format=format,
+            tree_headers=[h.name for h in sanitized_tree.get_terminals()],
+            outgroups=outgroups,
+            sanitized_tree=sanitized_tree,
         )
+
+        classeq_tree.update_tree_hash()
+
+        return right(classeq_tree)
 
     except Exception as exc:
         return c_exc.UseCaseError(exc, logger=LOGGER)()

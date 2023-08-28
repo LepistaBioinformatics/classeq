@@ -31,6 +31,8 @@ class ClasseqClade:
     branch_length: float | None = field(default=None)
     parent: UUID | None = field(default=None)
     children: tuple[Self, ...] | None = field(default=None)
+    taxid: int | None = field(default=None)
+    related_rank: str | None = field(default=None)
 
     # ? ------------------------------------------------------------------------
     # ? Life cycle hook methods
@@ -77,6 +79,8 @@ class ClasseqClade:
             "branch_length",
             "parent",
             "children",
+            "taxid",
+            "related_rank",
         ]:
             if key not in content:
                 return left(
@@ -108,6 +112,8 @@ class ClasseqClade:
                     UUID(parent) if (parent := content.get("parent")) else None
                 ),
                 children=tuple(children),
+                taxid=content.get("taxid"),
+                related_rank=content.get("related_rank"),
             )
         )
 
@@ -133,6 +139,8 @@ class ClasseqClade:
             "branch_length": self.branch_length,
             "parent": self.parent,
             "children": children,
+            "taxid": self.taxid,
+            "related_rank": self.related_rank,
         }
 
     def get_ingroup_clades(

@@ -9,7 +9,10 @@ from Bio import SeqIO
 from Bio.SeqRecord import SeqRecord
 from clean_base.either import Either, right
 
-from classeq.core.domain.dtos.biopython_wrappers import ExtendedBioPythonTree
+from classeq.core.domain.dtos.biopython_wrappers import (
+    ExtendedBioPythonClade,
+    ExtendedBioPythonTree,
+)
 from classeq.core.domain.dtos.clade import ClasseqClade
 from classeq.core.domain.dtos.msa_source_format import MsaSourceFormatEnum
 from classeq.core.domain.dtos.priors import TreePriors
@@ -36,13 +39,13 @@ def predict_for_multiple_fasta_file(
         # ? Resolve tree annotations
         # ? --------------------------------------------------------------------
 
-        resolved_names: dict[UUID, str] = dict()
+        resolved_names: dict[UUID, ExtendedBioPythonClade] = dict()
         if annotated_phylojson_path is not None:
             with annotated_phylojson_path.open("r") as f:
                 tree = ExtendedBioPythonTree.from_dict(content=load(f))
 
                 resolved_names = {
-                    node._id: node.name
+                    node._id: node
                     for node in tree.get_nonterminals()
                     if node.name is not None
                 }
@@ -104,8 +107,17 @@ def predict_for_multiple_fasta_file(
             )
 
         # ? --------------------------------------------------------------------
-        # ? Persisting output
+        # ? Persisting output as JSON
         # ? --------------------------------------------------------------------
+
+        prediction_output_fields = [
+            "name",
+            "id",
+            "support",
+            "parent",
+            "taxid",
+            "related_rank",
+        ]
 
         if output_file_path is None:
             output_file_path = fasta_path.parent.joinpath(
@@ -116,6 +128,9 @@ def predict_for_multiple_fasta_file(
                 output_file_path = output_file_path.with_suffix(".json")
 
         LOGGER.info(f"Saving output to `{output_file_path}`")
+
+        if output_file_path.parent.exists() is False:
+            output_file_path.parent.mkdir(parents=True)
 
         if output_file_path.exists():
             LOGGER.warning(f"Output file `{output_file_path}` overwritten")
@@ -129,7 +144,7 @@ def predict_for_multiple_fasta_file(
                     "output": [
                         {
                             "target": k,
-                            "status": v.pop("status").value,
+                            "status": v.get("status").value,  # type: ignore
                             "prediction": [
                                 {
                                     **{
@@ -137,13 +152,12 @@ def predict_for_multiple_fasta_file(
                                         for y, z in i.to_dict(
                                             omit_children=True
                                         ).items()
-                                        if y
-                                        in ["name", "id", "support", "parent"]
+                                        if y in prediction_output_fields
                                     },
                                     "depth": index + 1,
                                 }
                                 for index, i in enumerate(
-                                    v.pop("phylogeny_path")
+                                    v.get("phylogeny_path")  # type: ignore
                                 )
                             ],
                         }
@@ -155,6 +169,73 @@ def predict_for_multiple_fasta_file(
                 default=str,
             )
 
+        # ? --------------------------------------------------------------------
+        # ? Persisting output as TSV
+        # ? --------------------------------------------------------------------
+
+        output_file_path_tsv = output_file_path.with_suffix(".tsv")
+
+        LOGGER.info(f"Saving output to `{output_file_path_tsv}`")
+
+        if output_file_path_tsv.exists():
+            LOGGER.warning(f"Output file `{output_file_path_tsv}` overwritten")
+            output_file_path_tsv.unlink()
+
+        phylogeny_path: list[ClasseqClade]
+        with output_file_path_tsv.open("w+") as f:
+            response_lines: list[str] = []
+            line_definition = "{query}\t{id}\t{status}\t{depth}\t{name}\t{taxid}\t{related_rank}"
+
+            for sequence_name, prediction in response.items():
+                if (status := prediction.get("status")) is None:
+                    continue
+
+                if (phylogeny_path := prediction.get("phylogeny_path")) is None:  # type: ignore
+                    continue
+
+                for index, clade in enumerate(phylogeny_path):
+                    response_lines.append(
+                        line_definition.format(
+                            query=sequence_name,
+                            id=clade.id,
+                            status=status.value,
+                            depth=index + 1,
+                            name=clade.name,
+                            taxid=clade.taxid,
+                            related_rank=clade.related_rank,
+                        )
+                    )
+
+            f.write("\n".join(response_lines))
+
+            """ f.write(
+                "\n".join(
+                    [
+                        "\t".join(
+                            [
+                                k,
+                                v.get("status").value,  # type: ignore
+                                *[
+                                    *[
+                                        z
+                                        for y, z in i.to_dict(
+                                            omit_children=True
+                                        ).items()
+                                        if y in prediction_output_fields
+                                    ],
+                                    index + 1,
+                                    i.to_dict(omit_children=True)
+                                    for index, i in enumerate(
+                                        v.get("phylogeny_path")  # type: ignore
+                                    )
+                                ],
+                            ]
+                        )
+                        for k, v in response.items()
+                    ]
+                )
+            ) """
+
         return right(True)
 
     except Exception as exc:
@@ -162,7 +243,7 @@ def predict_for_multiple_fasta_file(
 
 
 def __resolve_path_name(
-    resolved_names: dict[UUID, str],
+    resolved_names: dict[UUID, ExtendedBioPythonClade],
     adherence_test_path: list[CladeAdherenceResult],
 ) -> list[ClasseqClade]:
     renamed_clades: list[ClasseqClade] = []
@@ -170,7 +251,9 @@ def __resolve_path_name(
     for clade_result in adherence_test_path:
         clade = clade_result.clade
         if (resolved_name := resolved_names.get(clade.id)) is not None:
-            clade.name = resolved_name
+            clade.name = resolved_name.name
+            clade.taxid = resolved_name._taxid
+            clade.related_rank = resolved_name._related_rank.name
 
         renamed_clades.append(clade)
     return renamed_clades

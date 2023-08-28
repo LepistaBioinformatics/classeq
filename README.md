@@ -1,1 +1,1 @@
-# CLASSEQ: Bringing phylogenies into true ML models
+# CLASSEQ: Bringing lineage prediction using phylogenies

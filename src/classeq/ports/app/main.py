@@ -726,20 +726,30 @@ class TreeEditor(QMainWindow):
     def __annotate_clade_rank(
         self,
         clade: ExtendedBioPythonClade,
-        current_value: str | None,
+        current_value: MajorTaxonomicRanks
+        | MinorTaxonomicRanks
+        | ExtraTaxonomicRanks
+        | None,
     ) -> None:
         clade_id: UUID = clade._id
+
+        items = [
+            ExtraTaxonomicRanks.NO_RANK.value,
+            *sorted(
+                [
+                    *[rank.value for rank in MajorTaxonomicRanks],
+                    *[rank.value for rank in MinorTaxonomicRanks],
+                    *[rank.value for rank in ExtraTaxonomicRanks],
+                ]
+            ),
+        ]
 
         text, ok = QInputDialog.getItem(
             self,
             "Annotate Node",
             "Enter node name:",
-            [
-                ExtraTaxonomicRanks.NO_RANK.value,
-                *[rank.value for rank in MajorTaxonomicRanks],
-                *[rank.value for rank in MinorTaxonomicRanks],
-                *[rank.value for rank in ExtraTaxonomicRanks],
-            ],
+            items,
+            items.index(current_value.value if current_value else ""),
         )
 
         if ok:
@@ -786,10 +796,6 @@ class TreeEditor(QMainWindow):
 
         self.__tree_widget.clearSelection()
         self.__tree_widget.setItemSelected(item, True)
-        self.__tree_widget.scrollToItem(
-            item,
-            QAbstractItemView.PositionAtCenter,
-        )
 
         self.__set_table_data(clade=clade)
 
