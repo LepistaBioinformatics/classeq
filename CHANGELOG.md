@@ -1,3 +1,9 @@
+## v0.6.0 (2023-08-28)
+
+### Feat
+
+- create the strand attribute of reference-sets to control kmer generation and turn the tree clades ids as predictable uuid3
+
 ## v0.5.0 (2023-08-27)
 
 ### Feat
