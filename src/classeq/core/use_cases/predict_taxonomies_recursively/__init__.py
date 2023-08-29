@@ -216,10 +216,12 @@ def predict_for_multiple_fasta_file(
             LOGGER.warning(f"Output file `{output_file_path_tsv}` overwritten")
             output_file_path_tsv.unlink()
 
+        default_none = "NA"
         phylogeny_path: list[ClasseqClade]
         with output_file_path_tsv.open("w+") as f:
             response_lines: list[str] = []
             line_definition = "{query}\t{id}\t{status}\t{depth}\t{name}\t{taxid}\t{related_rank}\t{support}\t{branches}"
+            f.write(line_definition.replace("{", "").replace("}", "") + "\n")
 
             for sequence_name, prediction in response.items():
                 if (status := prediction.get("status")) is None:
@@ -235,14 +237,14 @@ def predict_for_multiple_fasta_file(
                             id=clade.id,
                             status=status.value,
                             depth=index + 1,
-                            name=clade.name,
-                            taxid=clade.taxid,
-                            related_rank=clade.related_rank,
-                            support=clade.support,
+                            name=clade.name or default_none,
+                            taxid=clade.taxid or default_none,
+                            related_rank=clade.related_rank or default_none,
+                            support=clade.support or default_none,
                             branches=(
                                 clade.children.__len__()
                                 if clade.children
-                                else None
+                                else default_none
                             ),
                         )
                     )
@@ -266,7 +268,9 @@ def __resolve_path_name(
         if (resolved_name := resolved_names.get(clade.id)) is not None:
             clade.name = resolved_name.name
             clade.taxid = resolved_name._taxid
-            clade.related_rank = resolved_name._related_rank.name
+
+            if resolved_name._related_rank is not None:
+                clade.related_rank = resolved_name._related_rank.name
 
         renamed_clades.append(clade)
     return renamed_clades

@@ -2,7 +2,6 @@ from copy import copy
 from typing import Any
 
 import clean_base.exceptions as c_exc
-from Bio.Seq import Seq
 from clean_base.either import Either, right
 
 from classeq.core.domain.dtos.clade import ClasseqClade
@@ -105,7 +104,10 @@ def perform_single_sequence_phylogenetic_adherence_test(
         query_kmers: set[str] = {
             kmer
             for kmer in KmersInverseIndices.generate_kmers(
-                dna_sequence=Seq(target_sequence.upper()),
+                dna_sequence=KmersInverseIndices.sanitize_sequence(
+                    target_sequence,
+                    as_seq=True,
+                ),
                 k_size=kmer_size,
                 strand=strand,
             )
@@ -114,9 +116,6 @@ def perform_single_sequence_phylogenetic_adherence_test(
         # ? --------------------------------------------------------------------
         # ? Perform adherence test for outgroup
         # ? --------------------------------------------------------------------
-
-        if (outgroup_clades_either := tree.get_outgroup_clade()).is_left:
-            return outgroup_clades_either
 
         if (
             binding_either := do_clade_adherence_test_for_single_sequence(

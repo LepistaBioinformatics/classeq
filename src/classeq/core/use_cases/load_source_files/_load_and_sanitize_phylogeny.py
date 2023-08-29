@@ -72,6 +72,49 @@ def load_and_sanitize_phylogeny(
         rooted_tree: Tree = rooted_tree_either.value
 
         # ? --------------------------------------------------------------------
+        # ? Convert default BioPython's Tree to ExtendedBioPythonTree
+        # ? --------------------------------------------------------------------
+
+        rooted_tree_extended = ExtendedBioPythonTree.from_bio_python_tree(
+            tree=rooted_tree,
+            outgroups=outgroups,
+        )
+
+        # ? --------------------------------------------------------------------
+        # ? Collapse outgroup internal nodes
+        # ? --------------------------------------------------------------------
+
+        LOGGER.info("Collapsing outgroup branches")
+
+        tree_outgroups = [
+            clade
+            for clade in rooted_tree_extended.get_terminals()
+            if clade.name in outgroups
+        ]
+
+        common_ancestor: ExtendedBioPythonClade = (
+            rooted_tree_extended.common_ancestor(targets=tree_outgroups)
+        )
+
+        clade: ExtendedBioPythonClade
+        collapsable_clades: set[ExtendedBioPythonClade] = set()
+
+        for clade in common_ancestor.clades:
+            if all([t.name in outgroups for t in clade.get_terminals()]):
+                collapsable_clades.add(clade)
+
+        rooted_tree_extended.collapse_all(
+            lambda c: c.__hash__()
+            in [
+                i.__hash__()
+                for i in [
+                    *collapsable_clades,
+                    *common_ancestor,
+                ]
+            ]
+        )
+
+        # ? --------------------------------------------------------------------
         # ? Sanitize tree
         #
         # Remove nodes with low phylogenetic support.
@@ -84,7 +127,7 @@ def load_and_sanitize_phylogeny(
 
         sanitized_tree_either: Either = (
             ClasseqTree.collapse_low_supported_and_outgroup_nodes(
-                rooted_tree=rooted_tree,
+                rooted_tree=rooted_tree_extended,
                 support_value_cutoff=support_value_cutoff,
             )
         )
@@ -97,42 +140,6 @@ def load_and_sanitize_phylogeny(
             )()
 
         sanitized_tree: Tree = sanitized_tree_either.value
-
-        # ? --------------------------------------------------------------------
-        # ? Convert default BioPython's Tree to ExtendedBioPythonTree
-        # ? --------------------------------------------------------------------
-
-        sanitized_tree = ExtendedBioPythonTree.from_bio_python_tree(
-            tree=sanitized_tree,
-            outgroups=outgroups,
-        )
-
-        # ? --------------------------------------------------------------------
-        # ? Collapse outgroup internal nodes
-        # ? --------------------------------------------------------------------
-
-        LOGGER.info("Collapsing outgroup branches")
-
-        tree_outgroups = [
-            clade
-            for clade in sanitized_tree.get_terminals()
-            if clade.name in outgroups
-        ]
-
-        common_ancestor: ExtendedBioPythonClade = (
-            sanitized_tree.common_ancestor(targets=tree_outgroups)
-        )
-
-        clade: ExtendedBioPythonClade
-        collapsable_clades: set[ExtendedBioPythonClade] = set()
-
-        for clade in common_ancestor.clades:
-            if all([t.name in outgroups for t in clade.get_terminals()]):
-                collapsable_clades.add(clade)
-
-        sanitized_tree.collapse_all(
-            lambda c: c.__hash__() in [i.__hash__() for i in collapsable_clades]
-        )
 
         # ? --------------------------------------------------------------------
         # ? Persist sanitized tree

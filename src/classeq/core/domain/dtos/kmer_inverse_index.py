@@ -212,9 +212,17 @@ class KmersInverseIndices:
 
     @staticmethod
     def sanitize_sequence(
-        sequence: SeqRecord,
+        sequence: SeqRecord | str,
         as_seq: bool = False,
     ) -> str:
+        if isinstance(sequence, str):
+            sequence = SeqRecord(
+                id="",
+                name="",
+                description="",
+                seq=Seq(sequence),
+            )
+
         seq = "".join(
             [
                 letter

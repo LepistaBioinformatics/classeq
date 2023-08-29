@@ -156,7 +156,13 @@ class ClasseqClade:
                 )
             )
 
-        return right([clade for clade in children if clade.is_internal()])
+        return right(
+            [
+                clade
+                for clade in children
+                if clade.is_internal() is True and clade.id != self.id
+            ]
+        )
 
     def get_outgroup_clade(self) -> Either[c_exc.MappedErrors, list[Self]]:
         if self.is_root() is False:
