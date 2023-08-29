@@ -1,3 +1,9 @@
+## v0.6.2 (2023-08-29)
+
+### Fix
+
+- improve the tree sanitization and prediction use-cases to allow index and predict using trees with non polithomic outgroups
+
 ## v0.6.1 (2023-08-28)
 
 ### Fix
