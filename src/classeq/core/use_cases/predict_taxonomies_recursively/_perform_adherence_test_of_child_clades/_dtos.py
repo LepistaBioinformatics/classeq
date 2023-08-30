@@ -1,5 +1,6 @@
 from enum import Enum
 from hashlib import md5
+from typing import Any
 
 from attrs import define, field
 
@@ -20,6 +21,10 @@ class CladeAdherenceResultStatus(Enum):
 
 @define
 class CladeAdherenceResult:
+    # ? ------------------------------------------------------------------------
+    # ? Class attributes
+    # ? ------------------------------------------------------------------------
+
     clade: ClasseqClade = field()
     ingroup_adherence_test: AdherenceResult = field()
     sister_adherence_test: AdherenceResult = field()
@@ -61,3 +66,14 @@ class CladeAdherenceResult:
             + f"ingroup={self.ingroup_adherence_test.__str__()}, "
             + f"sister={self.sister_adherence_test.__str__()} )"
         )
+
+    # ? ------------------------------------------------------------------------
+    # ? Public instance methods
+    # ? ------------------------------------------------------------------------
+
+    def to_dict(self, omit_children: bool = False) -> dict[str, Any]:
+        return {
+            "clade": self.clade.to_dict(omit_children=omit_children),
+            "ingroup_adherence_test": self.ingroup_adherence_test.to_dict(),
+            "sister_adherence_test": self.sister_adherence_test.to_dict(),
+        }

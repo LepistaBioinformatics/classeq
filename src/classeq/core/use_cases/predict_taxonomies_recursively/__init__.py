@@ -32,6 +32,8 @@ def predict_for_multiple_fasta_file(
     fasta_format: MsaSourceFormatEnum = MsaSourceFormatEnum.FASTA,
     annotated_phylojson_path: Path | None = None,
     output_file_path: Path | None = None,
+    persist_as_json: bool = True,
+    persist_as_csv: bool = True,
     **kwargs: Any,
 ) -> Either[c_exc.MappedErrors, Literal[True]]:
     """Predict taxonomies for multiple sequences in a FASTA file and save the
@@ -142,17 +144,8 @@ def predict_for_multiple_fasta_file(
             )
 
         # ? --------------------------------------------------------------------
-        # ? Persisting output as JSON
+        # ? Persist output
         # ? --------------------------------------------------------------------
-
-        prediction_output_fields = [
-            "name",
-            "id",
-            "support",
-            "parent",
-            "taxid",
-            "related_rank",
-        ]
 
         if output_file_path is None:
             output_file_path = fasta_path.parent.joinpath(
@@ -162,94 +155,19 @@ def predict_for_multiple_fasta_file(
             if output_file_path.suffix != ".json":
                 output_file_path = output_file_path.with_suffix(".json")
 
-        LOGGER.info(f"Saving output to `{output_file_path}`")
-
-        if output_file_path.parent.exists() is False:
-            output_file_path.parent.mkdir(parents=True)
-
-        if output_file_path.exists():
-            LOGGER.warning(f"Output file `{output_file_path}` overwritten")
-            output_file_path.unlink()
-
-        with output_file_path.open("w+") as f:
-            dump(
-                {
-                    "input": str(fasta_path),
-                    "annotations": annotated_phylojson_path,
-                    "output": [
-                        {
-                            "target": k,
-                            "status": v.get("status").value,  # type: ignore
-                            "prediction": [
-                                {
-                                    **{
-                                        y: z
-                                        for y, z in i.to_dict(
-                                            omit_children=True
-                                        ).items()
-                                        if y in prediction_output_fields
-                                    },
-                                    "depth": index + 1,
-                                }
-                                for index, i in enumerate(
-                                    v.get("phylogeny_path")  # type: ignore
-                                )
-                            ],
-                        }
-                        for k, v in response.items()
-                    ],
-                },
-                f,
-                indent=4,
-                default=str,
+        if persist_as_json is True:
+            __write_json(
+                output_file_path=output_file_path,
+                response=response,
+                fasta_path=fasta_path,
+                annotated_phylojson_path=annotated_phylojson_path,
             )
 
-        # ? --------------------------------------------------------------------
-        # ? Persisting output as TSV
-        # ? --------------------------------------------------------------------
-
-        output_file_path_tsv = output_file_path.with_suffix(".tsv")
-
-        LOGGER.info(f"Saving output to `{output_file_path_tsv}`")
-
-        if output_file_path_tsv.exists():
-            LOGGER.warning(f"Output file `{output_file_path_tsv}` overwritten")
-            output_file_path_tsv.unlink()
-
-        default_none = "NA"
-        phylogeny_path: list[ClasseqClade]
-        with output_file_path_tsv.open("w+") as f:
-            response_lines: list[str] = []
-            line_definition = "{query}\t{id}\t{status}\t{depth}\t{name}\t{taxid}\t{related_rank}\t{support}\t{branches}"
-            f.write(line_definition.replace("{", "").replace("}", "") + "\n")
-
-            for sequence_name, prediction in response.items():
-                if (status := prediction.get("status")) is None:
-                    continue
-
-                if (phylogeny_path := prediction.get("phylogeny_path")) is None:  # type: ignore
-                    continue
-
-                for index, clade in enumerate(phylogeny_path):
-                    response_lines.append(
-                        line_definition.format(
-                            query=sequence_name,
-                            id=clade.id,
-                            status=status.value,
-                            depth=index + 1,
-                            name=clade.name or default_none,
-                            taxid=clade.taxid or default_none,
-                            related_rank=clade.related_rank or default_none,
-                            support=clade.support or default_none,
-                            branches=(
-                                clade.children.__len__()
-                                if clade.children
-                                else default_none
-                            ),
-                        )
-                    )
-
-            f.write("\n".join(response_lines))
+        if persist_as_csv is True:
+            __write_csv(
+                output_file_path=output_file_path,
+                response=response,
+            )
 
         return right(True)
 
@@ -260,8 +178,8 @@ def predict_for_multiple_fasta_file(
 def __resolve_path_name(
     resolved_names: dict[UUID, ExtendedBioPythonClade],
     adherence_test_path: list[CladeAdherenceResult],
-) -> list[ClasseqClade]:
-    renamed_clades: list[ClasseqClade] = []
+) -> list[CladeAdherenceResult]:
+    renamed_clades = []
 
     for clade_result in adherence_test_path:
         clade = clade_result.clade
@@ -272,5 +190,103 @@ def __resolve_path_name(
             if resolved_name._related_rank is not None:
                 clade.related_rank = resolved_name._related_rank.name
 
-        renamed_clades.append(clade)
+        renamed_clades.append(clade_result)
     return renamed_clades
+
+
+def __write_csv(
+    output_file_path: Path,
+    response: defaultdict[str, dict[str, Any]],
+) -> None:
+    output_file_path_tsv = output_file_path.with_suffix(".tsv")
+    default_none = "NA"
+    phylogeny_path: list[CladeAdherenceResult]
+
+    LOGGER.info(f"Saving output to `{output_file_path_tsv}`")
+
+    if output_file_path_tsv.exists():
+        LOGGER.warning(f"Output file `{output_file_path_tsv}` overwritten")
+        output_file_path_tsv.unlink()
+
+    with output_file_path_tsv.open("w+") as f:
+        response_lines: list[str] = []
+        line_definition = (
+            "{query}\t{id}\t{status}\t{depth}\t{name}\t{taxid}"
+            + "\t{related_rank}\t{support}\t{branches}"
+        )
+        f.write(line_definition.replace("{", "").replace("}", "") + "\n")
+
+        for sequence_name, prediction in response.items():
+            if (status := prediction.get("status")) is None:
+                continue
+
+            if (phylogeny_path := prediction.get("phylogeny_path")) is None:  # type: ignore
+                continue
+
+            for index, clade in enumerate(phylogeny_path):
+                response_lines.append(
+                    line_definition.format(
+                        query=sequence_name,
+                        id=clade.clade.id,
+                        status=status.value,
+                        depth=index + 1,
+                        name=clade.clade.name or default_none,
+                        taxid=clade.clade.taxid or default_none,
+                        related_rank=clade.clade.related_rank or default_none,
+                        support=clade.clade.support or default_none,
+                        branches=(
+                            clade.clade.children.__len__()
+                            if clade.clade.children
+                            else default_none
+                        ),
+                    )
+                )
+
+        f.write("\n".join(response_lines))
+
+
+def __write_json(
+    output_file_path: Path,
+    response: defaultdict[str, dict[str, Any]],
+    fasta_path: Path,
+    annotated_phylojson_path: Path | None,
+) -> None:
+    LOGGER.info(f"Saving output to `{output_file_path}`")
+
+    if output_file_path.parent.exists() is False:
+        output_file_path.parent.mkdir(parents=True)
+
+    if output_file_path.exists():
+        LOGGER.warning(f"Output file `{output_file_path}` overwritten")
+        output_file_path.unlink()
+
+    with output_file_path.open("w+") as f:
+        dump(
+            {
+                "input": fasta_path.name,
+                "annotations": (
+                    annotated_phylojson_path.name
+                    if annotated_phylojson_path
+                    else None
+                ),
+                "output": [
+                    {
+                        "target": k,
+                        "status": v.get("status").value,  # type: ignore
+                        "prediction": [
+                            {
+                                **i.to_dict(omit_children=True),
+                                "depth": index + 1,
+                            }
+                            for index, i in enumerate(
+                                v.get("phylogeny_path")  # type: ignore
+                            )
+                        ],
+                    }
+                    for k, v in response.items()
+                ],
+            },
+            f,
+            indent=4,
+            default=str,
+        )

@@ -10,6 +10,7 @@ from classeq.settings import LOGGER
 
 from .._do_clade_adherence_test_for_single_sequence import (
     do_clade_adherence_test_for_single_sequence,
+    AdherenceStatus,
 )
 from .._do_clade_adherence_test_for_single_sequence._dtos import AdherenceResult
 from ._dtos import CladeAdherenceResult, CladeAdherenceResultStatus
@@ -120,7 +121,12 @@ def perform_adherence_test_of_child_clades(
                     logger=LOGGER,
                 )()
 
-            if ingroup.match_kmers > sister.match_kmers:
+            if ingroup.match_kmers > sister.match_kmers and all(
+                [
+                    ingroup.status == AdherenceStatus.SUCCESS,
+                    sister.status == AdherenceStatus.SUCCESS,
+                ]
+            ):
                 contrasting_clades.add(
                     CladeAdherenceResult(
                         clade=clade,
