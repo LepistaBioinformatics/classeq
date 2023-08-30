@@ -1,3 +1,10 @@
+## v0.7.0 (2023-08-30)
+
+### Feat
+
+- configure default values for the output predictions
+- include the full prediciton results at the output table and json files
+
 ## v0.6.2 (2023-08-29)
 
 ### Fix
