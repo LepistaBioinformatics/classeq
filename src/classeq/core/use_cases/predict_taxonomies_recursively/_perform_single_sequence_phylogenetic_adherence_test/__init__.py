@@ -227,7 +227,7 @@ def perform_single_sequence_phylogenetic_adherence_test(
                     + "priors evidences to run comparisons."
                 )
 
-                status = CladeAdherenceResultStatus.INCONCLUSIVE
+                status = CladeAdherenceResultStatus(None)
                 break
 
             # ------------------------------------------------------------------
@@ -280,6 +280,9 @@ def perform_single_sequence_phylogenetic_adherence_test(
         if status == CladeAdherenceResultStatus.NEXT_ITERATION:
             status = CladeAdherenceResultStatus.CONCLUSIVE_INGROUP
             LOGGER.debug("Max resolution reached")
+
+        if clade_path.__len__() == 0:
+            status = CladeAdherenceResultStatus(None)
 
         # ? --------------------------------------------------------------------
         # ? Return a positive response

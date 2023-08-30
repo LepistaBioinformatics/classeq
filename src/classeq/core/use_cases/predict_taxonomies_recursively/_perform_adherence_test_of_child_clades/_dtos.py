@@ -18,6 +18,10 @@ class CladeAdherenceResultStatus(Enum):
     CONCLUSIVE_OUTGROUP = "conclusive-outgroup"
     MAX_RESOLUTION_REACHED = "max-resolution-reached"
 
+    @classmethod
+    def _missing_(cls, _: object) -> Any:
+        return CladeAdherenceResultStatus.INCONCLUSIVE
+
 
 @define
 class CladeAdherenceResult:

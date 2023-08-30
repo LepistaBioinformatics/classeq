@@ -211,9 +211,13 @@ def __write_csv(
     with output_file_path_tsv.open("w+") as f:
         response_lines: list[str] = []
         line_definition = (
-            "{query}\t{id}\t{status}\t{depth}\t{name}\t{taxid}"
-            + "\t{related_rank}\t{support}\t{branches}"
+            "{query}\t{status}\t{predicted_clade_id}\t{depth}\t{name}\t{taxid}"
+            + "\t{related_rank}\t{support}\t{branches}\t{in_match_kmers}"
+            + "\t{in_query_kmers_size}\t{in_subject_kmers_size}\t{in_status}"
+            + "\t{sis_match_kmers}\t{sis_query_kmers_size}"
+            + "\t{sis_subject_kmers_size}\t{sis_status}"
         )
+
         f.write(line_definition.replace("{", "").replace("}", "") + "\n")
 
         for sequence_name, prediction in response.items():
@@ -223,12 +227,22 @@ def __write_csv(
             if (phylogeny_path := prediction.get("phylogeny_path")) is None:  # type: ignore
                 continue
 
+            if phylogeny_path.__len__() == 0:
+                response_lines.append(
+                    "{query}\t{status}".format(
+                        query=sequence_name,
+                        status=status.name,
+                    )
+                )
+
+                continue
+
             for index, clade in enumerate(phylogeny_path):
                 response_lines.append(
                     line_definition.format(
                         query=sequence_name,
-                        id=clade.clade.id,
-                        status=status.value,
+                        status=status.name,
+                        predicted_clade_id=clade.clade.id,
                         depth=index + 1,
                         name=clade.clade.name or default_none,
                         taxid=clade.clade.taxid or default_none,
@@ -239,6 +253,14 @@ def __write_csv(
                             if clade.clade.children
                             else default_none
                         ),
+                        in_match_kmers=clade.ingroup_adherence_test.match_kmers,
+                        in_query_kmers_size=clade.ingroup_adherence_test.query_kmers_size,
+                        in_subject_kmers_size=clade.ingroup_adherence_test.subject_kmers_size,
+                        in_status=clade.ingroup_adherence_test.status.name,
+                        sis_match_kmers=clade.sister_adherence_test.match_kmers,
+                        sis_query_kmers_size=clade.sister_adherence_test.query_kmers_size,
+                        sis_subject_kmers_size=clade.sister_adherence_test.subject_kmers_size,
+                        sis_status=clade.sister_adherence_test.status.name,
                     )
                 )
 

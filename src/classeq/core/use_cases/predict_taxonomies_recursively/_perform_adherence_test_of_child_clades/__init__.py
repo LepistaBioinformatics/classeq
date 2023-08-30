@@ -192,7 +192,7 @@ def perform_adherence_test_of_child_clades(
                         reverse=True,
                     )[0].ingroup_adherence_test,
                     None,
-                    CladeAdherenceResultStatus.INCONCLUSIVE,
+                    CladeAdherenceResultStatus(None),
                 )
             )
 
