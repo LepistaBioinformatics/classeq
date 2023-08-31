@@ -21,6 +21,7 @@ def perform_adherence_test_of_child_clades(
     clades: list[ClasseqClade],
     tree_priors: TreePriors,
     kmer_indices: KmersInverseIndices,
+    minimum_query_kmers_match: int = 10,
     **kwargs: Any,
 ) -> Either[
     c_exc.MappedErrors,
@@ -127,13 +128,14 @@ def perform_adherence_test_of_child_clades(
                     sister.status == AdherenceStatus.SUCCESS,
                 ]
             ):
-                contrasting_clades.add(
-                    CladeAdherenceResult(
-                        clade=clade,
-                        ingroup_adherence_test=ingroup,
-                        sister_adherence_test=sister,
+                if ingroup.match_kmers >= minimum_query_kmers_match:
+                    contrasting_clades.add(
+                        CladeAdherenceResult(
+                            clade=clade,
+                            ingroup_adherence_test=ingroup,
+                            sister_adherence_test=sister,
+                        )
                     )
-                )
 
             sister_adherence_tests.append(sister)
 
