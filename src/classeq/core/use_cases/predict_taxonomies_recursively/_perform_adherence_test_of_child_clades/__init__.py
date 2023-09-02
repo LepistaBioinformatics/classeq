@@ -6,7 +6,11 @@ from clean_base.either import Either, right
 from classeq.core.domain.dtos.clade import ClasseqClade
 from classeq.core.domain.dtos.kmer_inverse_index import KmersInverseIndices
 from classeq.core.domain.dtos.priors import PriorGroup, TreePriors
-from classeq.settings import LOGGER
+from classeq.settings import (
+    LOGGER,
+    MINIMUM_INGROUP_QUERY_KMERS_MATCH,
+    MINIMUM_INGROUP_SISTER_MATCH_KMERS_DIFFERENCE,
+)
 
 from .._do_clade_adherence_test_for_single_sequence import (
     do_clade_adherence_test_for_single_sequence,
@@ -21,7 +25,8 @@ def perform_adherence_test_of_child_clades(
     clades: list[ClasseqClade],
     tree_priors: TreePriors,
     kmer_indices: KmersInverseIndices,
-    minimum_query_kmers_match: int = 10,
+    minimum_ingroup_query_kmers_match: int = MINIMUM_INGROUP_QUERY_KMERS_MATCH,
+    ingroup_sister_match_kmers_difference: int = MINIMUM_INGROUP_SISTER_MATCH_KMERS_DIFFERENCE,
     **kwargs: Any,
 ) -> Either[
     c_exc.MappedErrors,
@@ -43,6 +48,10 @@ def perform_adherence_test_of_child_clades(
         clades (list[CladeWrapper]): The clades.
         tree_priors (TreePriors): The tree priors.
         kmer_indices (KmersInverseIndices): The kmer indices.
+        minimum_query_kmers_match (int, optional): The minimum query kmers
+            match. Defaults to 10.
+        ingroup_sister_match_kmers_difference (int, optional): The ingroup
+            sister match kmers difference. Defaults to 10.
 
     Returns:
         Either[
@@ -122,27 +131,73 @@ def perform_adherence_test_of_child_clades(
                     logger=LOGGER,
                 )()
 
-            if ingroup.match_kmers > sister.match_kmers and all(
+            # ? ----------------------------------------------------------------
+            # ? Evaluate adherence test results
+            #
+            # Adherence test results should be evaluated to determine if the
+            # clade is a good candidate to be selected as the best clade. These
+            # step is performed by comparing the adherence test results of the
+            # ingroup and sister group. The following conditions should be
+            # satisfied to consider the clade as a good candidate:
+            #
+            # ? ----------------------------------------------------------------
+
+            if all(
                 [
-                    ingroup.status == AdherenceStatus.SUCCESS,
-                    sister.status == AdherenceStatus.SUCCESS,
+                    #
+                    # 1. Ingroup number of match kmers should be greater than
+                    # sister group matches.
+                    #
+                    ingroup.match_kmers > sister.match_kmers,
+                    #
+                    # 2. Ingroup and sister group kmers match evaluation should
+                    # occurred with success.
+                    #
+                    (
+                        ingroup.status == AdherenceStatus.SUCCESS
+                        and sister.status == AdherenceStatus.SUCCESS
+                    ),
+                    #
+                    # 3. Ingroup number of match kmers should be greater than
+                    # minimum query kmers match. Otherwise the difference
+                    # between ingroup and sister should be considered random.
+                    #
+                    ingroup.match_kmers >= minimum_ingroup_query_kmers_match,
+                    #
+                    # 4. Ingroup and sister group match kmers difference should
+                    # be greater than minimum query kmers match. Otherwise the
+                    # difference between ingroup and sister should be considered
+                    # random.
+                    #
+                    (
+                        (ingroup.match_kmers - sister.match_kmers)
+                        >= ingroup_sister_match_kmers_difference
+                    ),
                 ]
             ):
-                if ingroup.match_kmers >= minimum_query_kmers_match:
-                    contrasting_clades.add(
-                        CladeAdherenceResult(
-                            clade=clade,
-                            ingroup_adherence_test=ingroup,
-                            sister_adherence_test=sister,
-                        )
+                contrasting_clades.add(
+                    CladeAdherenceResult(
+                        clade=clade,
+                        ingroup_adherence_test=ingroup,
+                        sister_adherence_test=sister,
                     )
+                )
 
             sister_adherence_tests.append(sister)
 
         # ? --------------------------------------------------------------------
-        # ? Return a positive response
+        # ? Evaluate selected best clades
+        #
+        # Clades selected (or not) at the previous step should be evaluated to
+        # build the use-case output response.
+        #
         # ? --------------------------------------------------------------------
-
+        #
+        # If no clade was selected, the best results of the sister clade will be
+        # used to build the final response. In this situation the response
+        # status should be `MAX_RESOLUTION_REACHED`, indicating that the maximum
+        # resolution inside the tree clades was reached.
+        #
         if len(contrasting_clades) == 0:
             return right(
                 (
@@ -158,7 +213,11 @@ def perform_adherence_test_of_child_clades(
                     CladeAdherenceResultStatus.MAX_RESOLUTION_REACHED,
                 )
             )
-
+        #
+        # If only one clade was selected, final results is further evaluated to
+        # determine if the clade is conclusive (CONCLUSIVE_INGROUP) or the tree
+        # search should continue (NEXT_ITERATION).
+        #
         if len(contrasting_clades) == 1:
             clade_binding: CladeAdherenceResult
 
@@ -184,7 +243,11 @@ def perform_adherence_test_of_child_clades(
                     CladeAdherenceResultStatus.CONCLUSIVE_INGROUP,
                 )
             )
-
+        #
+        # If more than one clade was selected, the clade with the highest
+        # number of match kmers will be selected. In this situation the response
+        # status should be `INCONCLUSIVE` (more than one clade was selected).
+        #
         if len(contrasting_clades) > 1:
             return right(
                 (
@@ -197,7 +260,10 @@ def perform_adherence_test_of_child_clades(
                     CladeAdherenceResultStatus(None),
                 )
             )
-
+        #
+        # If none of the previous conditions was satisfied, an unexpected error
+        # should be raised.
+        #
         return c_exc.UseCaseError(
             "Unable to determine the clade adherence test result.",
             logger=LOGGER,

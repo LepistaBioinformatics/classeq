@@ -23,6 +23,8 @@ from classeq.settings import (
     DEFAULT_CLASSEQ_OUTPUT_FILE_NAME,
     DEFAULT_KMER_SIZE,
     LOGGER,
+    MINIMUM_INGROUP_QUERY_KMERS_MATCH,
+    MINIMUM_INGROUP_SISTER_MATCH_KMERS_DIFFERENCE,
     REFERENCE_SET_OUTPUT_FILE_NAME,
     TRAIN_SOURCE_OUTPUT_FILE_NAME,
 )
@@ -273,6 +275,24 @@ def __load_outgroups_from_file(file: Path) -> list[str]:
         dir_okay=True,
     ),
     help="The path to the annotated phylogeny in PHYLO-JSON format.",
+)
+@click.option(
+    "-mqm",
+    "--minimum-ingroup-query-kmers-match",
+    required=False,
+    type=click.INT,
+    default=MINIMUM_INGROUP_QUERY_KMERS_MATCH,
+    show_default=True,
+    help="The kmer size.",
+)
+@click.option(
+    "-isd",
+    "--ingroup-sister-match-kmers-difference",
+    required=False,
+    type=click.INT,
+    default=MINIMUM_INGROUP_SISTER_MATCH_KMERS_DIFFERENCE,
+    show_default=True,
+    help="The kmer size.",
 )
 def infer_identity_cmd(
     query_fasta_path: str,
