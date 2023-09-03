@@ -88,7 +88,7 @@ DEFAULT_KMER_SIZE = 12
 # ? ----------------------------------------------------------------------------
 
 
-MINIMUM_CLADE_SIZE = 3
+MINIMUM_CLADE_SIZE = 2
 
 
 # ? ----------------------------------------------------------------------------
@@ -96,10 +96,10 @@ MINIMUM_CLADE_SIZE = 3
 # ? ----------------------------------------------------------------------------
 
 
-MINIMUM_INGROUP_QUERY_KMERS_MATCH = 5
+MINIMUM_INGROUP_QUERY_KMERS_MATCH = 3
 
 
-MINIMUM_INGROUP_SISTER_MATCH_KMERS_DIFFERENCE = 5
+MINIMUM_INGROUP_SISTER_MATCH_KMERS_DIFFERENCE = 2
 
 
 # ? ----------------------------------------------------------------------------

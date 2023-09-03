@@ -283,7 +283,10 @@ def __load_outgroups_from_file(file: Path) -> list[str]:
     type=click.INT,
     default=MINIMUM_INGROUP_QUERY_KMERS_MATCH,
     show_default=True,
-    help="The kmer size.",
+    help=(
+        "The minimum number of matches a sequence needs to contain to be "
+        + "considered belonging to a clade."
+    ),
 )
 @click.option(
     "-isd",
@@ -292,13 +295,17 @@ def __load_outgroups_from_file(file: Path) -> list[str]:
     type=click.INT,
     default=MINIMUM_INGROUP_SISTER_MATCH_KMERS_DIFFERENCE,
     show_default=True,
-    help="The kmer size.",
+    help=(
+        "The smallest difference between the ingroup and sister matches size "
+        + "to consider a sequence belonging to a clade."
+    ),
 )
 def infer_identity_cmd(
     query_fasta_path: str,
     classeq_indices: str,
     annotated_phylojson_path: str | None = None,
     output_file_path: str | None = None,
+    **kwargs: Any,
 ) -> None:
     """Try to infer identity of multi FASTA sequences."""
 
@@ -395,6 +402,7 @@ def infer_identity_cmd(
                     if output_file_path is not None
                     else None
                 ),
+                **kwargs,
             )
         ).is_left:
             raise Exception(response.value.msg)

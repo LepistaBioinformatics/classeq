@@ -27,7 +27,7 @@ def perform_adherence_test_of_child_clades(
     kmer_indices: KmersInverseIndices,
     minimum_ingroup_query_kmers_match: int = MINIMUM_INGROUP_QUERY_KMERS_MATCH,
     ingroup_sister_match_kmers_difference: int = MINIMUM_INGROUP_SISTER_MATCH_KMERS_DIFFERENCE,
-    **kwargs: Any,
+    **_: Any,
 ) -> Either[
     c_exc.MappedErrors,
     tuple[
@@ -110,7 +110,6 @@ def perform_adherence_test_of_child_clades(
                     query_kmers=query_kmers,
                     clade_priors=clade_priors,
                     kmer_indices=kmer_indices,
-                    **kwargs,
                 )
             ).is_left:
                 return adherence_test_either
