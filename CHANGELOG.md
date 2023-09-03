@@ -1,3 +1,14 @@
+## v0.8.0 (2023-09-02)
+
+### Feat
+
+- improve filtration of the predictions results during prediction phase to include new arguments
+- include the minimum query match size at the clades prediciton
+
+### Fix
+
+- include conclusive-ingroup classification status as a break rule into predictions
+
 ## v0.7.0 (2023-08-30)
 
 ### Feat
