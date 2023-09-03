@@ -77,7 +77,7 @@ LOGGER.addHandler(stream_handler)
 # ? ----------------------------------------------------------------------------
 
 
-BASES = ["A", "C", "T", "G"]
+BASES = ["A", "C", "T", "G", "U"]
 
 
 DEFAULT_KMER_SIZE = 12

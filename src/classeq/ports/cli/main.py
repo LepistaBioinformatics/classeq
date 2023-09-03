@@ -9,6 +9,7 @@ from typing import Any
 import click
 
 from classeq.__version__ import version
+from classeq.core.domain.dtos.kmer_inverse_index import KmersInverseIndices
 from classeq.core.domain.dtos.msa_source_format import MsaSourceFormatEnum
 from classeq.core.domain.dtos.priors import TreePriors
 from classeq.core.domain.dtos.reference_set import ReferenceSet
@@ -20,6 +21,7 @@ from classeq.core.use_cases.predict_taxonomies_recursively import (
     predict_for_multiple_fasta_file,
 )
 from classeq.settings import (
+    BASES,
     DEFAULT_CLASSEQ_OUTPUT_FILE_NAME,
     DEFAULT_KMER_SIZE,
     LOGGER,
@@ -45,9 +47,39 @@ def classeq_cmd() -> None:
     pass
 
 
+@classeq_cmd.group(
+    "utils",
+    help="Utility commands to help you with the classeq CLI.",
+)
+def utils_cmd() -> None:
+    pass
+
+
 # ? ----------------------------------------------------------------------------
 # ? Initialize the CLI sub-commands
 # ? ----------------------------------------------------------------------------
+
+
+__STRAND_OPTION = click.option(
+    "-s",
+    "--strand",
+    required=False,
+    type=click.Choice([s.value for s in StrandEnum]),
+    default=StrandEnum(None).value,
+    show_default=True,
+    help="The DNA strand direction to include in analysis.",
+)
+
+
+__KMER_SIZE_OPTION = click.option(
+    "-k",
+    "--kmer-size",
+    required=False,
+    type=click.INT,
+    default=DEFAULT_KMER_SIZE,
+    show_default=True,
+    help="The kmer size.",
+)
 
 
 @classeq_cmd.command(
@@ -105,24 +137,8 @@ def classeq_cmd() -> None:
         + "value is 95."
     ),
 )
-@click.option(
-    "-k",
-    "--kmer-size",
-    required=False,
-    type=click.INT,
-    default=DEFAULT_KMER_SIZE,
-    show_default=True,
-    help="The kmer size.",
-)
-@click.option(
-    "-s",
-    "--strand",
-    required=False,
-    type=click.Choice([s.value for s in StrandEnum]),
-    default=StrandEnum(None).value,
-    show_default=True,
-    help="The DNA strand direction to include in analysis.",
-)
+@__KMER_SIZE_OPTION
+@__STRAND_OPTION
 @click.option(
     "-og",
     "--outgroups",
@@ -433,3 +449,34 @@ def serve_cmd(
     from classeq.ports.app.main import main
 
     main(phylo_json_tree=Path(phylo_json_tree))
+
+
+@utils_cmd.command(
+    "kmers",
+    help=(
+        "Get kmers of a character sequence. Only DNA/RNA residuals should be "
+        + f"accepted ({BASES})."
+    ),
+)
+@__STRAND_OPTION
+@__KMER_SIZE_OPTION
+def get_sequence_kmers_cmd(
+    strand: str,
+    kmer_size: int,
+) -> None:
+    sequence = click.get_text_stream("stdin").read()
+
+    for line in sequence.splitlines():
+        if line.startswith(">"):
+            click.get_text_stream("stdout").write(f"{line}\n")
+            continue
+
+        for kmer in KmersInverseIndices.generate_kmers(
+            dna_sequence=KmersInverseIndices.sanitize_sequence(
+                sequence=line,
+                as_seq=True,
+            ),
+            k_size=kmer_size or DEFAULT_KMER_SIZE,
+            strand=StrandEnum(strand),
+        ):
+            click.get_text_stream("stdout").write(f"{kmer}\n")
