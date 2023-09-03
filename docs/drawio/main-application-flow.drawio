@@ -1,0 +1,49 @@
+<mxfile host="65bd71144e">
+    <diagram id="FODyo0QtXdbULxPpkezB" name="Page-1">
+        <mxGraphModel dx="1599" dy="862" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1000" pageHeight="600" background="#ffffff" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="3" value="&lt;h1&gt;Index generation&lt;/h1&gt;&lt;p&gt;Phylogeny plus their source FASTA file are used to build the k-mers tree. Resulting output file is a self-containned tarball used during predictions step.&lt;/p&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;hachureGap=4;fontFamily=liberation-sans;fontSize=20;fontSource=https%3A%2F%2Ffonts.cdnfonts.com%2Fcss%2Fliberation-sans;" parent="1" vertex="1">
+                    <mxGeometry x="40" y="30" width="940" height="140" as="geometry"/>
+                </mxCell>
+                <mxCell id="20" value="&lt;h1&gt;Phylo-Identity prediction&lt;/h1&gt;&lt;p&gt;Query sequences are loaded, cleaned, and used to build query k-mers. Resulting k-mers are used during predictions.&lt;/p&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;hachureGap=4;fontFamily=liberation-sans;fontSize=20;fontSource=https%3A%2F%2Ffonts.cdnfonts.com%2Fcss%2Fliberation-sans;" parent="1" vertex="1">
+                    <mxGeometry x="40" y="314" width="740" height="156" as="geometry"/>
+                </mxCell>
+                <mxCell id="21" value="" style="endArrow=none;html=1;fontSize=22;" parent="1" edge="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="40" y="300" as="sourcePoint"/>
+                        <mxPoint x="890" y="300" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="22" value="&lt;b&gt;1st step:&lt;/b&gt;&lt;br&gt;k-mers Tree Loading" style="shape=step;perimeter=stepPerimeter;whiteSpace=wrap;html=1;fixedSize=1;fontSize=22;fontFamily=liberation-sans;fontSource=https%3A%2F%2Ffonts.cdnfonts.com%2Fcss%2Fliberation-sans;" parent="1" vertex="1">
+                    <mxGeometry x="60" y="470" width="170" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="23" value="&lt;b&gt;2nd step:&lt;br&gt;&lt;/b&gt;Query k-mers Generation" style="shape=step;perimeter=stepPerimeter;whiteSpace=wrap;html=1;fixedSize=1;fontSize=22;fontFamily=liberation-sans;fontSource=https%3A%2F%2Ffonts.cdnfonts.com%2Fcss%2Fliberation-sans;" parent="1" vertex="1">
+                    <mxGeometry x="230" y="470" width="180" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="25" value="&lt;b&gt;3rd step:&lt;br&gt;&lt;/b&gt;Outgroup Adherence&lt;br&gt;Test Calculation" style="shape=step;perimeter=stepPerimeter;whiteSpace=wrap;html=1;fixedSize=1;fontSize=22;fontFamily=liberation-sans;fontSource=https%3A%2F%2Ffonts.cdnfonts.com%2Fcss%2Fliberation-sans;" parent="1" vertex="1">
+                    <mxGeometry x="410" y="470" width="250" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="26" value="&lt;b&gt;4th step:&lt;br&gt;&lt;/b&gt;Recursive Ingroup&lt;br&gt;Adherence Test Calculation" style="shape=step;perimeter=stepPerimeter;whiteSpace=wrap;html=1;fixedSize=1;fontSize=22;fontFamily=liberation-sans;fontSource=https%3A%2F%2Ffonts.cdnfonts.com%2Fcss%2Fliberation-sans;" parent="1" vertex="1">
+                    <mxGeometry x="660" y="470" width="300" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="27" value="&lt;font data-font-src=&quot;https://fonts.cdnfonts.com/css/liberation-sans&quot; face=&quot;liberation-sans&quot;&gt;Main steps of Classeq execution&lt;/font&gt;" style="swimlane;whiteSpace=wrap;html=1;fontSize=16;startSize=30;" parent="1" vertex="1">
+                    <mxGeometry width="1000" height="600" as="geometry"/>
+                </mxCell>
+                <mxCell id="5" value="&lt;b&gt;1st step:&lt;/b&gt;&lt;br&gt;Tree Cleaning &lt;br&gt;and Reroot" style="shape=step;perimeter=stepPerimeter;whiteSpace=wrap;html=1;fixedSize=1;fontSize=22;fontFamily=liberation-sans;fontSource=https%3A%2F%2Ffonts.cdnfonts.com%2Fcss%2Fliberation-sans;" parent="27" vertex="1">
+                    <mxGeometry x="60" y="180" width="200" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="10" value="&lt;b&gt;2nd step:&lt;br&gt;&lt;/b&gt;FASTA&lt;br&gt;Cleaning" style="shape=step;perimeter=stepPerimeter;whiteSpace=wrap;html=1;fixedSize=1;fontSize=22;fontFamily=liberation-sans;fontSource=https%3A%2F%2Ffonts.cdnfonts.com%2Fcss%2Fliberation-sans;" parent="27" vertex="1">
+                    <mxGeometry x="260" y="180" width="200" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="11" value="&lt;b&gt;3rd step:&lt;br&gt;&lt;/b&gt;Compatibility&lt;br&gt;Check" style="shape=step;perimeter=stepPerimeter;whiteSpace=wrap;html=1;fixedSize=1;fontSize=22;fontFamily=liberation-sans;fontSource=https%3A%2F%2Ffonts.cdnfonts.com%2Fcss%2Fliberation-sans;" parent="27" vertex="1">
+                    <mxGeometry x="460" y="180" width="200" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="14" value="&lt;b&gt;4th step:&lt;br&gt;&lt;/b&gt;K-mers Inverse Indices Gen." style="shape=step;perimeter=stepPerimeter;whiteSpace=wrap;html=1;fixedSize=1;fontSize=22;fontFamily=liberation-sans;fontSource=https%3A%2F%2Ffonts.cdnfonts.com%2Fcss%2Fliberation-sans;" parent="27" vertex="1">
+                    <mxGeometry x="660" y="180" width="200" height="100" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
