@@ -9,4 +9,4 @@ class StrandEnum(Enum):
 
     @classmethod
     def _missing_(cls, _: object) -> Any:
-        return cls.PLUS
+        return cls.BOTH
