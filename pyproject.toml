@@ -14,7 +14,7 @@ build-backend = "setuptools.build_meta"
 [project]
 
 name = "classeq"
-version = "0.8.1"
+version = "0.9.0"
 authors = [{ name = "Samuel Galvão Elias", email = "sgelias@outlook.com" }]
 description = "A phylogeneny based classifier of DNA sequences"
 requires-python = ">=3.11"

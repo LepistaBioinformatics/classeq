@@ -1,3 +1,9 @@
+## v0.9.0 (2023-09-03)
+
+### Feat
+
+- implements a simple command to generate kmers from command line directely
+
 ## v0.8.1 (2023-09-02)
 
 ### Fix
