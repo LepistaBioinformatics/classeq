@@ -1,3 +1,9 @@
+## v0.8.1 (2023-09-02)
+
+### Fix
+
+- fix strand both as default option
+
 ## v0.8.0 (2023-09-02)
 
 ### Feat
