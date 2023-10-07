@@ -455,7 +455,7 @@ def serve_cmd(
     "kmers",
     help=(
         "Get kmers of a character sequence. Only DNA/RNA residuals should be "
-        + f"accepted ({BASES})."
+        + f"accepted ({', '.join(BASES)})."
     ),
 )
 @__STRAND_OPTION

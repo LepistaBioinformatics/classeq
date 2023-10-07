@@ -1,18 +1,11 @@
-# CLASSEQ: A clade-informed sequence identification tool.
-    Leveraging phylogenetic insights for biological sequences classification
+# CLASSEQ: A clade-informed sequence identification tool
+
+Literature:
+
+CLASSEQ: A clade-informed sequence identification tool. Leveraging phylogenetic insights for biological sequences classification.
 
 ## Install
 
-## Indexing your first phylogeny
+## Quick start
 
-```bash
-cls index \
-    --help
-```
-
-## Perform predictions
-
-```bash
-cls predict \
-    --help
-```
+See quick [start](docs/mds/README.md).
