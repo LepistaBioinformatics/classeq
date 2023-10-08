@@ -1,3 +1,9 @@
+## v0.10.0 (2023-10-08)
+
+### Feat
+
+- upgrade indexing and predictiong to include outgroup from out of the phylogeny
+
 ## v0.9.0 (2023-09-03)
 
 ### Feat
