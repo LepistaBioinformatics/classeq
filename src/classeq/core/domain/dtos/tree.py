@@ -6,7 +6,7 @@ from typing import Any, Self
 import clean_base.exceptions as c_exc
 from attr import define, field
 from Bio import Phylo
-from Bio.Phylo.BaseTree import Clade, Tree
+from Bio.Phylo.BaseTree import Tree
 from clean_base.either import Either, right
 from classeq.core.domain.dtos.biopython_wrappers import ExtendedBioPythonTree
 
@@ -22,7 +22,6 @@ class ClasseqTree:
     # ? ------------------------------------------------------------------------
 
     tree_headers: list[int] = field()
-    outgroups: list[str] = field()
     tree_format: MsaSourceFormatEnum = field()
     sanitized_tree: ExtendedBioPythonTree = field()
     tree_hash: str | None = field(default=None)
@@ -38,7 +37,6 @@ class ClasseqTree:
     ) -> Either[c_exc.MappedErrors, Self]:
         for key in [
             "tree_headers",
-            "outgroups",
             "tree_format",
             "sanitized_tree",
             "tree_hash",
@@ -59,7 +57,6 @@ class ClasseqTree:
 
         tree = cls(
             tree_headers=content.get("tree_headers"),  # type: ignore
-            outgroups=content.get("outgroups"),  # type: ignore
             tree_format=eval(content.get("tree_format")),  # type: ignore
             sanitized_tree=ExtendedBioPythonTree.from_dict(
                 content=sanitized_tree,
@@ -91,7 +88,6 @@ class ClasseqTree:
     def to_dict(self) -> dict[str, Any]:
         return {
             "tree_headers": self.tree_headers,
-            "outgroups": self.outgroups,
             "tree_format": self.tree_format,
             "sanitized_tree": self.sanitized_tree.to_dict(),
             "tree_hash": self.tree_hash,
@@ -102,7 +98,6 @@ class ClasseqTree:
             str(
                 (
                     self.tree_headers,
-                    self.outgroups,
                     self.tree_format,
                     "".join(
                         [
@@ -127,7 +122,6 @@ class ClasseqTree:
     @staticmethod
     def parse_and_reroot_phylojson_tree(
         phylojson_file_path: Path,
-        outgroups: list[str],
     ) -> Either[c_exc.MappedErrors, Tree]:
         try:
             with phylojson_file_path.open("r") as phylojson_file:
@@ -136,32 +130,7 @@ class ClasseqTree:
                     ExtendedBioPythonTree.from_dict(content)
                 )
 
-            terminals: list[Clade] = raw_tree.get_terminals()
-
-            tree_outgroups = [
-                clade for clade in terminals if clade.name in outgroups
-            ]
-
-            outgroup_paths: list[Clade] = list()
-            for clade in tree_outgroups:
-                ancestors: list[Clade] = raw_tree.get_path(clade)
-
-                outgroup_paths.extend(
-                    [i for i in ancestors if i.confidence is not None]
-                )
-
-            raw_tree.collapse_all(lambda c: c in outgroup_paths)
-
-            if not all([out.name in outgroups for out in tree_outgroups]):
-                return c_exc.UseCaseError(
-                    f"Not all specified outgroups exists in phylogeny: {outgroups}",
-                    exp=True,
-                    logger=LOGGER,
-                )()
-
-            if raw_tree.root_with_outgroup(tree_outgroups) is None:
-                LOGGER.warning("Outgroup is the current tree root")
-                raw_tree.rooted = True
+            raw_tree.root_at_midpoint()
 
             return right(raw_tree)
 
@@ -171,38 +140,11 @@ class ClasseqTree:
     @staticmethod
     def parse_and_reroot_newick_tree(
         newick_file_path: Path,
-        outgroups: list[str],
         format: TreeSourceFormatEnum,
     ) -> Either[c_exc.MappedErrors, Tree]:
         try:
             raw_tree: Tree = Phylo.read(newick_file_path, format.value)
-
-            terminals: list[Clade] = raw_tree.get_terminals()
-
-            tree_outgroups = [
-                clade for clade in terminals if clade.name in outgroups
-            ]
-
-            outgroup_paths: list[Clade] = list()
-            for clade in tree_outgroups:
-                ancestors: list[Clade] = raw_tree.get_path(clade)
-
-                outgroup_paths.extend(
-                    [i for i in ancestors if i.confidence is not None]
-                )
-
-            raw_tree.collapse_all(lambda c: c in outgroup_paths)
-
-            if not all([out.name in outgroups for out in tree_outgroups]):
-                return c_exc.UseCaseError(
-                    f"Not all specified outgroups exists in phylogeny: {outgroups}",
-                    exp=True,
-                    logger=LOGGER,
-                )()
-
-            if raw_tree.root_with_outgroup(tree_outgroups) is None:
-                LOGGER.warning("Outgroup is the current tree root")
-                raw_tree.rooted = True
+            raw_tree.root_at_midpoint()
 
             return right(raw_tree)
 
@@ -210,7 +152,7 @@ class ClasseqTree:
             return c_exc.UseCaseError(exc, logger=LOGGER)()
 
     @staticmethod
-    def collapse_low_supported_and_outgroup_nodes(
+    def collapse_low_supported_nodes(
         rooted_tree: Tree,
         support_value_cutoff: int = 99,
     ) -> Either[c_exc.MappedErrors, Tree]:

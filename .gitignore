@@ -23,3 +23,7 @@ functional-predictions-merged
 
 # Mypy specifig files
 .dmypy.json
+
+#Drawio
+**/*.drawio.bkp
+**/*.drawio.dtmp

@@ -6,10 +6,7 @@ from Bio import Phylo
 from Bio.Phylo.BaseTree import Tree
 from clean_base.either import Either, right
 
-from classeq.core.domain.dtos.biopython_wrappers import (
-    ExtendedBioPythonClade,
-    ExtendedBioPythonTree,
-)
+from classeq.core.domain.dtos.biopython_wrappers import ExtendedBioPythonTree
 from classeq.core.domain.dtos.tree import ClasseqTree
 from classeq.core.domain.dtos.tree_source_format import TreeSourceFormatEnum
 from classeq.settings import LOGGER, TEMP_INPUT_FILE_SUFFIX
@@ -17,7 +14,6 @@ from classeq.settings import LOGGER, TEMP_INPUT_FILE_SUFFIX
 
 def load_and_sanitize_phylogeny(
     source_file_path: Path,
-    outgroups: list[str],
     format: TreeSourceFormatEnum,
     output_directory: Path,
     support_value_cutoff: int = 99,
@@ -59,7 +55,6 @@ def load_and_sanitize_phylogeny(
         if (
             rooted_tree_either := ClasseqTree.parse_and_reroot_newick_tree(
                 source_file_path,
-                outgroups,
                 format,
             )
         ).is_left:
@@ -77,41 +72,6 @@ def load_and_sanitize_phylogeny(
 
         rooted_tree_extended = ExtendedBioPythonTree.from_bio_python_tree(
             tree=rooted_tree,
-            outgroups=outgroups,
-        )
-
-        # ? --------------------------------------------------------------------
-        # ? Collapse outgroup internal nodes
-        # ? --------------------------------------------------------------------
-
-        LOGGER.info("Collapsing outgroup branches")
-
-        tree_outgroups = [
-            clade
-            for clade in rooted_tree_extended.get_terminals()
-            if clade.name in outgroups
-        ]
-
-        common_ancestor: ExtendedBioPythonClade = (
-            rooted_tree_extended.common_ancestor(targets=tree_outgroups)
-        )
-
-        clade: ExtendedBioPythonClade
-        collapsable_clades: set[ExtendedBioPythonClade] = set()
-
-        for clade in common_ancestor.clades:
-            if all([t.name in outgroups for t in clade.get_terminals()]):
-                collapsable_clades.add(clade)
-
-        rooted_tree_extended.collapse_all(
-            lambda c: c.__hash__()
-            in [
-                i.__hash__()
-                for i in [
-                    *collapsable_clades,
-                    *common_ancestor,
-                ]
-            ]
         )
 
         # ? --------------------------------------------------------------------
@@ -126,7 +86,7 @@ def load_and_sanitize_phylogeny(
         )
 
         sanitized_tree_either: Either = (
-            ClasseqTree.collapse_low_supported_and_outgroup_nodes(
+            ClasseqTree.collapse_low_supported_nodes(
                 rooted_tree=rooted_tree_extended,
                 support_value_cutoff=support_value_cutoff,
             )
@@ -186,7 +146,6 @@ def load_and_sanitize_phylogeny(
         classeq_tree = ClasseqTree(
             tree_format=format,
             tree_headers=[h.name for h in sanitized_tree.get_terminals()],
-            outgroups=outgroups,
             sanitized_tree=sanitized_tree,
         )
 

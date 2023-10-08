@@ -70,57 +70,11 @@ def fetch_clade_specific_kmers(
             )()
 
         # ? --------------------------------------------------------------------
-        # ? Extract root node
-        #
-        # Recursive analysis starts from the root node. Them the root should be
-        # identified before the analysis initialization.
-        #
-        # ? --------------------------------------------------------------------
-
-        try:
-            root = next(i for i in iter(references.linear_tree) if i.is_root())
-        except StopIteration:
-            return c_exc.UseCaseError(
-                "Root node not present in linear tree.",
-                logger=LOGGER,
-            )()
-
-        # ? --------------------------------------------------------------------
-        # ? Extract outgroup nodes
-        #
-        # Outgroup nodes should be included over each training step as a random
-        # noise.
-        #
-        # ? --------------------------------------------------------------------
-
-        outgroup_nodes = [i for i in references.linear_tree if i.is_outgroup()]
-
-        expected_outgroups = [
-            name
-            for i in references.tree.outgroups
-            if (name := references.labels_map.get(i)) is not None
-        ]
-
-        if not all([i.name in expected_outgroups for i in outgroup_nodes]):
-            return c_exc.UseCaseError(
-                "Not all outgroups are present at the phylogenetic tree. "
-                + f"Expected nodes: {', '.join(references.tree.outgroups)}",
-                logger=LOGGER,
-            )()
-
-        # ? --------------------------------------------------------------------
         # ? Recursive calculate probabilities
         # ? --------------------------------------------------------------------
 
         return recursively_fetch_kmers(
-            reference_tree=references.tree,
-            root=root,
-            outgroups=outgroup_nodes,
-            ingroups=[
-                ingroup
-                for ingroup in references.linear_tree
-                if ingroup.id not in [root.id, *[o.id for o in outgroup_nodes]]
-            ],
+            ingroups=references.linear_tree,
             kmer_indices=references.msa.kmers_indices,
             min_clade_size=min_clade_size,
         )

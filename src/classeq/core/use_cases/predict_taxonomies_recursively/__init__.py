@@ -19,6 +19,7 @@ from classeq.core.domain.dtos.priors import TreePriors
 from classeq.core.domain.dtos.reference_set import ReferenceSet
 from classeq.settings import LOGGER
 
+from ._get_outgroup_priors import get_outgroup_priors
 from ._perform_adherence_test_of_child_clades import CladeAdherenceResult
 from ._perform_single_sequence_phylogenetic_adherence_test import (
     perform_single_sequence_phylogenetic_adherence_test,
@@ -26,7 +27,8 @@ from ._perform_single_sequence_phylogenetic_adherence_test import (
 
 
 def predict_for_multiple_fasta_file(
-    fasta_path: Path,
+    prediction_input_path: Path,
+    outgroups_input_path: Path,
     tree_priors: TreePriors,
     reference_set: ReferenceSet,
     fasta_format: MsaSourceFormatEnum = MsaSourceFormatEnum.FASTA,
@@ -80,11 +82,24 @@ def predict_for_multiple_fasta_file(
                 }
 
         # ? --------------------------------------------------------------------
+        # ? Calculate outgroup priors
+        # ? --------------------------------------------------------------------
+
+        if (
+            outgroup_priors_either := get_outgroup_priors(
+                source_file_path=outgroups_input_path,
+                k_size=reference_set.kmer_size,
+                strand=reference_set.strand,
+            )
+        ).is_left:
+            return outgroup_priors_either
+
+        # ? --------------------------------------------------------------------
         # ? Predict taxonomies
         # ? --------------------------------------------------------------------
 
         records: list[SeqRecord] = list(
-            SeqIO.parse(str(fasta_path), fasta_format.value)
+            SeqIO.parse(str(prediction_input_path), fasta_format.value)
         )
 
         response: defaultdict[str, dict[str, Any]] = defaultdict()
@@ -107,6 +122,7 @@ def predict_for_multiple_fasta_file(
                     tree=hierarchical_tree,
                     strand=reference_set.strand,
                     tree_priors=tree_priors,
+                    outgroup_priors=outgroup_priors_either.value,
                     **kwargs,
                 )
             ).is_left:
@@ -148,8 +164,8 @@ def predict_for_multiple_fasta_file(
         # ? --------------------------------------------------------------------
 
         if output_file_path is None:
-            output_file_path = fasta_path.parent.joinpath(
-                fasta_path.stem
+            output_file_path = prediction_input_path.parent.joinpath(
+                prediction_input_path.stem
             ).with_suffix(".json")
         else:
             if output_file_path.suffix != ".json":
@@ -159,7 +175,7 @@ def predict_for_multiple_fasta_file(
             __write_json(
                 output_file_path=output_file_path,
                 response=response,
-                fasta_path=fasta_path,
+                fasta_path=prediction_input_path,
                 annotated_phylojson_path=annotated_phylojson_path,
             )
 

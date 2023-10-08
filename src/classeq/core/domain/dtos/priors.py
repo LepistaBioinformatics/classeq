@@ -252,7 +252,6 @@ class TreePriors:
     # ? Class attributes
     # ? ------------------------------------------------------------------------
 
-    outgroup: OutgroupPriors = field()
     ingroups: list[IngroupPriors] = field(default=[])
 
     # ? ------------------------------------------------------------------------
@@ -261,7 +260,6 @@ class TreePriors:
 
     def to_dict(self) -> dict[str, Any]:
         return {
-            "outgroup": self.outgroup.to_dict(),
             "ingroups": [i.to_dict() for i in self.ingroups],
         }
 
@@ -274,23 +272,13 @@ class TreePriors:
         cls,
         content: dict[str, Any],
     ) -> Either[c_exc.MappedErrors, Self]:
-        for key in [
-            "outgroup",
-            "ingroups",
-        ]:
+        for key in ["ingroups"]:
             if key not in content:
                 return c_exc.DadaTransferObjectError(
                     f"Invalid content detected on parse `{TreePriors}`. "
                     f"{key}` key is empty.",
                     logger=LOGGER,
                 )()
-
-        outgroup_either = OutgroupPriors.from_dict(
-            content=content.get("outgroup")  # type: ignore
-        )
-
-        if outgroup_either.is_left:
-            return outgroup_either
 
         ingroups: list[IngroupPriors] = []
         for item in content.get("ingroups"):  # type: ignore
@@ -301,9 +289,4 @@ class TreePriors:
 
             ingroups.append(parsed_item.value)
 
-        return right(
-            cls(
-                outgroup=outgroup_either.value,
-                ingroups=ingroups,
-            )
-        )
+        return right(cls(ingroups=ingroups))

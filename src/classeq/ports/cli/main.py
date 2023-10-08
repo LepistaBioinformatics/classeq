@@ -139,41 +139,41 @@ __KMER_SIZE_OPTION = click.option(
 )
 @__KMER_SIZE_OPTION
 @__STRAND_OPTION
-@click.option(
-    "-og",
-    "--outgroups",
-    type=click.STRING,
-    multiple=True,
-    required=False,
-    help=(
-        "The outgroup list. Each outgroup must be into a separate argument."
-        + "Ex: -og outgroup1 -og outgroup2 -og outgroup3"
-    ),
-)
-@click.option(
-    "-of",
-    "--outgroups-file",
-    required=False,
-    type=click.Path(
-        resolve_path=True,
-        readable=True,
-        exists=True,
-        dir_okay=True,
-    ),
-    help=(
-        "The outgroup file path. As an alternative to the --outgroups option, "
-        + "you can pass a file containing the outgroups. Each outgroup must "
-        + "be into a separate line."
-    ),
-)
+# @click.option(
+#    "-og",
+#    "--outgroups",
+#    type=click.STRING,
+#    multiple=True,
+#    required=False,
+#    help=(
+#        "The outgroup list. Each outgroup must be into a separate argument."
+#        + "Ex: -og outgroup1 -og outgroup2 -og outgroup3"
+#    ),
+# )
+# @click.option(
+#    "-of",
+#    "--outgroups-file",
+#    required=False,
+#    type=click.Path(
+#        resolve_path=True,
+#        readable=True,
+#        exists=True,
+#        dir_okay=True,
+#    ),
+#    help=(
+#        "The outgroup file path. As an alternative to the --outgroups option, "
+#        + "you can pass a file containing the outgroups. Each outgroup must "
+#        + "be into a separate line."
+#    ),
+# )
 def parse_source_files_cmd(
     fasta_file_path: str,
     tree_file_path: str,
     support_value_cutoff: int,
     kmer_size: int,
     output_directory: str | None = None,
-    outgroups: tuple[str, ...] | None = None,
-    outgroups_file: click.Path | None = None,
+    # outgroups: tuple[str, ...] | None = None,
+    # outgroups_file: click.Path | None = None,
     strand: str | None = None,
     **_: Any,
 ) -> None:
@@ -181,16 +181,16 @@ def parse_source_files_cmd(
 
     LOGGER.debug(" ".join(argv))
 
-    if outgroups == () and outgroups_file is None:
+    """ if outgroups == () and outgroups_file is None:
         click.echo("Error: You must provide outgroups.")
-        exit(1)
+        exit(1) """
 
     try:
-        valid_outgroups: tuple[str] = (
+        """valid_outgroups: tuple[str] = (
             outgroups
             if len(list(outgroups)) > 0  # type: ignore
             else __load_outgroups_from_file(Path(outgroups_file))  # type: ignore
-        )
+        )"""
 
         if (
             response := load_source_files(
@@ -198,7 +198,7 @@ def parse_source_files_cmd(
                 msa_format=MsaSourceFormatEnum.FASTA,
                 tree_file_path=Path(tree_file_path),
                 tree_format=TreeSourceFormatEnum.NEWICK,
-                outgroups=valid_outgroups,
+                # outgroups=valid_outgroups,
                 output_directory=(
                     Path(output_directory)
                     if output_directory is not None
@@ -262,6 +262,18 @@ def __load_outgroups_from_file(file: Path) -> list[str]:
     help="The path to the query FASTA file.",
 )
 @click.option(
+    "-og",
+    "--outgroups-fasta-file",
+    required=True,
+    type=click.Path(
+        resolve_path=True,
+        readable=True,
+        exists=True,
+        dir_okay=True,
+    ),
+    help="The outgroup file containing outgroups sequences as FASTA format.",
+)
+@click.option(
     "-i",
     "--classeq-indices",
     required=True,
@@ -318,6 +330,7 @@ def __load_outgroups_from_file(file: Path) -> list[str]:
 )
 def infer_identity_cmd(
     query_fasta_path: str,
+    outgroups_fasta_file: str,
     classeq_indices: str,
     annotated_phylojson_path: str | None = None,
     output_file_path: str | None = None,
@@ -404,7 +417,8 @@ def infer_identity_cmd(
 
         if (
             response := predict_for_multiple_fasta_file(
-                fasta_path=Path(query_fasta_path),
+                prediction_input_path=Path(query_fasta_path),
+                outgroups_input_path=Path(outgroups_fasta_file),
                 fasta_format=MsaSourceFormatEnum.FASTA,
                 tree_priors=tree_priors_either.value,
                 reference_set=reference_set_either.value,

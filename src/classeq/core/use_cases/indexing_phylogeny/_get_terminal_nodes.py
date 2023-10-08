@@ -36,7 +36,7 @@ def get_terminal_nodes(
 
         node: ClasseqClade
         for node in target_nodes:
-            if node.is_terminal() or node.is_outgroup():
+            if node.is_terminal():
                 yield node
 
             yield from get_terminal_nodes(

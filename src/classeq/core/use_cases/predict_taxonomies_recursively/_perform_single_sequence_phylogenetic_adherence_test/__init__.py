@@ -6,7 +6,11 @@ from clean_base.either import Either, right
 
 from classeq.core.domain.dtos.clade import ClasseqClade
 from classeq.core.domain.dtos.kmer_inverse_index import KmersInverseIndices
-from classeq.core.domain.dtos.priors import PriorGroup, TreePriors
+from classeq.core.domain.dtos.priors import (
+    OutgroupPriors,
+    PriorGroup,
+    TreePriors,
+)
 from classeq.core.domain.dtos.strand import StrandEnum
 from classeq.settings import LOGGER
 
@@ -28,6 +32,7 @@ def perform_single_sequence_phylogenetic_adherence_test(
     target_sequence: str,
     kmers_indices: KmersInverseIndices,
     tree_priors: TreePriors,
+    outgroup_priors: OutgroupPriors,
     kmer_size: int,
     tree: ClasseqClade,
     strand: StrandEnum,
@@ -120,7 +125,7 @@ def perform_single_sequence_phylogenetic_adherence_test(
         if (
             binding_either := do_clade_adherence_test_for_single_sequence(
                 query_kmers=query_kmers,
-                clade_priors=tree_priors.outgroup,
+                clade_priors=outgroup_priors,
                 kmer_indices=kmers_indices,
             )
         ).is_left:
@@ -147,9 +152,7 @@ def perform_single_sequence_phylogenetic_adherence_test(
             return ingroup_clades_either
 
         ingroup_clades: list[ClasseqClade] = list(
-            ingroup
-            for ingroup in ingroup_clades_either.value
-            if ingroup.parent == tree_priors.outgroup.parent
+            ingroup for ingroup in ingroup_clades_either.value
         )
 
         # ? --------------------------------------------------------------------

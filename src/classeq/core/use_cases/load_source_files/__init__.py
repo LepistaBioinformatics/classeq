@@ -28,7 +28,6 @@ def load_source_files(
     msa_format: MsaSourceFormatEnum,
     tree_file_path: Path,
     tree_format: TreeSourceFormatEnum,
-    outgroups: list[str],
     k_size: int,
     strand: StrandEnum,
     output_directory: Path | None = None,
@@ -80,7 +79,6 @@ def load_source_files(
         if (
             tree_either := load_and_sanitize_phylogeny(
                 source_file_path=tree_file_path,
-                outgroups=outgroups,
                 format=tree_format,
                 support_value_cutoff=support_value_cutoff,
                 output_directory=train_output_dir,

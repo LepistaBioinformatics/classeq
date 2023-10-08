@@ -1,7 +1,4 @@
-from uuid import UUID
-
 import clean_base.exceptions as c_exc
-from Bio.Phylo.BaseTree import Tree
 from clean_base.either import Either, right
 
 from classeq.core.domain.dtos.clade import ClasseqClade
@@ -10,21 +7,18 @@ from classeq.core.domain.dtos.ordered_tuple import OrderedTuple
 from classeq.core.domain.dtos.priors import (
     IngroupPriors,
     IngroupCladePriors,
-    OutgroupPriors,
-    OutgroupLabeledPriors,
     SisterCladePriors,
     TreePriors,
 )
-from classeq.core.domain.dtos.tree import ClasseqTree
+from classeq.core.use_cases.shared.fetch_kmers_indices import (
+    fetch_kmers_indices,
+)
 from classeq.settings import LOGGER
 
 from ._get_terminal_nodes import get_terminal_nodes
 
 
 def recursively_fetch_kmers(
-    reference_tree: ClasseqTree,
-    root: ClasseqClade,
-    outgroups: list[ClasseqClade],
     ingroups: list[ClasseqClade],
     kmer_indices: KmersInverseIndices,
     min_clade_size: int,
@@ -37,8 +31,6 @@ def recursively_fetch_kmers(
         calculates the probabilities for each clade in the tree.
 
     Args:
-        root (CladeWrapper): Root node of the tree.
-        outgroups (list[CladeWrapper]): Outgroup nodes of the tree.
         ingroups (list[CladeWrapper]): Ingroup nodes of the tree.
         kmer_indices (KmersInverseIndices): Kmer indices of the MSA.
         min_clade_size (int, optional): Minimum size of the clade to be
@@ -53,92 +45,7 @@ def recursively_fetch_kmers(
 
     """
 
-    def fetch_kmers_indices(
-        kmer_indices: KmersInverseIndices,
-        sequence_codes: list[int],
-    ) -> Either[c_exc.MappedErrors, set[str]]:
-        """Fetch kmer indices for a given set of sequence codes.
-
-        Args:
-            kmer_indices (KmersInverseIndices): Kmer indices of the MSA.
-            sequence_codes (list[int]): Sequence codes to be used as filter.
-
-        Returns:
-            Either[c_exc.MappedErrors, set[str]]: Either a set of kmer indices
-                or a `classeq.core.domain.utils.exceptions.MappedErrors`
-                instance.
-
-        Raises:
-            c_exc.UseCaseError: If any error occurred.
-
-        """
-
-        try:
-            return right(
-                OrderedTuple(
-                    {
-                        index.kmer
-                        for index in kmer_indices.indices
-                        if not set(index.records).isdisjoint(sequence_codes)
-                    }
-                )
-            )
-
-        except Exception as exc:
-            raise c_exc.UseCaseError(exc, logger=LOGGER)()
-
     try:
-        # ? --------------------------------------------------------------------
-        # ? Calculate outgroup clade priors
-        #
-        # Outgroup specific priors should be calculated separately to test
-        # specific hypothesis during the prediction steps.
-        #
-        # ? --------------------------------------------------------------------
-
-        LOGGER.info("Calculating outgroup priors")
-
-        outgroup_labels: list[int] = []
-        outgroups_parents = {o.parent for o in outgroups}
-
-        sanitized_tree: Tree = reference_tree.sanitized_tree  # type: ignore
-
-        outgroup_clades = sanitized_tree.common_ancestor(
-            [i for i in sanitized_tree.get_terminals() if i in outgroups]
-        )
-
-        outgroup_path = sanitized_tree.get_path(outgroup_clades)
-
-        if len(outgroup_path) == 0:
-            LOGGER.warning("Outgroup is the current tree root")
-
-        outgroup_parent: UUID = outgroups_parents.pop()
-
-        if root.id != outgroup_parent:
-            return c_exc.UseCaseError(
-                "Invalid outgroups. Outgroups should share the the root as "
-                + f"parent node. Expected {root.id}, found {outgroup_parent}",
-                logger=LOGGER,
-            )()
-
-        if (
-            outgroup_kmers_either := fetch_kmers_indices(
-                kmer_indices=kmer_indices,
-                sequence_codes=[i.name for i in outgroups],
-            )
-        ).is_left:
-            return outgroup_kmers_either
-
-        outgroup_priors = OutgroupPriors(
-            parent=outgroup_parent,
-            clade_priors=OutgroupLabeledPriors(
-                labels=OrderedTuple(outgroup_labels),
-                kmers=outgroup_kmers_either.value,
-            ),
-        )
-
-        LOGGER.info("Outgroup priors calculated")
-
         # ? --------------------------------------------------------------------
         # ? Calculate ingroups clades priors
         #
@@ -264,12 +171,7 @@ def recursively_fetch_kmers(
         # ? Return a positive response
         # ? --------------------------------------------------------------------
 
-        return right(
-            TreePriors(
-                outgroup=outgroup_priors,
-                ingroups=ingroups_priors,
-            )
-        )
+        return right(TreePriors(ingroups=ingroups_priors))
 
     except Exception as exc:
         return c_exc.UseCaseError(exc, logger=LOGGER)()

@@ -13,7 +13,6 @@ from classeq.settings import LOGGER
 
 class NodeType(Enum):
     ROOT = "root"
-    OUTGROUP = "outgroup"
     INTERNAL = "internal"
     TERMINAL = "terminal"
 
@@ -164,33 +163,8 @@ class ClasseqClade:
             ]
         )
 
-    def get_outgroup_clade(self) -> Either[c_exc.MappedErrors, list[Self]]:
-        if self.is_root() is False:
-            return left(
-                c_exc.ExecutionError(
-                    "Could not get outgroup. The current clade is not the "
-                    + "tree `root`.",
-                    logger=LOGGER,
-                )
-            )
-
-        if (children := self.children) is None:
-            return left(
-                c_exc.ExecutionError(
-                    "Unable to find outgroups. Specified clade has no "
-                    + f"children: {self.get_pretty_clade()}",
-                    exp=True,
-                    logger=LOGGER,
-                )
-            )
-
-        return right([clade for clade in children if clade.is_outgroup()])
-
     def is_root(self) -> bool:
         return self.type == NodeType.ROOT
-
-    def is_outgroup(self) -> bool:
-        return self.type == NodeType.OUTGROUP
 
     def is_internal(self) -> bool:
         return self.type == NodeType.INTERNAL
@@ -199,9 +173,6 @@ class ClasseqClade:
         return self.type == NodeType.TERMINAL
 
     def get_pretty_clade(self) -> str:
-        if self.is_terminal() or self.is_outgroup():
-            return f"type({self.type.name}): {self.name}"
-
         nodes = 0 if self.children is None else len(self.children)
         name = self.name if self.name is not None else self.id
         return f"type({self.type.name}): [{nodes} nodes] {self.support} {name}"
@@ -241,12 +212,8 @@ class ClasseqClade:
             entries_length = len(entries)
 
             for index, child in enumerate(entries):
-                if child.is_terminal() or child.is_outgroup():
+                if child.is_terminal():
                     base_color = "\033[92m"
-
-                    if child.is_outgroup():
-                        base_color = "\033[91m"
-
                     colored_name = f"{base_color}{child.name}{escape}"
 
                     if entries_length - 1 == index:

@@ -51,7 +51,7 @@ class TreeEditor(QMainWindow):
     __tree_field_status: int = 1
     __tree_field_taxid: int = 3
     __tree_field_related_rank: int = 4
-    __tree_field_ids: int = 7
+    __tree_field_ids: int = 6
 
     # ? ------------------------------------------------------------------------
     # ? LIFE CYCLE HOOKS
@@ -171,7 +171,6 @@ class TreeEditor(QMainWindow):
                     "Support",
                     "Taxid",
                     "Related Rank",
-                    "Outgroup",
                     "Terminal",
                     "Identifier",
                 ]
@@ -186,8 +185,7 @@ class TreeEditor(QMainWindow):
         tree_widget.setColumnWidth(3, 80)
         tree_widget.setColumnWidth(4, 110)
         tree_widget.setColumnWidth(5, 80)
-        tree_widget.setColumnWidth(6, 80)
-        tree_widget.setColumnWidth(7, 300)
+        tree_widget.setColumnWidth(6, 300)
         tree_widget.setSelectionMode(QAbstractItemView.ExtendedSelection)
         tree_widget.setSortingEnabled(True)
         tree_widget.itemClicked.connect(self.__on_item_clicked)
@@ -528,15 +526,6 @@ class TreeEditor(QMainWindow):
                         ),
                     ),
                     (
-                        "If Clade is Outgroup",
-                        parent.setText,
-                        (
-                            clade._is_outgroup.__str__()
-                            if clade._is_outgroup
-                            else ""
-                        ),
-                    ),
-                    (
                         "If Clade is Terminal",
                         parent.setText,
                         (
@@ -618,7 +607,6 @@ class TreeEditor(QMainWindow):
                 (clade.confidence.__str__() if clade.confidence else ""),
                 (clade._taxid.__str__() if clade._taxid else ""),
                 (clade._related_rank.name if clade._related_rank else ""),
-                (clade._is_outgroup.__str__() or ""),
                 (clade.is_terminal().__str__() if clade.is_terminal() else ""),
                 (clade._id.__str__() or ""),
                 (

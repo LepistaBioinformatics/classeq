@@ -114,7 +114,6 @@ class ExtendedBioPythonClade(ExtendedBioPythonElement, Clade):
     # ? ------------------------------------------------------------------------
 
     _id: UUID
-    _is_outgroup: bool
     _taxid: int | None = None
     _related_rank: MajorTaxonomicRanks | MinorTaxonomicRanks | ExtraTaxonomicRanks | None = (
         None
@@ -127,7 +126,6 @@ class ExtendedBioPythonClade(ExtendedBioPythonElement, Clade):
     def __init__(
         self,
         id: UUID | None = None,
-        is_outgroup: bool | None = None,
         taxid: int | None = None,
         related_rank: MajorTaxonomicRanks
         | MinorTaxonomicRanks
@@ -148,7 +146,6 @@ class ExtendedBioPythonClade(ExtendedBioPythonElement, Clade):
             ),
         )
 
-        self._is_outgroup = is_outgroup or False
         self._taxid = taxid or None
         self._related_rank = related_rank or None
 
@@ -159,7 +156,6 @@ class ExtendedBioPythonClade(ExtendedBioPythonElement, Clade):
     def to_dict(self) -> dict[str, Any]:
         return {
             "id": self._id,
-            "is_outgroup": self._is_outgroup,
             "branch_length": self.branch_length,
             "name": self.name,
             "confidence": self.confidence,
@@ -185,7 +181,6 @@ class ExtendedBioPythonClade(ExtendedBioPythonElement, Clade):
     ) -> Self:
         return cls(
             id=UUID(content.get("id")),
-            is_outgroup=content.get("is_outgroup"),
             branch_length=content.get("branch_length"),
             name=content.get("name"),
             confidence=content.get("confidence"),
@@ -206,7 +201,6 @@ class ExtendedBioPythonClade(ExtendedBioPythonElement, Clade):
     def from_bio_python_clade(
         cls,
         clade: Clade,
-        outgroups: list[str],
     ) -> Self:
         """Recursively copy a BioPython Clade object and its children.
 
@@ -228,7 +222,6 @@ class ExtendedBioPythonClade(ExtendedBioPythonElement, Clade):
                     confidence=clade.confidence,
                     color=clade.color,
                     width=clade.width,
-                    is_outgroup=clade.name in outgroups,
                 )
 
                 copied_clade.clades = recursive_parse_clades(
@@ -248,7 +241,6 @@ class ExtendedBioPythonClade(ExtendedBioPythonElement, Clade):
             confidence=clade.confidence,
             color=clade.color,
             width=clade.width,
-            is_outgroup=clade.name in outgroups,
         )
 
 
@@ -331,13 +323,15 @@ class ExtendedBioPythonTree(Tree):
         )
 
     @classmethod
-    def from_bio_python_tree(cls, tree: Tree, outgroups: list[str]) -> Self:
+    def from_bio_python_tree(
+        cls,
+        tree: Tree,
+    ) -> Self:
         inner_tree = deepcopy(tree)
 
         return cls(
             root=ExtendedBioPythonClade.from_bio_python_clade(
-                inner_tree.root,
-                outgroups=outgroups,
+                clade=inner_tree.root
             ),
             rooted=inner_tree.rooted,
             id=inner_tree.id,

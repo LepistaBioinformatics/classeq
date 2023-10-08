@@ -187,8 +187,6 @@ class ReferenceSet:
 
         def __discover_node_type(clade: ExtendedBioPythonClade) -> NodeType:
             if clade.is_terminal():
-                if clade.name in self.tree.outgroups:
-                    return NodeType.OUTGROUP
                 return NodeType.TERMINAL
             return NodeType.INTERNAL
 
@@ -233,7 +231,6 @@ class ReferenceSet:
         try:
             tree: ExtendedBioPythonTree = deepcopy(self.tree.sanitized_tree)
             root: ExtendedBioPythonClade = deepcopy(tree.root)
-
             linear_tree: set[ClasseqClade] = set()
 
             __collect_clades_recursively(
