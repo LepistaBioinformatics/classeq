@@ -139,41 +139,12 @@ __KMER_SIZE_OPTION = click.option(
 )
 @__KMER_SIZE_OPTION
 @__STRAND_OPTION
-# @click.option(
-#    "-og",
-#    "--outgroups",
-#    type=click.STRING,
-#    multiple=True,
-#    required=False,
-#    help=(
-#        "The outgroup list. Each outgroup must be into a separate argument."
-#        + "Ex: -og outgroup1 -og outgroup2 -og outgroup3"
-#    ),
-# )
-# @click.option(
-#    "-of",
-#    "--outgroups-file",
-#    required=False,
-#    type=click.Path(
-#        resolve_path=True,
-#        readable=True,
-#        exists=True,
-#        dir_okay=True,
-#    ),
-#    help=(
-#        "The outgroup file path. As an alternative to the --outgroups option, "
-#        + "you can pass a file containing the outgroups. Each outgroup must "
-#        + "be into a separate line."
-#    ),
-# )
 def parse_source_files_cmd(
     fasta_file_path: str,
     tree_file_path: str,
     support_value_cutoff: int,
     kmer_size: int,
     output_directory: str | None = None,
-    # outgroups: tuple[str, ...] | None = None,
-    # outgroups_file: click.Path | None = None,
     strand: str | None = None,
     **_: Any,
 ) -> None:
@@ -181,24 +152,13 @@ def parse_source_files_cmd(
 
     LOGGER.debug(" ".join(argv))
 
-    """ if outgroups == () and outgroups_file is None:
-        click.echo("Error: You must provide outgroups.")
-        exit(1) """
-
     try:
-        """valid_outgroups: tuple[str] = (
-            outgroups
-            if len(list(outgroups)) > 0  # type: ignore
-            else __load_outgroups_from_file(Path(outgroups_file))  # type: ignore
-        )"""
-
         if (
             response := load_source_files(
                 msa_file_path=Path(fasta_file_path),
                 msa_format=MsaSourceFormatEnum.FASTA,
                 tree_file_path=Path(tree_file_path),
                 tree_format=TreeSourceFormatEnum.NEWICK,
-                # outgroups=valid_outgroups,
                 output_directory=(
                     Path(output_directory)
                     if output_directory is not None
@@ -233,16 +193,6 @@ def parse_source_files_cmd(
     except Exception as exc:
         click.echo(f"Error: {exc}")
         exit(1)
-
-
-def __load_outgroups_from_file(file: Path) -> list[str]:
-    if not file.exists():
-        raise FileNotFoundError(f"File not found: {file}")
-
-    with open(file, "r") as f:
-        outgroups = f.readlines()
-
-    return list({outgroup.strip() for outgroup in outgroups})
 
 
 @classeq_cmd.command(
