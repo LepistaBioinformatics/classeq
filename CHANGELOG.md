@@ -1,3 +1,9 @@
+## v0.10.2 (2023-10-13)
+
+### Fix
+
+- fix app to use the new pyside6 and replace tree root to use ete3
+
 ## v0.10.1 (2023-10-13)
 
 ### Fix
