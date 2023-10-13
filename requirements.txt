@@ -2,6 +2,7 @@
 attrs==23.1.0
 biopython==1.81
 clean-base==0.1.1
+maturin==1.2.3
 numpy==1.25.2 ; python_version >= '3.9'
 pyqt5==5.15.9
 pyqt5-qt5==5.15.2

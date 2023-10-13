@@ -1,15 +1,8 @@
-# ? ----------------------------------------------------------------------------
-# ? Building
-# ? ----------------------------------------------------------------------------
-
 [build-system]
 
 requires = ["setuptools", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
-# ? ----------------------------------------------------------------------------
-# ? Building
-# ? ----------------------------------------------------------------------------
 
 [project]
 
@@ -17,33 +10,27 @@ name = "classeq"
 version = "0.10.0"
 authors = [{ name = "Samuel Galvão Elias", email = "sgelias@outlook.com" }]
 description = "A phylogeneny based classifier of DNA sequences"
+readme = "README.md"
 requires-python = ">=3.11"
+dynamic = ["dependencies"]
+
 keywords = ["Machine Learning", "Bioinformatics", "Phylogeny"]
-classifiers = ["Programming Language :: Python :: 3.11"]
+classifiers = [
+    "Programming Language :: Python :: 3.11",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Other Audience",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+]
 
-
-# ? ----------------------------------------------------------------------------
-# ? Entrypoints
-# ? ----------------------------------------------------------------------------
 
 [project.scripts]
 
-# The CLI entrypoint
 cls = "classeq.ports.cli.main:classeq_cmd"
 
-# ? ----------------------------------------------------------------------------
-# ? Assets
-# ? ----------------------------------------------------------------------------
-
-# Remove hashtag if non python files should be included at the installation
-# files.
-#
-# [tool.setuptools.package-data]
-# classeq = ["assets/*.png", "assets/*.qss"]
-
-# ? ----------------------------------------------------------------------------
-# ? Code consistence
-# ? ----------------------------------------------------------------------------
 
 [tool.mypy]
 python_version = 3.11

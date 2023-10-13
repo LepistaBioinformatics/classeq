@@ -27,3 +27,6 @@ functional-predictions-merged
 #Drawio
 **/*.drawio.bkp
 **/*.drawio.dtmp
+
+# Env
+.venv
