@@ -2,6 +2,7 @@ from hashlib import md5
 from json import load
 from pathlib import Path
 from typing import Any, Self
+from tempfile import NamedTemporaryFile
 
 import clean_base.exceptions as c_exc
 from attr import define, field
@@ -9,6 +10,7 @@ from Bio import Phylo
 from Bio.Phylo.BaseTree import Tree
 from clean_base.either import Either, right
 from classeq.core.domain.dtos.biopython_wrappers import ExtendedBioPythonTree
+from ete3 import Tree as ETree
 
 from classeq.core.domain.dtos.msa_source_format import MsaSourceFormatEnum
 from classeq.core.domain.dtos.tree_source_format import TreeSourceFormatEnum
@@ -143,8 +145,16 @@ class ClasseqTree:
         format: TreeSourceFormatEnum,
     ) -> Either[c_exc.MappedErrors, Tree]:
         try:
-            raw_tree: Tree = Phylo.read(newick_file_path, format.value)
-            raw_tree.root_at_midpoint()
+            tmp_tree_path = NamedTemporaryFile(mode="w+", suffix=".newick")
+
+            with newick_file_path.open("r") as newick_file:
+                tmp_tree = ETree(newick_file.read(), format=0)
+                tmp_tree.set_outgroup(tmp_tree.get_midpoint_outgroup())
+                tmp_tree.write(outfile=tmp_tree_path.name, format=0)
+
+            raw_tree: Tree = Phylo.read(tmp_tree_path, format.value)
+            tmp_tree_path.close()
+            raw_tree.rooted = True
 
             return right(raw_tree)
 

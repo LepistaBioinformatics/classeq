@@ -10,6 +10,7 @@ clean-base = "*"
 pyside2 = "*"
 pyqt5 = "*"
 maturin = "*"
+ete3 = "*"
 
 [dev-packages]
 black = "*"
