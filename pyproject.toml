@@ -7,7 +7,7 @@ build-backend = "setuptools.build_meta"
 [project]
 
 name = "classeq"
-version = "0.10.0"
+version = "0.10.1"
 authors = [{ name = "Samuel Galvão Elias", email = "sgelias@outlook.com" }]
 description = "A phylogeneny based classifier of DNA sequences"
 readme = "README.md"

@@ -1,3 +1,13 @@
+## v0.10.1 (2023-10-13)
+
+### Fix
+
+- replace middlepoint reroot from biopython features to use ete3 functionality
+
+### Refactor
+
+- remove unused code from the main cli port
+
 ## v0.10.0 (2023-10-08)
 
 ### Feat
