@@ -7,8 +7,8 @@ from uuid import UUID
 
 import clean_base.exceptions as c_exc
 from clean_base.either import Either, right
-from PySide2 import QtCore, QtGui
-from PySide2.QtWidgets import (
+from PySide6 import QtCore, QtGui
+from PySide6.QtWidgets import (
     QAbstractItemView,
     QApplication,
     QFileDialog,
@@ -117,7 +117,7 @@ class TreeEditor(QMainWindow):
         # ? --------------------------------------------------------------------
 
         left_splitter = QSplitter(splitter)
-        left_splitter.setOrientation(QtCore.Qt.Vertical)
+        left_splitter.setOrientation(QtCore.Qt.Orientation.Vertical)
 
         left_widget = QWidget(left_splitter)
         left_layout = QVBoxLayout(left_widget)
@@ -154,7 +154,7 @@ class TreeEditor(QMainWindow):
         splitter.addWidget(right_widget)
 
         search_field = self.__search_field = QLineEdit(right_widget)
-        search_field.setFocusPolicy(QtCore.Qt.StrongFocus)
+        search_field.setFocusPolicy(QtCore.Qt.FocusPolicy.StrongFocus)
         search_field.setObjectName("search_field")
         search_field.setStyleSheet("font-size: 16px; height: 50px;")
         search_field.setPlaceholderText("Search for a node")
@@ -186,7 +186,9 @@ class TreeEditor(QMainWindow):
         tree_widget.setColumnWidth(4, 110)
         tree_widget.setColumnWidth(5, 80)
         tree_widget.setColumnWidth(6, 300)
-        tree_widget.setSelectionMode(QAbstractItemView.ExtendedSelection)
+        tree_widget.setSelectionMode(
+            QAbstractItemView.SelectionMode.ExtendedSelection
+        )
         tree_widget.setSortingEnabled(True)
         tree_widget.itemClicked.connect(self.__on_item_clicked)
 
@@ -271,8 +273,8 @@ class TreeEditor(QMainWindow):
         for item in [
             *recursive_find_in_children(
                 items=self.__tree_widget.findItems(
-                    None,
-                    QtCore.Qt.MatchRecursive,
+                    "",
+                    QtCore.Qt.MatchFlag.MatchRecursive,
                     self.__tree_field_names,
                 ),
                 text=text,
@@ -280,8 +282,8 @@ class TreeEditor(QMainWindow):
             ),
             *recursive_find_in_children(
                 items=self.__tree_widget.findItems(
-                    None,
-                    QtCore.Qt.MatchContains,
+                    "",
+                    QtCore.Qt.MatchFlag.MatchContains,
                     self.__tree_field_ids,
                 ),
                 text=text,
@@ -293,16 +295,16 @@ class TreeEditor(QMainWindow):
         if len(name_items) > 0:
             self.__tree_widget.scrollToItem(
                 name_items[0],
-                QAbstractItemView.PositionAtCenter,
+                QAbstractItemView.ScrollHint.PositionAtCenter,
             )
 
-        for item in set(name_items):
-            self.__tree_widget.setItemSelected(item, True)
+        for item in set(name_items):  # type: ignore
+            item.setSelected(True)  # type: ignore
 
     def __build_main_menu(self, parent: Any) -> None:
         self.menubar = self.menuBar()
         self.file_menu = QMenu("File", parent)
-        self.file_menu.addAction(
+        self.file_menu.addAction(  # type: ignore
             "Import Tree", self.__load_tree_from_widget_menu
         ).setShortcut("Ctrl+O")
 
@@ -413,20 +415,16 @@ class TreeEditor(QMainWindow):
             """
 
             parent.setExpanded(True)
-            faded_color = QtGui.QColor("#808080")
 
-            if clade.is_terminal():
-                parent.setTextColor(self.__tree_field_names, faded_color)
-
-            else:
+            if not clade.is_terminal():
                 # ? ------------------------------------------------------------
                 # ? Annotate name
                 # ? ------------------------------------------------------------
 
                 name_button = QPushButton()
-                name_button.setFocusPolicy(QtCore.Qt.NoFocus)
+                name_button.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
                 name_button.setCursor(
-                    QtGui.QCursor(QtCore.Qt.PointingHandCursor)
+                    QtGui.QCursor(QtCore.Qt.CursorShape.PointingHandCursor)
                 )
 
                 name_button.mouseDoubleClickEvent = (
@@ -445,9 +443,9 @@ class TreeEditor(QMainWindow):
                 # ? ------------------------------------------------------------
 
                 taxid_button = QPushButton()
-                taxid_button.setFocusPolicy(QtCore.Qt.NoFocus)
+                taxid_button.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
                 taxid_button.setCursor(
-                    QtGui.QCursor(QtCore.Qt.PointingHandCursor)
+                    QtGui.QCursor(QtCore.Qt.CursorShape.PointingHandCursor)
                 )
 
                 taxid_button.mouseDoubleClickEvent = (
@@ -466,9 +464,9 @@ class TreeEditor(QMainWindow):
                 # ? ------------------------------------------------------------
 
                 rank_button = QPushButton()
-                rank_button.setFocusPolicy(QtCore.Qt.NoFocus)
+                rank_button.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
                 rank_button.setCursor(
-                    QtGui.QCursor(QtCore.Qt.PointingHandCursor)
+                    QtGui.QCursor(QtCore.Qt.CursorShape.PointingHandCursor)
                 )
 
                 rank_button.mouseDoubleClickEvent = (
@@ -543,7 +541,7 @@ class TreeEditor(QMainWindow):
             ):
                 tip, action, value = element
                 action(index, value)
-                parent.setTextColor(index, faded_color)
+                # parent.setTextColor(index, faded_color)
                 parent.setToolTip(index, tip)
 
             return parent
@@ -618,7 +616,7 @@ class TreeEditor(QMainWindow):
         ):
             self.__table_view.setItem(index, 0, QTableWidgetItem(data))
             item = self.__table_view.item(index, 0)
-            item.setFlags(QtCore.Qt.ItemIsEnabled)
+            item.setFlags(QtCore.Qt.ItemFlag.ItemIsEnabled)
 
     def __annotate_clade_name(
         self,
@@ -631,7 +629,7 @@ class TreeEditor(QMainWindow):
             self,
             "Annotate Node",
             "Enter node name:",
-            QLineEdit.Normal,
+            QLineEdit.EchoMode.Normal,
             current_value or "",
         )
 
@@ -677,7 +675,7 @@ class TreeEditor(QMainWindow):
             self,
             "Annotate Node",
             "Enter node name:",
-            QLineEdit.Normal,
+            QLineEdit.EchoMode.Normal,
             current_value or "",
         )
 
@@ -779,7 +777,7 @@ class TreeEditor(QMainWindow):
     ) -> None:
         item = self.__tree_widget.findItems(
             clade._id.__str__(),
-            QtCore.Qt.MatchRecursive,
+            QtCore.Qt.MatchFlag.MatchRecursive,
             self.__tree_field_ids,
         )[0]
 
@@ -787,7 +785,7 @@ class TreeEditor(QMainWindow):
         item.setIcon(self.__tree_field_status, self.__check_status(clade))
 
         self.__tree_widget.clearSelection()
-        self.__tree_widget.setItemSelected(item, True)
+        item.setSelected(True)
 
         self.__set_table_data(clade=clade)
 

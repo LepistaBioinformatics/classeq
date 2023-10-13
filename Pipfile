@@ -7,10 +7,10 @@ name = "pypi"
 biopython = "*"
 attrs = "*"
 clean-base = "*"
-pyside2 = "*"
 pyqt5 = "*"
 maturin = "*"
 ete3 = "*"
+pyside6 = "*"
 
 [dev-packages]
 black = "*"
