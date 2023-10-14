@@ -1,3 +1,9 @@
+## v0.11.1 (2023-10-14)
+
+### Fix
+
+- include a search break to avoid classify sequences with low similarity to train set
+
 ## v0.11.0 (2023-10-13)
 
 ### Feat
