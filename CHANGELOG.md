@@ -1,3 +1,9 @@
+## v0.11.0 (2023-10-13)
+
+### Feat
+
+- create a cli command to sanitize phylogenies
+
 ## v0.10.2 (2023-10-13)
 
 ### Fix
