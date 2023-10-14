@@ -119,6 +119,14 @@ class OutgroupPriors:
     clade_priors: OutgroupLabeledPriors = field()
 
     # ? ------------------------------------------------------------------------
+    # ? Validations
+    # ? ------------------------------------------------------------------------
+
+    @parent.default
+    def _id_default(self) -> UUID:
+        return self.default_parent_id()
+
+    # ? ------------------------------------------------------------------------
     # ? Public instance methods
     # ? ------------------------------------------------------------------------
 
@@ -127,6 +135,10 @@ class OutgroupPriors:
             "parent": self.parent.__str__(),
             "clade_priors": self.clade_priors.to_dict(),
         }
+
+    @staticmethod
+    def default_parent_id() -> UUID:
+        return UUID(int=0)
 
     # ? ------------------------------------------------------------------------
     # ? Public class methods

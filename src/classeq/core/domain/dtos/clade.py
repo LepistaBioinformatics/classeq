@@ -12,6 +12,7 @@ from classeq.settings import LOGGER
 
 
 class NodeType(Enum):
+    EXTERNAL = "external"
     ROOT = "root"
     INTERNAL = "internal"
     TERMINAL = "terminal"
@@ -23,7 +24,7 @@ class ClasseqClade:
     # ? Class attributes
     # ? ------------------------------------------------------------------------
 
-    name: str = field()
+    name: str | None = field()
     id: UUID = field()
     type: NodeType = field()
     support: float | None = field(default=None)
@@ -64,6 +65,20 @@ class ClasseqClade:
     # ? ------------------------------------------------------------------------
     # ? Public class methods
     # ? ------------------------------------------------------------------------
+
+    @classmethod
+    def new_anemic_clade(cls) -> Self:
+        return cls(
+            name=None,
+            id=UUID(int=0),
+            type=NodeType.EXTERNAL,
+            support=None,
+            branch_length=None,
+            parent=None,
+            children=None,
+            taxid=None,
+            related_rank=None,
+        )
 
     @classmethod
     def from_dict(

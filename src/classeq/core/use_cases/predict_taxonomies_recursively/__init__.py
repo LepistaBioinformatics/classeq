@@ -20,9 +20,12 @@ from classeq.core.domain.dtos.reference_set import ReferenceSet
 from classeq.settings import LOGGER
 
 from ._get_outgroup_priors import get_outgroup_priors
-from ._perform_adherence_test_of_child_clades import CladeAdherenceResult
 from ._perform_single_sequence_phylogenetic_adherence_test import (
     perform_single_sequence_phylogenetic_adherence_test,
+)
+from ._perform_single_sequence_phylogenetic_adherence_test._dtos import (
+    PredictionStep,
+    PredictionResult,
 )
 
 
@@ -102,7 +105,7 @@ def predict_for_multiple_fasta_file(
             SeqIO.parse(str(prediction_input_path), fasta_format.value)
         )
 
-        response: defaultdict[str, dict[str, Any]] = defaultdict()
+        response: defaultdict[str, PredictionResult] = defaultdict()
 
         if (tree_either := reference_set.get_hierarchical_tree()).is_left:
             return tree_either
@@ -128,30 +131,26 @@ def predict_for_multiple_fasta_file(
             ).is_left:
                 return adherence_test_response_either
 
-            (
-                adherence_test_path,
-                status,
-            ) = adherence_test_response_either.value
+            prediction_result: PredictionResult = (
+                adherence_test_response_either.value
+            )
 
             resolved_path_names = __resolve_path_name(
                 resolved_names=resolved_names,
-                adherence_test_path=adherence_test_path,
+                adherence_test_path=prediction_result.path,
             )
 
             LOGGER.debug("")
             LOGGER.debug(f"Adherence Test Path: {resolved_path_names}")
             LOGGER.debug("")
 
-            response[record.id] = {
-                "phylogeny_path": resolved_path_names,
-                "status": status,
-            }
+            response[record.id] = prediction_result
 
             LOGGER.debug(
                 "\n"
                 + dumps(
                     [
-                        i.to_dict(omit_children=True)
+                        i.result.to_dict(omit_children=True)
                         for i in resolved_path_names
                     ],
                     indent=4,
@@ -193,12 +192,12 @@ def predict_for_multiple_fasta_file(
 
 def __resolve_path_name(
     resolved_names: dict[UUID, ExtendedBioPythonClade],
-    adherence_test_path: list[CladeAdherenceResult],
-) -> list[CladeAdherenceResult]:
+    adherence_test_path: list[PredictionStep],
+) -> list[PredictionStep]:
     renamed_clades = []
 
     for clade_result in adherence_test_path:
-        clade = clade_result.clade
+        clade = clade_result.result.clade
         if (resolved_name := resolved_names.get(clade.id)) is not None:
             clade.name = resolved_name.name
             clade.taxid = resolved_name._taxid
@@ -212,11 +211,10 @@ def __resolve_path_name(
 
 def __write_csv(
     output_file_path: Path,
-    response: defaultdict[str, dict[str, Any]],
+    response: defaultdict[str, PredictionResult],
 ) -> None:
     output_file_path_tsv = output_file_path.with_suffix(".tsv")
     default_none = "NA"
-    phylogeny_path: list[CladeAdherenceResult]
 
     LOGGER.info(f"Saving output to `{output_file_path_tsv}`")
 
@@ -228,55 +226,48 @@ def __write_csv(
         response_lines: list[str] = []
         line_definition = (
             "{query}\t{status}\t{predicted_clade_id}\t{depth}\t{name}\t{taxid}"
-            + "\t{related_rank}\t{support}\t{branches}\t{in_match_kmers}"
-            + "\t{in_query_kmers_size}\t{in_subject_kmers_size}\t{in_status}"
-            + "\t{sis_match_kmers}\t{sis_query_kmers_size}"
-            + "\t{sis_subject_kmers_size}\t{sis_status}"
+            + "\t{related_rank}\t{support}\t{branches}\t{query_kmers_size}"
+            + "\t{in_match_kmers}\t{in_subject_kmers_size}\t{in_status}"
+            + "\t{sis_match_kmers}\t{sis_subject_kmers_size}\t{sis_status}"
         )
 
         f.write(line_definition.replace("{", "").replace("}", "") + "\n")
 
         for sequence_name, prediction in response.items():
-            if (status := prediction.get("status")) is None:
-                continue
-
-            if (phylogeny_path := prediction.get("phylogeny_path")) is None:  # type: ignore
-                continue
-
-            if phylogeny_path.__len__() == 0:
+            if prediction.path.__len__() == 0:
                 response_lines.append(
                     "{query}\t{status}".format(
                         query=sequence_name,
-                        status=status.name,
+                        status=prediction.status.name,
                     )
                 )
 
                 continue
 
-            for index, clade in enumerate(phylogeny_path):
+            for clade in prediction.path:
                 response_lines.append(
                     line_definition.format(
                         query=sequence_name,
-                        status=status.name,
-                        predicted_clade_id=clade.clade.id,
-                        depth=index + 1,
-                        name=clade.clade.name or default_none,
-                        taxid=clade.clade.taxid or default_none,
-                        related_rank=clade.clade.related_rank or default_none,
-                        support=clade.clade.support or default_none,
+                        status=prediction.status.name,
+                        predicted_clade_id=clade.result.clade.id,
+                        depth=clade.depth,
+                        name=clade.result.clade.name or default_none,
+                        taxid=clade.result.clade.taxid or default_none,
+                        related_rank=clade.result.clade.related_rank
+                        or default_none,
+                        support=clade.result.clade.support or default_none,
                         branches=(
-                            clade.clade.children.__len__()
-                            if clade.clade.children
+                            clade.result.clade.children.__len__()
+                            if clade.result.clade.children
                             else default_none
                         ),
-                        in_match_kmers=clade.ingroup_adherence_test.match_kmers,
-                        in_query_kmers_size=clade.ingroup_adherence_test.query_kmers_size,
-                        in_subject_kmers_size=clade.ingroup_adherence_test.subject_kmers_size,
-                        in_status=clade.ingroup_adherence_test.status.name,
-                        sis_match_kmers=clade.sister_adherence_test.match_kmers,
-                        sis_query_kmers_size=clade.sister_adherence_test.query_kmers_size,
-                        sis_subject_kmers_size=clade.sister_adherence_test.subject_kmers_size,
-                        sis_status=clade.sister_adherence_test.status.name,
+                        query_kmers_size=clade.result.ingroup_adherence_test.query_kmers_size,
+                        in_match_kmers=clade.result.ingroup_adherence_test.match_kmers,
+                        in_subject_kmers_size=clade.result.ingroup_adherence_test.subject_kmers_size,
+                        in_status=clade.result.ingroup_adherence_test.status.name,
+                        sis_match_kmers=clade.result.sister_adherence_test.match_kmers,
+                        sis_subject_kmers_size=clade.result.sister_adherence_test.subject_kmers_size,
+                        sis_status=clade.result.sister_adherence_test.status.name,
                     )
                 )
 
@@ -285,7 +276,7 @@ def __write_csv(
 
 def __write_json(
     output_file_path: Path,
-    response: defaultdict[str, dict[str, Any]],
+    response: defaultdict[str, PredictionResult],
     fasta_path: Path,
     annotated_phylojson_path: Path | None,
 ) -> None:
@@ -308,19 +299,7 @@ def __write_json(
                     else None
                 ),
                 "output": [
-                    {
-                        "target": k,
-                        "status": v.get("status").value,  # type: ignore
-                        "prediction": [
-                            {
-                                **i.to_dict(omit_children=True),
-                                "depth": index + 1,
-                            }
-                            for index, i in enumerate(
-                                v.get("phylogeny_path")  # type: ignore
-                            )
-                        ],
-                    }
+                    {"query": k, **v.to_dict(omit_children=True)}
                     for k, v in response.items()
                 ],
             },

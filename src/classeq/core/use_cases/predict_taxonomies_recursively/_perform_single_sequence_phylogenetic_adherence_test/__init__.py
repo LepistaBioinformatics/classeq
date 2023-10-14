@@ -26,6 +26,7 @@ from .._perform_adherence_test_of_child_clades import (
     CladeAdherenceResultStatus,
     perform_adherence_test_of_child_clades,
 )
+from ._dtos import PredictionStep, PredictionResult
 
 
 def perform_single_sequence_phylogenetic_adherence_test(
@@ -38,10 +39,7 @@ def perform_single_sequence_phylogenetic_adherence_test(
     strand: StrandEnum,
     max_iterations: int = 1000,
     **kwargs: Any,
-) -> Either[
-    c_exc.MappedErrors,
-    tuple[list[ClasseqClade], CladeAdherenceResultStatus],
-]:
+) -> Either[c_exc.MappedErrors, PredictionResult]:
     """Perform phylogenetic adherence test.
 
     Description:
@@ -166,7 +164,7 @@ def perform_single_sequence_phylogenetic_adherence_test(
         response_clades: list[ClasseqClade] = ingroup_clades
         current_iteration: int = 0
 
-        clade_path: list[CladeAdherenceResult] = list()
+        clade_path: list[PredictionStep] = list()
 
         while (
             response_clades
@@ -210,7 +208,12 @@ def perform_single_sequence_phylogenetic_adherence_test(
             LOGGER.debug(f"\tStatus: {status}")
 
             if response_children is not None:
-                clade_path.append(response_children)
+                clade_path.append(
+                    PredictionStep(
+                        depth=current_iteration,
+                        result=response_children,
+                    )
+                )
 
             # ------------------------------------------------------------------
             # Break the search if the adherence test is inconclusive due to
@@ -250,6 +253,7 @@ def perform_single_sequence_phylogenetic_adherence_test(
                     "The processed sequence does not differs from outgroup"
                 )
 
+                clade_path[0].result.clade = ClasseqClade.new_anemic_clade()
                 status = CladeAdherenceResultStatus.CONCLUSIVE_OUTGROUP
                 break
 
@@ -264,6 +268,24 @@ def perform_single_sequence_phylogenetic_adherence_test(
                 status == CladeAdherenceResultStatus.NEXT_ITERATION
                 and response_children is not None
             ):
+                # --------------------------------------------------------------
+                # Break the search if the number of match kmers not exceeds the
+                # at last 50% of the total number of query kmers.
+                # --------------------------------------------------------------
+
+                if adherence_result.match_kmers < (query_kmers.__len__() / 2):
+                    LOGGER.debug(
+                        "The processed sequence does not differs from "
+                        + "ingroup"
+                    )
+
+                    clade_path[
+                        current_iteration - 1
+                    ].result.clade = ClasseqClade.new_anemic_clade()
+
+                    status = CladeAdherenceResultStatus.INCONCLUSIVE
+                    break
+
                 response_clades.append(response_children.clade)
 
             # ------------------------------------------------------------------
@@ -292,7 +314,12 @@ def perform_single_sequence_phylogenetic_adherence_test(
         # ? Return a positive response
         # ? --------------------------------------------------------------------
 
-        return right((clade_path, status))
+        return right(
+            PredictionResult(
+                status=status,
+                path=clade_path,
+            )
+        )
 
     except Exception as exc:
         return c_exc.UseCaseError(exc, logger=LOGGER)()
