@@ -82,6 +82,34 @@ __KMER_SIZE_OPTION = click.option(
 )
 
 
+__SUPPORT_VALUE_CUTOFF = click.option(
+    "-s",
+    "--support-value-cutoff",
+    required=False,
+    type=click.INT,
+    default=95,
+    show_default=True,
+    help=(
+        "The support value cutoff used to filter the phylogeny. The default "
+        + "value is 95."
+    ),
+)
+
+
+__TREE_FILE_PATH = click.option(
+    "-t",
+    "--tree-file-path",
+    required=True,
+    type=click.Path(
+        resolve_path=True,
+        readable=True,
+        exists=True,
+        dir_okay=True,
+    ),
+    help="The path to the TREE file.",
+)
+
+
 @classeq_cmd.command(
     "index",
     help=(
@@ -101,18 +129,7 @@ __KMER_SIZE_OPTION = click.option(
     ),
     help="The path to the FASTA file.",
 )
-@click.option(
-    "-t",
-    "--tree-file-path",
-    required=True,
-    type=click.Path(
-        resolve_path=True,
-        readable=True,
-        exists=True,
-        dir_okay=True,
-    ),
-    help="The path to the TREE file.",
-)
+@__TREE_FILE_PATH
 @click.option(
     "-o",
     "--output-directory",
@@ -125,18 +142,7 @@ __KMER_SIZE_OPTION = click.option(
     ),
     help="The path to the TREE file.",
 )
-@click.option(
-    "-s",
-    "--support-value-cutoff",
-    required=False,
-    type=click.INT,
-    default=95,
-    show_default=True,
-    help=(
-        "The support value cutoff used to filter the phylogeny. The default "
-        + "value is 95."
-    ),
-)
+@__SUPPORT_VALUE_CUTOFF
 @__KMER_SIZE_OPTION
 @__STRAND_OPTION
 def parse_source_files_cmd(
@@ -416,7 +422,7 @@ def serve_cmd(
 
 
 @utils_cmd.command(
-    "kmers",
+    "get-kmers",
     help=(
         "Get kmers of a character sequence. Only DNA/RNA residuals should be "
         + f"accepted ({', '.join(BASES)})."
@@ -444,3 +450,64 @@ def get_sequence_kmers_cmd(
             strand=StrandEnum(strand),
         ):
             click.get_text_stream("stdout").write(f"{kmer}\n")
+
+
+@utils_cmd.command(
+    "sanitize-tree",
+    help="Reroot tree at midpoint and remove low supported branches.",
+)
+@__TREE_FILE_PATH
+@__SUPPORT_VALUE_CUTOFF
+@click.option(
+    "-o",
+    "--output-file",
+    required=True,
+    type=click.Path(
+        resolve_path=True,
+        readable=True,
+        dir_okay=True,
+    ),
+    help="The file name to persist tree.",
+)
+def sanitize_tree_cmd(
+    tree_file_path: str,
+    support_value_cutoff: int,
+    output_file: str,
+) -> None:
+    from Bio.Phylo.BaseTree import Tree
+    from Bio import Phylo
+
+    from classeq.core.domain.dtos.biopython_wrappers import (
+        ExtendedBioPythonTree,
+    )
+    from classeq.core.domain.dtos.tree import ClasseqTree
+
+    if (
+        rooted_tree_either := ClasseqTree.parse_and_reroot_newick_tree(
+            Path(tree_file_path),
+            TreeSourceFormatEnum.NEWICK,
+        )
+    ).is_left:
+        raise Exception(rooted_tree_either.value)
+
+    rooted_tree: Tree = rooted_tree_either.value
+
+    rooted_tree_extended = ExtendedBioPythonTree.from_bio_python_tree(
+        tree=rooted_tree,
+    )
+
+    sanitized_tree_either = ClasseqTree.collapse_low_supported_nodes(
+        rooted_tree=rooted_tree_extended,
+        support_value_cutoff=support_value_cutoff,
+    )
+
+    if sanitized_tree_either.is_left:
+        raise Exception(sanitized_tree_either.value)
+
+    sanitized_tree: Tree = sanitized_tree_either.value
+
+    Phylo.write(
+        sanitized_tree,
+        Path(output_file),
+        format=TreeSourceFormatEnum.NEWICK.value,
+    )
