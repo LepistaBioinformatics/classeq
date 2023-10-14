@@ -1,3 +1,9 @@
+## v0.12.0 (2023-10-14)
+
+### Feat
+
+- include the options to user ignore the usage of outgroups during predicion
+
 ## v0.11.1 (2023-10-14)
 
 ### Fix
