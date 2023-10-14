@@ -15,7 +15,7 @@ from classeq.core.domain.dtos.biopython_wrappers import (
 )
 from classeq.core.domain.dtos.clade import ClasseqClade
 from classeq.core.domain.dtos.msa_source_format import MsaSourceFormatEnum
-from classeq.core.domain.dtos.priors import TreePriors
+from classeq.core.domain.dtos.priors import OutgroupPriors, TreePriors
 from classeq.core.domain.dtos.reference_set import ReferenceSet
 from classeq.settings import LOGGER
 
@@ -31,10 +31,10 @@ from ._perform_single_sequence_phylogenetic_adherence_test._dtos import (
 
 def predict_for_multiple_fasta_file(
     prediction_input_path: Path,
-    outgroups_input_path: Path,
     tree_priors: TreePriors,
     reference_set: ReferenceSet,
     fasta_format: MsaSourceFormatEnum = MsaSourceFormatEnum.FASTA,
+    outgroups_input_path: Path | None = None,
     annotated_phylojson_path: Path | None = None,
     output_file_path: Path | None = None,
     persist_as_json: bool = True,
@@ -88,14 +88,18 @@ def predict_for_multiple_fasta_file(
         # ? Calculate outgroup priors
         # ? --------------------------------------------------------------------
 
-        if (
-            outgroup_priors_either := get_outgroup_priors(
-                source_file_path=outgroups_input_path,
-                k_size=reference_set.kmer_size,
-                strand=reference_set.strand,
-            )
-        ).is_left:
-            return outgroup_priors_either
+        outgroup_priors: OutgroupPriors | Literal[False] = False
+        if outgroups_input_path is not None:
+            if (
+                outgroup_priors_either := get_outgroup_priors(
+                    source_file_path=outgroups_input_path,
+                    k_size=reference_set.kmer_size,
+                    strand=reference_set.strand,
+                )
+            ).is_left:
+                return outgroup_priors_either
+
+            outgroup_priors = outgroup_priors_either.value
 
         # ? --------------------------------------------------------------------
         # ? Predict taxonomies
@@ -125,7 +129,7 @@ def predict_for_multiple_fasta_file(
                     tree=hierarchical_tree,
                     strand=reference_set.strand,
                     tree_priors=tree_priors,
-                    outgroup_priors=outgroup_priors_either.value,
+                    outgroup_priors=outgroup_priors,
                     **kwargs,
                 )
             ).is_left:

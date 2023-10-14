@@ -1,5 +1,5 @@
 from copy import copy
-from typing import Any
+from typing import Any, Literal
 
 import clean_base.exceptions as c_exc
 from clean_base.either import Either, right
@@ -12,7 +12,7 @@ from classeq.core.domain.dtos.priors import (
     TreePriors,
 )
 from classeq.core.domain.dtos.strand import StrandEnum
-from classeq.settings import LOGGER
+from classeq.settings import DEFAULT_MATCHES_COVERAGE, LOGGER
 
 from .._do_clade_adherence_test_for_single_sequence import (
     do_clade_adherence_test_for_single_sequence,
@@ -33,11 +33,12 @@ def perform_single_sequence_phylogenetic_adherence_test(
     target_sequence: str,
     kmers_indices: KmersInverseIndices,
     tree_priors: TreePriors,
-    outgroup_priors: OutgroupPriors,
     kmer_size: int,
     tree: ClasseqClade,
     strand: StrandEnum,
+    outgroup_priors: OutgroupPriors | Literal[False] = False,
     max_iterations: int = 1000,
+    matches_coverage: float = DEFAULT_MATCHES_COVERAGE,
     **kwargs: Any,
 ) -> Either[c_exc.MappedErrors, PredictionResult]:
     """Perform phylogenetic adherence test.
@@ -57,6 +58,8 @@ def perform_single_sequence_phylogenetic_adherence_test(
         strand (StrandEnum): The strand.
         max_iterations (int, optional): The maximum number of iterations.
             Defaults to 1000.
+        matches_coverage (float, optional): The minimum number of matches
+            coverage. Defaults to 0.5.
 
     Returns:
         Either[c_exc.MappedErrors, bool]: The result of the test.
@@ -100,6 +103,49 @@ def perform_single_sequence_phylogenetic_adherence_test(
                 logger=LOGGER,
             )()
 
+        if not isinstance(kmers_indices, KmersInverseIndices):
+            return c_exc.UseCaseError(
+                "Unexpected error. The `kmers_indices` argument should be a "
+                + f"KmersInverseIndices. Received {type(kmers_indices)}.",
+                logger=LOGGER,
+            )()
+
+        if not isinstance(kmer_size, int):
+            return c_exc.UseCaseError(
+                "Unexpected error. The `kmer_size` argument should be a "
+                + f"int. Received {type(kmer_size)}.",
+                logger=LOGGER,
+            )()
+
+        if not isinstance(tree, ClasseqClade):
+            return c_exc.UseCaseError(
+                "Unexpected error. The `tree` argument should be a "
+                + f"ClasseqClade. Received {type(tree)}.",
+                logger=LOGGER,
+            )()
+
+        if not isinstance(strand, StrandEnum):
+            return c_exc.UseCaseError(
+                "Unexpected error. The `strand` argument should be a "
+                + f"StrandEnum. Received {type(strand)}.",
+                logger=LOGGER,
+            )()
+
+        if matches_coverage < 0.1 or matches_coverage > 1:
+            return c_exc.UseCaseError(
+                "Unexpected error. The `matches_coverage` argument should be "
+                + f"between 0.1 and 1. Received {matches_coverage}.",
+                logger=LOGGER,
+            )()
+
+        if outgroup_priors:
+            if not isinstance(outgroup_priors, OutgroupPriors):
+                return c_exc.UseCaseError(
+                    "Unexpected error. The `outgroup_priors` argument should be a "
+                    + f"OutgroupPriors. Received {type(outgroup_priors)}.",
+                    logger=LOGGER,
+                )()
+
         # ? --------------------------------------------------------------------
         # ? Get sequence kmers
         # ? --------------------------------------------------------------------
@@ -120,27 +166,28 @@ def perform_single_sequence_phylogenetic_adherence_test(
         # ? Perform adherence test for outgroup
         # ? --------------------------------------------------------------------
 
-        if (
-            binding_either := do_clade_adherence_test_for_single_sequence(
-                query_kmers=query_kmers,
-                clade_priors=outgroup_priors,
-                kmer_indices=kmers_indices,
-            )
-        ).is_left:
-            return binding_either
+        if outgroup_priors:
+            if (
+                binding_either := do_clade_adherence_test_for_single_sequence(
+                    query_kmers=query_kmers,
+                    clade_priors=outgroup_priors,
+                    kmer_indices=kmers_indices,
+                )
+            ).is_left:
+                return binding_either
 
-        if (
-            outgroup_adherence_test := binding_either.value.pop(
-                PriorGroup.OUTGROUP
-            )
-        ) is None:
-            return c_exc.UseCaseError(
-                "Unexpected error on try to calculate "
-                + "adherence test for ingroup.",
-                logger=LOGGER,
-            )()
+            if (
+                outgroup_adherence_test := binding_either.value.pop(
+                    PriorGroup.OUTGROUP
+                )
+            ) is None:
+                return c_exc.UseCaseError(
+                    "Unexpected error on try to calculate "
+                    + "adherence test for ingroup.",
+                    logger=LOGGER,
+                )()
 
-        LOGGER.debug(f"Output Adherence Result: {outgroup_adherence_test}")
+            LOGGER.debug(f"Output Adherence Result: {outgroup_adherence_test}")
 
         # ? --------------------------------------------------------------------
         # ? Perform adherence test for the outgroup-sister pairs
@@ -244,18 +291,19 @@ def perform_single_sequence_phylogenetic_adherence_test(
             # clade of the outgroup, in other words, the tree entrypoint.
             # ------------------------------------------------------------------
 
-            if (
-                current_iteration == 1
-                and outgroup_adherence_test.match_kmers
-                > adherence_result.match_kmers
-            ):
-                LOGGER.debug(
-                    "The processed sequence does not differs from outgroup"
-                )
+            if outgroup_priors:
+                if (
+                    current_iteration == 1
+                    and outgroup_adherence_test.match_kmers
+                    > adherence_result.match_kmers
+                ):
+                    LOGGER.debug(
+                        "The processed sequence does not differs from outgroup"
+                    )
 
-                clade_path[0].result.clade = ClasseqClade.new_anemic_clade()
-                status = CladeAdherenceResultStatus.CONCLUSIVE_OUTGROUP
-                break
+                    clade_path[0].result.clade = ClasseqClade.new_anemic_clade()
+                    status = CladeAdherenceResultStatus.CONCLUSIVE_OUTGROUP
+                    break
 
             # ------------------------------------------------------------------
             # Case the adherence test is conclusive for ingroup and the ingroup
@@ -273,7 +321,9 @@ def perform_single_sequence_phylogenetic_adherence_test(
                 # at last 50% of the total number of query kmers.
                 # --------------------------------------------------------------
 
-                if adherence_result.match_kmers < (query_kmers.__len__() / 2):
+                if adherence_result.match_kmers < (
+                    query_kmers.__len__() * matches_coverage
+                ):
                     LOGGER.debug(
                         "The processed sequence does not differs from "
                         + "ingroup"

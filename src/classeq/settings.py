@@ -102,6 +102,9 @@ MINIMUM_INGROUP_QUERY_KMERS_MATCH = 3
 MINIMUM_INGROUP_SISTER_MATCH_KMERS_DIFFERENCE = 2
 
 
+DEFAULT_MATCHES_COVERAGE = 0.5
+
+
 # ? ----------------------------------------------------------------------------
 # ? Temp files names
 # ? ----------------------------------------------------------------------------

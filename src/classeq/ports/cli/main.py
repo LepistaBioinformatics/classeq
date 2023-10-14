@@ -24,6 +24,7 @@ from classeq.settings import (
     BASES,
     DEFAULT_CLASSEQ_OUTPUT_FILE_NAME,
     DEFAULT_KMER_SIZE,
+    DEFAULT_MATCHES_COVERAGE,
     LOGGER,
     MINIMUM_INGROUP_QUERY_KMERS_MATCH,
     MINIMUM_INGROUP_SISTER_MATCH_KMERS_DIFFERENCE,
@@ -220,13 +221,14 @@ def parse_source_files_cmd(
 @click.option(
     "-og",
     "--outgroups-fasta-file",
-    required=True,
+    required=False,
     type=click.Path(
         resolve_path=True,
         readable=True,
         exists=True,
         dir_okay=True,
     ),
+    default=None,
     help="The outgroup file containing outgroups sequences as FASTA format.",
 )
 @click.option(
@@ -284,10 +286,23 @@ def parse_source_files_cmd(
         + "to consider a sequence belonging to a clade."
     ),
 )
+@click.option(
+    "-m",
+    "--matches-coverage",
+    required=False,
+    type=click.FLOAT,
+    default=DEFAULT_MATCHES_COVERAGE,
+    show_default=True,
+    help=(
+        "The minimum number of k-mer's matches which the query sequence needs "
+        + "to contain to be considered belonging to a clade. Value must be "
+        + "between 0.1 and 1."
+    ),
+)
 def infer_identity_cmd(
     query_fasta_path: str,
-    outgroups_fasta_file: str,
     classeq_indices: str,
+    outgroups_fasta_file: str | None = None,
     annotated_phylojson_path: str | None = None,
     output_file_path: str | None = None,
     **kwargs: Any,
@@ -374,7 +389,11 @@ def infer_identity_cmd(
         if (
             response := predict_for_multiple_fasta_file(
                 prediction_input_path=Path(query_fasta_path),
-                outgroups_input_path=Path(outgroups_fasta_file),
+                outgroups_input_path=(
+                    Path(outgroups_fasta_file)
+                    if outgroups_fasta_file is not None
+                    else outgroups_fasta_file
+                ),
                 fasta_format=MsaSourceFormatEnum.FASTA,
                 tree_priors=tree_priors_either.value,
                 reference_set=reference_set_either.value,
