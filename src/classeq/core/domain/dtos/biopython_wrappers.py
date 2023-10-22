@@ -1,9 +1,11 @@
 from copy import deepcopy
 from enum import Enum
 from typing import Any, Self
-from uuid import NAMESPACE_DNS, UUID, uuid3
+from uuid import UUID, uuid3
 
 from Bio.Phylo.BaseTree import Clade, Tree
+
+from classeq.settings import CLASSEQ_NAMESPACE_DNS
 
 
 class ExtendedBioPythonElement:
@@ -137,12 +139,16 @@ class ExtendedBioPythonClade(ExtendedBioPythonElement, Clade):
         super().__init__(*args, **kwargs)
 
         self._id = id or uuid3(
-            NAMESPACE_DNS,
+            CLASSEQ_NAMESPACE_DNS,
             (
                 (self.name or "")
-                + (self.branch_length or 0).__str__()
-                + (self.confidence or 0).__str__()
-                + "".join([str(i) for i in self.clades] or [])
+                + "".join(
+                    [
+                        "".join([j.name for j in i.get_terminals()])
+                        for i in self.clades
+                    ]
+                    or []
+                )
             ),
         )
 

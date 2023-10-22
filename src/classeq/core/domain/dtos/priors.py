@@ -7,7 +7,7 @@ from attrs import field, frozen
 from clean_base.either import Either, right
 
 from classeq.core.domain.dtos.ordered_tuple import OrderedTuple
-from classeq.settings import LOGGER
+from classeq.settings import DEFAULT_ANEMIC_ID, LOGGER
 
 
 class PriorGroup(Enum):
@@ -138,7 +138,7 @@ class OutgroupPriors:
 
     @staticmethod
     def default_parent_id() -> UUID:
-        return UUID(int=0)
+        return DEFAULT_ANEMIC_ID
 
     # ? ------------------------------------------------------------------------
     # ? Public class methods

@@ -13,6 +13,7 @@ from logging import (
     getLogger,
 )
 from os import getenv
+from uuid import UUID
 
 # ? ----------------------------------------------------------------------------
 # ? Build logger configurations
@@ -89,6 +90,17 @@ DEFAULT_KMER_SIZE = 12
 
 
 MINIMUM_CLADE_SIZE = 2
+
+
+# ? ----------------------------------------------------------------------------
+# ? Indexing related params
+# ? ----------------------------------------------------------------------------
+
+
+DEFAULT_ANEMIC_ID = UUID(int=0)
+
+
+CLASSEQ_NAMESPACE_DNS = UUID(int=9)
 
 
 # ? ----------------------------------------------------------------------------

@@ -325,8 +325,8 @@ def perform_single_sequence_phylogenetic_adherence_test(
                     query_kmers.__len__() * matches_coverage
                 ):
                     LOGGER.debug(
-                        "The processed sequence does not differs from "
-                        + "ingroup"
+                        "Low number of matches. The processed sequence "
+                        + "probably does not belongs to the current clade."
                     )
 
                     clade_path[

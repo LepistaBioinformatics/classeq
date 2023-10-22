@@ -8,7 +8,7 @@ from attr import define, field
 from clean_base.either import Either, left, right
 
 from classeq.core.domain.dtos.kmer_inverse_index import KmerIndex
-from classeq.settings import LOGGER
+from classeq.settings import DEFAULT_ANEMIC_ID, LOGGER
 
 
 class NodeType(Enum):
@@ -70,7 +70,7 @@ class ClasseqClade:
     def new_anemic_clade(cls) -> Self:
         return cls(
             name=None,
-            id=UUID(int=0),
+            id=DEFAULT_ANEMIC_ID,
             type=NodeType.EXTERNAL,
             support=None,
             branch_length=None,
@@ -190,7 +190,7 @@ class ClasseqClade:
     def get_pretty_clade(self) -> str:
         nodes = 0 if self.children is None else len(self.children)
         name = self.name if self.name is not None else self.id
-        return f"type({self.type.name}): [{nodes} nodes] {self.support} {name}"
+        return f"ClasseqClade(type::{self.type.name}): [{nodes} nodes] {self.support} {name}"
 
     def get_pretty_tree(self) -> str:
         str_repr: list[str] = []
