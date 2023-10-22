@@ -1,3 +1,9 @@
+## v0.12.2 (2023-10-22)
+
+### Fix
+
+- reduce the minimum clade size to allow low leaf sister evaluation
+
 ## v0.12.1 (2023-10-22)
 
 ### Fix
