@@ -81,7 +81,7 @@ LOGGER.addHandler(stream_handler)
 BASES = ["A", "C", "T", "G", "U"]
 
 
-DEFAULT_KMER_SIZE = 12
+DEFAULT_KMER_SIZE = getenv("DEFAULT_KMER_SIZE", 12)
 
 
 # ? ----------------------------------------------------------------------------
@@ -89,7 +89,7 @@ DEFAULT_KMER_SIZE = 12
 # ? ----------------------------------------------------------------------------
 
 
-MINIMUM_CLADE_SIZE = 2
+MINIMUM_CLADE_SIZE = getenv("MINIMUM_CLADE_SIZE", 1)
 
 
 # ? ----------------------------------------------------------------------------
