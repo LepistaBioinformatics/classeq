@@ -1,3 +1,9 @@
+## v0.12.1 (2023-10-22)
+
+### Fix
+
+- fix clades id generation that create repeaded uuids for simbling clades
+
 ## v0.12.0 (2023-10-14)
 
 ### Feat
