@@ -1,3 +1,9 @@
+## v0.12.3 (2023-10-29)
+
+### Fix
+
+- decrease the matches-coverage allowed lower value to allow predict over genome sequences
+
 ## v0.12.2 (2023-10-22)
 
 ### Fix
