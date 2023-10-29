@@ -131,10 +131,10 @@ def perform_single_sequence_phylogenetic_adherence_test(
                 logger=LOGGER,
             )()
 
-        if matches_coverage < 0.1 or matches_coverage > 1:
+        if matches_coverage < 0.00001 or matches_coverage > 1:
             return c_exc.UseCaseError(
                 "Unexpected error. The `matches_coverage` argument should be "
-                + f"between 0.1 and 1. Received {matches_coverage}.",
+                + f"between 0.00001 and 1. Received {matches_coverage}.",
                 logger=LOGGER,
             )()
 
