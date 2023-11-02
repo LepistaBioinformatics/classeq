@@ -1,3 +1,9 @@
+## v0.12.4 (2023-11-02)
+
+### Fix
+
+- remove unused kmer-inverse-indices from prediction use-cases
+
 ## v0.12.3 (2023-10-29)
 
 ### Fix
