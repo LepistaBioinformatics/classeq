@@ -1,7 +1,6 @@
 import clean_base.exceptions as c_exc
 from clean_base.either import Either, right
 
-from classeq.core.domain.dtos.kmer_inverse_index import KmersInverseIndices
 from classeq.core.domain.dtos.ordered_tuple import OrderedTuple
 from classeq.core.domain.dtos.priors import (
     CladePriors,
@@ -17,7 +16,6 @@ from ._dtos import AdherenceResult, AdherenceStatus
 def do_clade_adherence_test_for_single_sequence(
     query_kmers: set[str],
     clade_priors: IngroupPriors | OutgroupPriors,
-    kmer_indices: KmersInverseIndices,
 ) -> Either[c_exc.MappedErrors, dict[PriorGroup, AdherenceResult]]:
     """Calculate the probability of a sequence belongs to a clade.
 
@@ -30,7 +28,6 @@ def do_clade_adherence_test_for_single_sequence(
         target_sequence (str): The sequence to be tested.
         clade_priors (IngroupCladePriors | OutgroupCladePriors): The clade
             priors.
-        kmer_indices (KmersInverseIndices): The kmer indices.
         total_length (int): The total length of the sequences.
 
     Returns:
@@ -91,16 +88,12 @@ def do_clade_adherence_test_for_single_sequence(
                 logger=LOGGER,
             )()
 
-        for observed, desired in [
-            (query_kmers, set),
-            (kmer_indices, KmersInverseIndices),
-        ]:
-            if not isinstance(observed, desired):
-                return c_exc.UseCaseError(
-                    f"argument `{observed}` should be a instance of `{desired}`.",
-                    exp=True,
-                    logger=LOGGER,
-                )()
+        if not isinstance(query_kmers, set):
+            return c_exc.UseCaseError(
+                "argument `query_kmers` should be a instance of `set`.",
+                exp=True,
+                logger=LOGGER,
+            )()
 
         # ? --------------------------------------------------------------------
         # ? Calculate joint probability units

@@ -4,7 +4,6 @@ import clean_base.exceptions as c_exc
 from clean_base.either import Either, right
 
 from classeq.core.domain.dtos.clade import ClasseqClade
-from classeq.core.domain.dtos.kmer_inverse_index import KmersInverseIndices
 from classeq.core.domain.dtos.priors import PriorGroup, TreePriors
 from classeq.settings import (
     LOGGER,
@@ -24,7 +23,6 @@ def perform_adherence_test_of_child_clades(
     query_kmers: set[str],
     clades: list[ClasseqClade],
     tree_priors: TreePriors,
-    kmer_indices: KmersInverseIndices,
     minimum_ingroup_query_kmers_match: int = MINIMUM_INGROUP_QUERY_KMERS_MATCH,
     ingroup_sister_match_kmers_difference: int = MINIMUM_INGROUP_SISTER_MATCH_KMERS_DIFFERENCE,
     **_: Any,
@@ -47,7 +45,6 @@ def perform_adherence_test_of_child_clades(
         query_kmers (set[str]): The query kmers.
         clades (list[CladeWrapper]): The clades.
         tree_priors (TreePriors): The tree priors.
-        kmer_indices (KmersInverseIndices): The kmer indices.
         minimum_query_kmers_match (int, optional): The minimum query kmers
             match. Defaults to 10.
         ingroup_sister_match_kmers_difference (int, optional): The ingroup
@@ -109,7 +106,6 @@ def perform_adherence_test_of_child_clades(
                 adherence_test_either := do_clade_adherence_test_for_single_sequence(
                     query_kmers=query_kmers,
                     clade_priors=clade_priors,
-                    kmer_indices=kmer_indices,
                 )
             ).is_left:
                 return adherence_test_either

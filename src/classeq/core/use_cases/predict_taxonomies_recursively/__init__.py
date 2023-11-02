@@ -124,7 +124,6 @@ def predict_for_multiple_fasta_file(
             if (
                 adherence_test_response_either := perform_single_sequence_phylogenetic_adherence_test(
                     target_sequence=str(record.seq),
-                    kmers_indices=reference_set.msa.kmers_indices,
                     kmer_size=reference_set.kmer_size,
                     tree=hierarchical_tree,
                     strand=reference_set.strand,

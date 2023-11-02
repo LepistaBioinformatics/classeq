@@ -31,7 +31,6 @@ from ._dtos import PredictionStep, PredictionResult
 
 def perform_single_sequence_phylogenetic_adherence_test(
     target_sequence: str,
-    kmers_indices: KmersInverseIndices,
     tree_priors: TreePriors,
     kmer_size: int,
     tree: ClasseqClade,
@@ -51,7 +50,6 @@ def perform_single_sequence_phylogenetic_adherence_test(
 
     Args:
         target_sequence (str): The target sequence.
-        kmers_indices (KmersInverseIndices): The kmer indices.
         tree_priors (TreePriors): The tree priors.
         kmer_size (int): The kmer size.
         tree (ClasseqClade): The tree.
@@ -100,13 +98,6 @@ def perform_single_sequence_phylogenetic_adherence_test(
             return c_exc.UseCaseError(
                 "Unexpected error. Retrieved tree using "
                 + "`get_hierarchical_tree` is not a rooted tree.",
-                logger=LOGGER,
-            )()
-
-        if not isinstance(kmers_indices, KmersInverseIndices):
-            return c_exc.UseCaseError(
-                "Unexpected error. The `kmers_indices` argument should be a "
-                + f"KmersInverseIndices. Received {type(kmers_indices)}.",
                 logger=LOGGER,
             )()
 
@@ -171,7 +162,6 @@ def perform_single_sequence_phylogenetic_adherence_test(
                 binding_either := do_clade_adherence_test_for_single_sequence(
                     query_kmers=query_kmers,
                     clade_priors=outgroup_priors,
-                    kmer_indices=kmers_indices,
                 )
             ).is_left:
                 return binding_either
@@ -237,7 +227,6 @@ def perform_single_sequence_phylogenetic_adherence_test(
                     query_kmers=query_kmers,
                     clades=children,
                     tree_priors=tree_priors,
-                    kmer_indices=kmers_indices,
                     **kwargs,
                 )
             ).is_left:
