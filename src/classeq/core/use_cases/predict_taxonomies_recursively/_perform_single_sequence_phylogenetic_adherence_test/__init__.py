@@ -252,8 +252,8 @@ def perform_single_sequence_phylogenetic_adherence_test(
                 )
 
             # ------------------------------------------------------------------
-            # Break the search if the adherence test is inconclusive due to
-            # absence of priors to perform comparisons.
+            # Break the search if the adherence test is conclusive for ingroups
+            # or reaches the maximum resolution.
             # ------------------------------------------------------------------
             if status in [
                 CladeAdherenceResultStatus.MAX_RESOLUTION_REACHED,

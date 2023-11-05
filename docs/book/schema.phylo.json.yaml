@@ -29,8 +29,8 @@ definitions:
         description: |
           A unique identifier for the clade. It is a uuid of version 3 and
           namespace 99999999-9999-9999-9999-999999999999. The uuid is generated
-          from the name of the clade concatenated with the name of all terminal
-          names of the children clades.
+          from the name of the clade concatenated with the all terminal names of
+          the children clades.
       name:
         $ref: "#/definitions/nullString"
       confidence:
