@@ -1,0 +1,36 @@
+---
+$schema: http://json-schema.org/draft-04/schema#
+type: object  # Priors artifact
+properties:
+  ingroup:
+    type: array
+    items:
+      $ref: "#/definitions/nodePrior"
+required: [ingroup]
+definitions:
+  nodePrior:
+    type: object
+    properties:
+      parent:
+        type: string
+        format: uuid
+      clade_priors:
+        type: array
+        items:
+          $ref: "#/definitions/prior"
+    required: [parent, clade_priors]
+  prior:
+    type: object
+    properties:
+      group:
+        type: string
+        enum: [INGROUP, SISTER]
+      kmers:
+        type: array
+        items:
+          type: string
+      labels:
+        type: array
+        items:
+          type: integer
+    required: [group, kmers, labels]
