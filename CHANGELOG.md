@@ -1,3 +1,13 @@
+## v0.13.1 (2023-12-10)
+
+### Fix
+
+- replace name selection from models to use the model id instead
+
+### Refactor
+
+- move manuscript figures to a dedicated directory
+
 ## v0.13.0 (2023-12-10)
 
 ### Feat
