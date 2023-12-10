@@ -11,6 +11,12 @@ pyqt5 = "*"
 maturin = "*"
 ete3 = "*"
 pyside6 = "*"
+pyyaml = "*"
+unidecode = "*"
+fastapi = "*"
+starlette = "*"
+uvicorn = "*"
+pydantic = "*"
 
 [dev-packages]
 black = "*"

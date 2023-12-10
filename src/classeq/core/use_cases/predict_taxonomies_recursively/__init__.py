@@ -17,6 +17,7 @@ from classeq.core.domain.dtos.clade import ClasseqClade
 from classeq.core.domain.dtos.msa_source_format import MsaSourceFormatEnum
 from classeq.core.domain.dtos.priors import OutgroupPriors, TreePriors
 from classeq.core.domain.dtos.reference_set import ReferenceSet
+from classeq.core.use_cases.shared import resolve_path_name
 from classeq.settings import LOGGER
 
 from ._get_outgroup_priors import get_outgroup_priors
@@ -24,7 +25,6 @@ from ._perform_single_sequence_phylogenetic_adherence_test import (
     perform_single_sequence_phylogenetic_adherence_test,
 )
 from ._perform_single_sequence_phylogenetic_adherence_test._dtos import (
-    PredictionStep,
     PredictionResult,
 )
 
@@ -138,7 +138,7 @@ def predict_for_multiple_fasta_file(
                 adherence_test_response_either.value
             )
 
-            resolved_path_names = __resolve_path_name(
+            resolved_path_names = resolve_path_name(
                 resolved_names=resolved_names,
                 adherence_test_path=prediction_result.path,
             )
@@ -191,25 +191,6 @@ def predict_for_multiple_fasta_file(
 
     except Exception as exc:
         return c_exc.UseCaseError(exc, logger=LOGGER)()
-
-
-def __resolve_path_name(
-    resolved_names: dict[UUID, ExtendedBioPythonClade],
-    adherence_test_path: list[PredictionStep],
-) -> list[PredictionStep]:
-    renamed_clades = []
-
-    for clade_result in adherence_test_path:
-        clade = clade_result.result.clade
-        if (resolved_name := resolved_names.get(clade.id)) is not None:
-            clade.name = resolved_name.name
-            clade.taxid = resolved_name._taxid
-
-            if resolved_name._related_rank is not None:
-                clade.related_rank = resolved_name._related_rank.name
-
-        renamed_clades.append(clade_result)
-    return renamed_clades
 
 
 def __write_csv(

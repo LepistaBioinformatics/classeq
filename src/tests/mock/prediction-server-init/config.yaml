@@ -1,0 +1,8 @@
+contexts:
+  - name: test
+    indices: CLASSEQ_ARTIFACT
+    annotations: ANNOTATION_ARTIFACT
+    metadata:
+      created: "2023-12-08"
+      updated: "2023-12-10"
+      description: "This is a test prediction context"

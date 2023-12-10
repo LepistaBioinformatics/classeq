@@ -9,7 +9,7 @@ from classeq.core.domain.dtos.clade import ClasseqClade
 from .._do_clade_adherence_test_for_single_sequence._dtos import AdherenceResult
 
 
-class CladeAdherenceResultStatus(Enum):
+class CladeAdherenceResultStatus(str, Enum):
     """The status of the clade adherence test."""
 
     INCONCLUSIVE = "inconclusive"
