@@ -78,21 +78,23 @@ def build_prediction_context(
         # ? --------------------------------------------------------------------
 
         def predict_into_context(
-            model_name: str,
+            model_id: str,
             seq: SeqRecord,
             **kwargs: Any,
         ) -> PredictionResult:
             named_context: Context | None
             if (
-                named_context := context.get_context_by_name(name=model_name)
+                named_context := context.get_context_by_name(
+                    identifier=model_id
+                )
             ) is None:
                 raise UnexistingContext(
-                    f"Context {model_name} does not exist.",
+                    f"Context {model_id} does not exist.",
                 )
 
             if named_context.prediction_priors is None:
                 raise FailLoadingContext(
-                    f"Context {model_name} loaded but does not have prediction priors.",
+                    f"Context {model_id} loaded but does not have prediction priors.",
                 )
 
             reference_set: ReferenceSet

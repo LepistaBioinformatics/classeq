@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 from os import getenv
 from pathlib import Path
 from typing import Any, Callable
+from uuid import UUID
 
 from Bio.SeqRecord import SeqRecord
 from fastapi import Depends, FastAPI, HTTPException, Response, status
@@ -122,7 +123,7 @@ class PredictionResultResponse(BaseModel):
 
 
 class PredictionResponse(BaseModel):
-    model: str
+    model: UUID
     query: str
     prediction: PredictionResultResponse
 
@@ -143,7 +144,8 @@ async def get_models(res: Response) -> Any:
     return {
         "models": [
             {
-                "name": model,
+                "id": model,
+                "name": value.name,
                 "metadata": value.metadata,
             }
             for model, value in __PREDICTION_CONTEXT[0].contexts.items()
@@ -151,15 +153,15 @@ async def get_models(res: Response) -> Any:
     }
 
 
-@app.post("/predict/{model_name}")
+@app.post("/predict/{id}")
 async def predict(
-    model_name: str,
+    id: UUID,
     query: Query,
     predictor: Callable[..., PredictionResult] = Depends(__get_predictor),
 ) -> PredictionResponse:
     try:
         prediction: PredictionResult = predictor(
-            model_name=model_name,
+            model_id=id,
             seq=SeqRecord(
                 id=query.header,
                 seq=query.sequence,
@@ -192,7 +194,7 @@ async def predict(
         )
 
     return PredictionResponse(
-        model=model_name,
+        model=id,
         query=query.header,
         prediction=prediction.to_dict(omit_children=True),
     )

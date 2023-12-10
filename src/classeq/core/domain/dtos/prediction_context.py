@@ -5,12 +5,11 @@ from io import BytesIO
 from json import load, loads
 from pathlib import Path, PosixPath
 from typing import Any, Self
-from uuid import UUID
+from uuid import UUID, uuid3, uuid4
 
 import clean_base.exceptions as c_exc
 from attrs import define, field
 from clean_base.either import Either, right
-from clean_base.validations import slugify_string
 from yaml import safe_load
 
 from classeq.core.domain.dtos.biopython_wrappers import (
@@ -36,6 +35,7 @@ class Context:
 
     prediction_priors: tuple[ReferenceSetTest, TreePriors] = field(init=False)
     resolved_names: dict[UUID, ExtendedBioPythonClade] = field(init=False)
+    id: UUID = field(init=False, factory=uuid4)
 
     def __attrs_post_init__(self) -> None:
         # ? --------------------------------------------------------------------
@@ -78,6 +78,7 @@ class Context:
             raise ValueError(prediction_priors.value.msg)
 
         self.prediction_priors = prediction_priors.value
+        self.id = uuid3(UUID(int=0), self.name)
 
         LOGGER.info(
             f"Loaded context `{self.name}` with `{len(self.resolved_names)}` annotated nodes"
@@ -154,16 +155,16 @@ class Context:
 @define(kw_only=True)
 class PredictionContext:
     last_reload: datetime = field(default=datetime.now())
-    contexts: dict[str, Context] = field(default={})
+    contexts: dict[UUID, Context] = field(default={})
 
     def update_last_reload(self) -> None:
         self.last_reload = datetime.now()
 
     def get_context_by_name(
         self,
-        name: str,
+        identifier: UUID,
     ) -> Either[c_exc.UseCaseError, Context | None]:
-        return self.contexts.get(name)
+        return self.contexts.get(identifier)
 
     @classmethod
     def load_from_yaml(cls, path: Path) -> Either[c_exc.UseCaseError, Self]:
@@ -213,7 +214,7 @@ class PredictionContext:
                     logger=LOGGER,
                 )()
 
-            output_contexts: dict[str, Context] = dict()
+            output_contexts: dict[UUID, Context] = dict()
             for context in contexts:
                 if (name := context.get("name")) is None:
                     return c_exc.UseCaseError(
@@ -258,16 +259,14 @@ class PredictionContext:
                             logger=LOGGER,
                         )()
 
-                output_contexts.update(
-                    {
-                        slugify_string(name): Context(
-                            name=name,
-                            indices=Path(indices),
-                            annotations=Path(annotations),
-                            metadata=metadata,
-                        )
-                    }
+                new_context = Context(
+                    name=name,
+                    indices=Path(indices),
+                    annotations=Path(annotations),
+                    metadata=metadata,
                 )
+
+                output_contexts.update({new_context.id: new_context})
 
             instance = cls(contexts=output_contexts)
             instance.update_last_reload()
