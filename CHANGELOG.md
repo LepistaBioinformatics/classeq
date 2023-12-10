@@ -1,3 +1,9 @@
+## v0.13.0 (2023-12-10)
+
+### Feat
+
+- implements a simple server to predict sequences from the web
+
 ## v0.12.4 (2023-11-02)
 
 ### Fix
