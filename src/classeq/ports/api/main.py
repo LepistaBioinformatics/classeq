@@ -5,7 +5,7 @@ from typing import Any, Callable
 from uuid import UUID
 
 from Bio.SeqRecord import SeqRecord
-from fastapi import Depends, FastAPI, HTTPException, Response, status
+from fastapi import Depends, FastAPI, HTTPException, status
 from pydantic import BaseModel
 from starlette.middleware.cors import CORSMiddleware
 
@@ -102,6 +102,12 @@ async def __get_predictor() -> Callable[..., PredictionResult]:
 # ? ----------------------------------------------------------------------------
 
 
+class ModelResponse(BaseModel):
+    id: UUID
+    name: str
+    metadata: dict[str, Any]
+
+
 class Query(BaseModel):
     header: str
     sequence: str
@@ -134,23 +140,23 @@ class PredictionResponse(BaseModel):
 
 
 @app.get("/models/")
-async def get_models(res: Response) -> Any:
+async def get_models() -> list[ModelResponse]:
     if __PREDICTION_CONTEXT is None:
         raise HTTPException(
             detail="No models loaded",
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 
-    return {
-        "models": [
-            {
+    return [
+        ModelResponse(
+            **{
                 "id": model,
                 "name": value.name,
                 "metadata": value.metadata,
             }
-            for model, value in __PREDICTION_CONTEXT[0].contexts.items()
-        ]
-    }
+        )
+        for model, value in __PREDICTION_CONTEXT[0].contexts.items()
+    ]
 
 
 @app.post("/predict/{id}")
