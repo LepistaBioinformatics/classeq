@@ -1,3 +1,9 @@
+## v0.13.2 (2023-12-28)
+
+### Fix
+
+- include the response type for the models endpoint
+
 ## v0.13.1 (2023-12-10)
 
 ### Fix
