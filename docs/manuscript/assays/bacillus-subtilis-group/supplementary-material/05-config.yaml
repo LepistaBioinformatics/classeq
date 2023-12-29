@@ -1,9 +1,8 @@
 contexts:
-  - name: bacillus-subtilis-group
+  - name: bacillus-subtilis-group-with-gyrb-gene
     indices: docs/manuscript/assays/bacillus-subtilis-group/supplementary-material/04-classeq.tar
     annotations: docs/manuscript/assays/bacillus-subtilis-group/supplementary-material/03-bsub-annotated.sanitized.cutoff80.phylo.json
     metadata:
       created: "2023-12-10"
-      updated: "2023-12-10"
       description: |
-        These indices contains Bacillus subtilis group models.
+        These indices contains Bacillus subtilis group model for gyrB gene.
