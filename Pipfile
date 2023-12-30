@@ -24,6 +24,7 @@ mypy = "*"
 pre-commit = "*"
 pandas = "*"
 classeq = {editable = true, path = "."}
+aiohttp = "*"
 
 [requires]
 python_version = "3.11"

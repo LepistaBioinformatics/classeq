@@ -139,7 +139,7 @@ class PredictionResponse(BaseModel):
 # ? ----------------------------------------------------------------------------
 
 
-@app.get("/models/")
+@app.get("/api/models/")
 async def get_models() -> list[ModelResponse]:
     if __PREDICTION_CONTEXT is None:
         raise HTTPException(
@@ -159,7 +159,7 @@ async def get_models() -> list[ModelResponse]:
     ]
 
 
-@app.post("/predict/{id}")
+@app.post("/api/predict/{id}")
 async def predict(
     id: UUID,
     query: Query,
