@@ -143,13 +143,34 @@ class ClasseqTree:
     def parse_and_reroot_newick_tree(
         newick_file_path: Path,
         format: TreeSourceFormatEnum,
+        rescale_to_100: bool = False,
     ) -> Either[c_exc.MappedErrors, Tree]:
+        """Parse a newick tree file and return a BioPython Tree object.
+
+        Args:
+            newick_file_path (Path): The path to the newick file.
+            format (TreeSourceFormatEnum): The format of the newick file.
+            rescale_to_100 (bool, optional): Rescale the branch support values
+                to 100. Defaults to False.
+
+        Returns:
+            Either[c_exc.MappedErrors, Tree]: A BioPython Tree object.
+        """
+
         try:
             tmp_tree_path = NamedTemporaryFile(mode="w+", suffix=".newick")
 
             with newick_file_path.open("r") as newick_file:
                 tmp_tree = ETree(newick_file.read(), format=0)
                 tmp_tree.set_outgroup(tmp_tree.get_midpoint_outgroup())
+
+                if rescale_to_100:
+                    tmp_tree_copy = tmp_tree.copy()
+                    for node in tmp_tree_copy.traverse():
+                        if node.support:
+                            node._set_support(round(node.support * 100))
+
+                    tmp_tree = tmp_tree_copy
                 tmp_tree.write(outfile=tmp_tree_path.name, format=0)
 
             raw_tree: Tree = Phylo.read(tmp_tree_path, format.value)

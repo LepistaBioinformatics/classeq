@@ -17,6 +17,7 @@ def load_and_sanitize_phylogeny(
     format: TreeSourceFormatEnum,
     output_directory: Path,
     support_value_cutoff: int = 99,
+    rescale_to_100: bool = False,
 ) -> Either[c_exc.MappedErrors, ClasseqTree]:
     """Load phylogenetic tree into memory.
 
@@ -54,8 +55,9 @@ def load_and_sanitize_phylogeny(
 
         if (
             rooted_tree_either := ClasseqTree.parse_and_reroot_newick_tree(
-                source_file_path,
-                format,
+                newick_file_path=source_file_path,
+                format=format,
+                rescale_to_100=rescale_to_100,
             )
         ).is_left:
             return c_exc.UseCaseError(

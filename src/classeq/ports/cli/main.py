@@ -61,6 +61,15 @@ def utils_cmd() -> None:
 # ? ----------------------------------------------------------------------------
 
 
+def __extend_options(options: list[Any]) -> Any:
+    def _extend_options(func: Any) -> Any:
+        for option in reversed(options):
+            func = option(func)
+        return func
+
+    return _extend_options
+
+
 __STRAND_OPTION = click.option(
     "-s",
     "--strand",
@@ -83,18 +92,32 @@ __KMER_SIZE_OPTION = click.option(
 )
 
 
-__SUPPORT_VALUE_CUTOFF = click.option(
-    "-s",
-    "--support-value-cutoff",
-    required=False,
-    type=click.INT,
-    default=95,
-    show_default=True,
-    help=(
-        "The support value cutoff used to filter the phylogeny. The default "
-        + "value is 95."
+__SUPPORT_VALUE_OPTOINS = [
+    click.option(
+        "-s",
+        "--support-value-cutoff",
+        required=False,
+        type=click.INT,
+        default=95,
+        show_default=True,
+        help=(
+            "The support value cutoff used to filter the phylogeny. The default "
+            + "value is 95."
+        ),
     ),
-)
+    click.option(
+        "-r",
+        "--rescale-to-100",
+        required=False,
+        is_flag=True,
+        default=False,
+        show_default=True,
+        help=(
+            "Rescale the branch support to 100. This is useful when the tree "
+            + "support values are in the range of 0-1."
+        ),
+    ),
+]
 
 
 __TREE_FILE_PATH = click.option(
@@ -143,13 +166,14 @@ __TREE_FILE_PATH = click.option(
     ),
     help="The path to the TREE file.",
 )
-@__SUPPORT_VALUE_CUTOFF
+@__extend_options(__SUPPORT_VALUE_OPTOINS)
 @__KMER_SIZE_OPTION
 @__STRAND_OPTION
 def parse_source_files_cmd(
     fasta_file_path: str,
     tree_file_path: str,
     support_value_cutoff: int,
+    rescale_to_100: bool,
     kmer_size: int,
     output_directory: str | None = None,
     strand: str | None = None,
@@ -172,6 +196,7 @@ def parse_source_files_cmd(
                     else None
                 ),
                 support_value_cutoff=support_value_cutoff,
+                rescale_to_100=rescale_to_100,
                 k_size=kmer_size,
                 strand=(
                     StrandEnum(None) if strand is None else StrandEnum(strand)
@@ -476,7 +501,7 @@ def get_sequence_kmers_cmd(
     help="Reroot tree at midpoint and remove low supported branches.",
 )
 @__TREE_FILE_PATH
-@__SUPPORT_VALUE_CUTOFF
+@__extend_options(__SUPPORT_VALUE_OPTOINS)
 @click.option(
     "-o",
     "--output-file",
@@ -492,6 +517,7 @@ def sanitize_tree_cmd(
     tree_file_path: str,
     support_value_cutoff: int,
     output_file: str,
+    rescale_to_100: bool,
 ) -> None:
     from Bio.Phylo.BaseTree import Tree
     from Bio import Phylo
@@ -505,6 +531,7 @@ def sanitize_tree_cmd(
         rooted_tree_either := ClasseqTree.parse_and_reroot_newick_tree(
             Path(tree_file_path),
             TreeSourceFormatEnum.NEWICK,
+            rescale_to_100=rescale_to_100,
         )
     ).is_left:
         raise Exception(rooted_tree_either.value)

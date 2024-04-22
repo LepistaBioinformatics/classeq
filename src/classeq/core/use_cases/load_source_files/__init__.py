@@ -32,6 +32,7 @@ def load_source_files(
     strand: StrandEnum,
     output_directory: Path | None = None,
     support_value_cutoff: int = 99,
+    rescale_to_100: bool = False,
 ) -> Either[c_exc.MappedErrors, tuple[Path, ReferenceSet]]:
     try:
         train_output_dir = (
@@ -82,6 +83,7 @@ def load_source_files(
                 format=tree_format,
                 support_value_cutoff=support_value_cutoff,
                 output_directory=train_output_dir,
+                rescale_to_100=rescale_to_100,
             )
         ).is_left:
             return tree_either
