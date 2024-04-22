@@ -14,7 +14,7 @@ pyside6 = "*"
 pyyaml = "*"
 unidecode = "*"
 fastapi = "*"
-starlette = "*"
+starlette = ">=0.36.2"
 uvicorn = "*"
 pydantic = "*"
 
