@@ -17,7 +17,7 @@ from classeq.core.domain.dtos.clade import ClasseqClade
 from classeq.core.domain.dtos.msa_source_format import MsaSourceFormatEnum
 from classeq.core.domain.dtos.priors import OutgroupPriors, TreePriors
 from classeq.core.domain.dtos.reference_set import ReferenceSet
-from classeq.core.use_cases.shared import resolve_path_name
+from classeq.core.use_cases.shared.resolve_path_name import resolve_path_name
 from classeq.settings import LOGGER
 
 from ._get_outgroup_priors import get_outgroup_priors
