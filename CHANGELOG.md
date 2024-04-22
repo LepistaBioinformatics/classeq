@@ -1,3 +1,9 @@
+## v0.13.4 (2024-04-22)
+
+### Fix
+
+- upgrade starlette to avoid python-multipart vulnerable content-type header redos
+
 ## v0.13.3 (2024-04-22)
 
 ### Fix
