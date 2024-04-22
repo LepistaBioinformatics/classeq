@@ -1,3 +1,10 @@
+## v0.13.3 (2024-04-22)
+
+### Fix
+
+- replace module import of resolve_path_name to function name instead
+- turn on the possibility to process trees with 0 to 1 range support values
+
 ## v0.13.2 (2023-12-28)
 
 ### Fix
