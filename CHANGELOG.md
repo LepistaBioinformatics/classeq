@@ -1,3 +1,9 @@
+## v0.14.0 (2024-05-08)
+
+### Feat
+
+- implements a use-case to convert the classeq results to a newick tree
+
 ## v0.13.4 (2024-04-22)
 
 ### Fix
