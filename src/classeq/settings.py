@@ -132,3 +132,20 @@ REFERENCE_SET_OUTPUT_FILE_NAME = "reference-set.json.gz"
 
 
 TRAIN_SOURCE_OUTPUT_FILE_NAME = "train-source.json.gz"
+
+
+# ? ----------------------------------------------------------------------------
+# ? Output related params
+# ? ----------------------------------------------------------------------------
+
+
+OUTPUT_DICT_KEY = "output"
+
+
+PREDICTION_DICT_KEY = "path"
+
+
+STATUS_DICT_KEY = "status"
+
+
+QUERY_DICT_KEY = "query"

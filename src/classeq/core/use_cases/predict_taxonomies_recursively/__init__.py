@@ -18,7 +18,7 @@ from classeq.core.domain.dtos.msa_source_format import MsaSourceFormatEnum
 from classeq.core.domain.dtos.priors import OutgroupPriors, TreePriors
 from classeq.core.domain.dtos.reference_set import ReferenceSet
 from classeq.core.use_cases.shared.resolve_path_name import resolve_path_name
-from classeq.settings import LOGGER
+from classeq.settings import LOGGER, OUTPUT_DICT_KEY, QUERY_DICT_KEY
 
 from ._get_outgroup_priors import get_outgroup_priors
 from ._perform_single_sequence_phylogenetic_adherence_test import (
@@ -282,8 +282,8 @@ def __write_json(
                     if annotated_phylojson_path
                     else None
                 ),
-                "output": [
-                    {"query": k, **v.to_dict(omit_children=True)}
+                OUTPUT_DICT_KEY: [
+                    {QUERY_DICT_KEY: k, **v.to_dict(omit_children=True)}
                     for k, v in response.items()
                 ],
             },

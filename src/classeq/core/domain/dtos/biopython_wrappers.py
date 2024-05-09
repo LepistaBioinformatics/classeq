@@ -117,9 +117,9 @@ class ExtendedBioPythonClade(ExtendedBioPythonElement, Clade):
 
     _id: UUID
     _taxid: int | None = None
-    _related_rank: MajorTaxonomicRanks | MinorTaxonomicRanks | ExtraTaxonomicRanks | None = (
-        None
-    )
+    _related_rank: (
+        MajorTaxonomicRanks | MinorTaxonomicRanks | ExtraTaxonomicRanks | None
+    ) = None
 
     # ? ------------------------------------------------------------------------
     # ? Life cycle hook methods
@@ -129,10 +129,12 @@ class ExtendedBioPythonClade(ExtendedBioPythonElement, Clade):
         self,
         id: UUID | None = None,
         taxid: int | None = None,
-        related_rank: MajorTaxonomicRanks
-        | MinorTaxonomicRanks
-        | ExtraTaxonomicRanks
-        | None = None,
+        related_rank: (
+            MajorTaxonomicRanks
+            | MinorTaxonomicRanks
+            | ExtraTaxonomicRanks
+            | None
+        ) = None,
         *args: Any,
         **kwargs: Any,
     ) -> None:
@@ -293,13 +295,39 @@ class ExtendedBioPythonTree(Tree):
     def set_clade_rank(
         self,
         id: UUID,
-        rank: MajorTaxonomicRanks
-        | MinorTaxonomicRanks
-        | ExtraTaxonomicRanks
-        | None = None,
+        rank: (
+            MajorTaxonomicRanks
+            | MinorTaxonomicRanks
+            | ExtraTaxonomicRanks
+            | None
+        ) = None,
     ) -> None:
         for clade in [clade for clade in self.find_clades() if clade._id == id]:
             setattr(clade, "_related_rank", rank)
+
+    def set_clade_sibling(
+        self,
+        id: UUID,
+        child: ExtendedBioPythonClade,
+    ) -> None:
+        target_clades = [
+            clade
+            for clade in [
+                clade for clade in self.find_clades() if clade._id == id
+            ]
+        ]
+
+        if target_clades.__len__() == 0:
+            raise ValueError(f"There is no clade with the given ID: {id}")
+
+        if target_clades.__len__() > 1:
+            raise ValueError(
+                f"There are more than one clades with the same ID: {id}"
+            )
+
+        for clade in [clade for clade in self.find_clades() if clade._id == id]:
+            clade.clades.append(child)
+            setattr(clade, "clades", clade.clades)
 
     def find_clade_by_id(
         self,

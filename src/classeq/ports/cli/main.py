@@ -15,6 +15,7 @@ from classeq.core.domain.dtos.priors import TreePriors
 from classeq.core.domain.dtos.reference_set import ReferenceSet
 from classeq.core.domain.dtos.strand import StrandEnum
 from classeq.core.domain.dtos.tree_source_format import TreeSourceFormatEnum
+from classeq.core.use_cases.format_output_as_tree import format_output_as_tree
 from classeq.core.use_cases.indexing_phylogeny import indexing_phylogeny
 from classeq.core.use_cases.load_source_files import load_source_files
 from classeq.core.use_cases.predict_taxonomies_recursively import (
@@ -557,3 +558,64 @@ def sanitize_tree_cmd(
         Path(output_file),
         format=TreeSourceFormatEnum.NEWICK.value,
     )
+
+
+@utils_cmd.command(
+    "result-as-tree",
+    help="Format the result as a TREE file.",
+)
+@click.option(
+    "-p",
+    "--phylojson-path",
+    required=True,
+    type=click.Path(
+        resolve_path=True,
+        readable=True,
+        exists=True,
+        dir_okay=True,
+    ),
+    help="The path to the PHYLO-JSON file.",
+)
+@click.option(
+    "-r",
+    "--results-path",
+    required=True,
+    type=click.Path(
+        resolve_path=True,
+        readable=True,
+        exists=True,
+        dir_okay=True,
+    ),
+    help="The path to the results file.",
+)
+@click.option(
+    "-o",
+    "--output-path",
+    required=False,
+    type=click.Path(
+        resolve_path=True,
+        readable=True,
+        exists=False,
+        dir_okay=True,
+    ),
+    help="The path to the output file.",
+)
+def format_output_as_tree_cmd(
+    phylojson_path: str,
+    results_path: str,
+    output_path: str | None = None,
+) -> None:
+    if phylojson_path is None:
+        raise Exception("The phylojson file path is not provided")
+
+    if results_path is None:
+        raise Exception("The results file path is not provided")
+
+    if (
+        result := format_output_as_tree(
+            phylojson_path=Path(phylojson_path),
+            results_path=Path(results_path),
+            output_path=Path(output_path) if output_path is not None else None,
+        )
+    ).is_left:
+        raise Exception(result.value.msg)
